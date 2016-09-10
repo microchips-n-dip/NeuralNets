@@ -5,12 +5,12 @@
 
 using namespace std;
 
-class Neuron;
-class Synapse;
-class Network;
+//class Neuron;
+//class Synapse;
+//class Network;
 
-class NeuronUpdateRule;
-class DecayRule;
+//class NeuronUpdateRule;
+//class DecayRule;
 
 //#include "NN_NeuronUpdateRule.hpp"
 //#include "NN_SDR.hpp"

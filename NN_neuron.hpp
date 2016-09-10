@@ -1,4 +1,5 @@
 #include "NN_NeuronUpdateRule.hpp"
+#include "NN_synapse.hpp"
 
 class Neuron {
     private:
