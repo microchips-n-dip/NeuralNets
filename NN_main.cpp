@@ -12,7 +12,7 @@ class Network;
 class NeuronUpdateRule;
 class DecayRule;
 
-#include "NN_NeuronUpdateRule.hpp"
+//#include "NN_NeuronUpdateRule.hpp"
 //#include "NN_SDR.hpp"
 #include "NN_neuron.hpp"
 #include "NN_DecayRule.hpp"

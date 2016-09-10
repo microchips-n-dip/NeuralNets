@@ -1,3 +1,5 @@
+#include "NN_NeuronUpdateRule.hpp"
+
 class Neuron {
     private:
     double nv = 0.0; // Value of neuron
