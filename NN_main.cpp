@@ -3,34 +3,32 @@
 #include <math.h>
 #include "Math.hpp"
 
-using namespace std;
+// using namespace std;
 
-class Neuron;
-class Synapse;
-class Network;
-
-class NeuronUpdateRule;
-class DecayRule;
+// class Neuron;
+// class Synapse;
+// class Network;
+// 
+// class NeuronUpdateRule;
+// class DecayRule;
 
 #include "NN_NeuronUpdateRule.hpp"
 //#include "NN_SDR.hpp"
 #include "NN_neuron.hpp"
-#include "NN_DecayRule.hpp"
+// #include "NN_Rule.hpp"
 #include "NN_synapse.hpp"
 #include "NN_network.hpp"
 
 int main(void)
 {
-    DecayRule generalRule;
-
     Network network;
-    Neuron neuron1, neuron2, neuron3;
+    
+    /* There will be a cascade of destructor calls when this is freed,
+     * which will free the objects allocated by each call to new
+     */
+    network.addNeuron(new NeuronDecay());
+    network.addNeuron(new NeuronEmpty());
+    network.addNeuron(new NeuronEmpty());
 
-    neuron1.setUpdateRule(&generalRule);
-
-    network.addNeuron(neuron1);
-    network.addNeuron(neuron2);
-    network.addNeuron(neuron3);
-
-    network.printPointers();
+//     network.printPointers();
 }
