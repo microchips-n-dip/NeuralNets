@@ -8,11 +8,14 @@
 // class Neuron;
 // class Synapse;
 // class Network;
+//class Neuron;
+//class Synapse;
+//class Network;
 // 
 // class NeuronUpdateRule;
 // class DecayRule;
 
-#include "NN_NeuronUpdateRule.hpp"
+//#include "NN_NeuronUpdateRule.hpp"
 //#include "NN_SDR.hpp"
 #include "NN_neuron.hpp"
 // #include "NN_Rule.hpp"
