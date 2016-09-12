@@ -1,6 +1,6 @@
 #include <vector>
 
-#include "NN_synapse.hpp"
+//#include "NN_synapse.hpp"
 
 
 class Network
