@@ -7,6 +7,7 @@ void MemoryUpdate(Network& network, Neuron *NeuronTarget)
 {
     for(unsigned int i = 0; i < network.getSynapseCount(); i++)
     if(network.getSynapse(i).getTarget() == NeuronTarget) {
+	network.getSynapse(i).getTarget().update();
 	network.getSynapse(i).setW();
     }
 }
