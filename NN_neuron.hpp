@@ -8,7 +8,8 @@ class Neuron
   protected:
     double nv = 0.0; // Value of neuron
     double nvt = 0.0; // Temporary value storage
-    
+    string name = ("");
+
   public:
     
     Neuron()
@@ -43,10 +44,11 @@ class NeuronDecay: public Neuron
     
   public:
     NeuronDecay(){};
-    NeuronDecay(double d, double b)
+    NeuronDecay(double d, double b, string newname)
     {
         decay = d;
         baseline = b;
+	name = newname;
     }
     ~NeuronDecay(){}
     
