@@ -13,18 +13,8 @@ class Synapse
 	TargetNeuron = target;
     }
 
-    void transmit()
-    {
-        TargetNeuron->forceAddNeuronTemp(w * SourceNeuron->getNeuronValue());
-    }
-    
-    void setW(double new_W)
-    {
-        w = new_W;
-    }
-    
-    double getW()
-    {
-        return w;
-    }
+    void transmit() {TargetNeuron->forceAddNeuronTemp(w * SourceNeuron->getNeuronValue());}
+    void setW(double new_W) {w = new_W;}
+    double getW() {return w;}
+    Neuron* getTarget() {return TargetNeuron;}
 };
