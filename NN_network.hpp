@@ -1,6 +1,6 @@
 #include <vector>
 
-#include "NN_synapse.hpp"
+//#include "NN_synapse.hpp"
 
 
 class Network
@@ -45,6 +45,12 @@ class Network
         neur.push_back(neuron);
         
     }
+
+    void addSynapse(Synapse *synapse)
+    {
+	syn.push_back(synapse);
+    }
+
     
     // Request a pointer to a particular Neuron or Synapse
     Neuron* getNeuron(size_t &id){return neur.at(id);}
