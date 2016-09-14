@@ -1,4 +1,6 @@
 // Includes
+#include <cmath>
+
 
 /*********************************************************************/
 /*************************** Neuron base class ***********************/
@@ -8,7 +10,6 @@ class Neuron
   protected:
     double nv = 0.0; // Value of neuron
     double nvt = 0.0; // Temporary value storage
-    string name = ("");
 
   public:
     
@@ -44,11 +45,10 @@ class NeuronDecay: public Neuron
     
   public:
     NeuronDecay(){};
-    NeuronDecay(double d, double b, string newname)
+    NeuronDecay(double d, double b)
     {
         decay = d;
-        baseline = b;
-	name = newname;
+        baseline = d;
     }
     ~NeuronDecay(){}
     

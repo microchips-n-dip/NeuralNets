@@ -7,7 +7,7 @@ class Synapse
     Neuron *TargetNeuron;
 
     public:
-    Synapse(Neuron source, Neuron target, double w = 0)
+    Synapse(Neuron *source, Neuron *target, double w = 0)
     {
 	SourceNeuron = source;
 	TargetNeuron = target;

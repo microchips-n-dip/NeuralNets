@@ -7,3 +7,6 @@ NN.o:
 clean:
 	rm *.o
 	rm *.exe
+
+gpull:
+	git pull https://github.com/microchips-n-dip/NeuralNets
