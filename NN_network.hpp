@@ -87,6 +87,17 @@ class Network
         syn.pop_back();        // Erase it (will call its destructor and free memory)
         
     }
+
+    void propagate()
+    {
+	for(unsigned int i = 0; i < syn.size(); i++) {
+	    syn.at(i)->transmit();
+	}
+
+	for(unsigned int i = 0; i < neur.size(); i++) {
+	    neur.at(i)->update();
+	}
+    }
     
     void printPointers()
     {

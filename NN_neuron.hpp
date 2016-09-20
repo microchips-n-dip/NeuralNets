@@ -72,6 +72,17 @@ class NeuronDecay: public Neuron
     void setBaseline(double b){baseline = b;}
 };
 
+class NeuronClamped: public Neuron
+{
+  public:
+    NeuronClamped(double v)
+    {
+	nv = v;
+    }
+
+    void update() {;}
+};
+
 
 /*********************************************************************/
 // Class to use a placeholder while I fixed things

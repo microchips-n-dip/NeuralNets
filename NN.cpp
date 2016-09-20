@@ -12,9 +12,28 @@
     }
 }*/
 
+void rewardSystem(Network& network)
+{
+//    NeuronClamped stimulus(1.0);
+    NeuronDecay compulsor(0.1, 0.0);
+    NeuronDecay Time(0.01, 1.0);
+
+//    Synapse StimulusCompulsor(&stimulus, &compulsor, 1.0);
+    Synapse TimeCompulsor(&Time, &compulsor, 1.0);
+
+//    network.addNeuron(&stimulus);
+    network.addNeuron(&Time);
+    network.addNeuron(&compulsor);
+
+//    network.addSynapse(&StimulusCompulsor);
+    network.addSynapse(&TimeCompulsor);
+}
+
 int main(void)
 {
     Network network;
 
-    
+    rewardSystem(network);
+    network.propagate();
+    network.propagate();
 }
