@@ -90,12 +90,15 @@ class Network
 
     void propagate()
     {
+    	syn.at(0)->transmit();
+    	neur.at(0)->update();
+    	
 	for(unsigned int i = 0; i < syn.size(); i++) {
-	    syn.at(i)->transmit();
+	    //syn.at(i)->transmit();
 	}
 
 	for(unsigned int i = 0; i < neur.size(); i++) {
-	    neur.at(i)->update();
+	    //neur.at(i)->update();
 	}
     }
     
