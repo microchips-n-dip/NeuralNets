@@ -53,8 +53,8 @@ class Network
 
     
     // Request a pointer to a particular Neuron or Synapse
-    Neuron* getNeuron(size_t &id){return neur.at(id);}
-    Synapse* getSynapse(size_t &id){return syn.at(id);}
+    Neuron* getNeuron(long unsigned int id){return neur.at(id);}
+    Synapse* getSynapse(long unsigned int id){return syn.at(id);}
     
     // Request list sizes
     unsigned int getNeuronCount(){return neur.size();}
@@ -90,15 +90,12 @@ class Network
 
     void propagate()
     {
-    	syn.at(0)->transmit();
-    	neur.at(0)->update();
-    	
 	for(unsigned int i = 0; i < syn.size(); i++) {
-	    //syn.at(i)->transmit();
+	    (*syn.at(i)).transmit();
 	}
 
 	for(unsigned int i = 0; i < neur.size(); i++) {
-	    //neur.at(i)->update();
+	    (*neur.at(i)).update();
 	}
     }
     
