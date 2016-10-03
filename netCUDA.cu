@@ -1,4 +1,5 @@
 #if CUDA_SUPPORT 1
+#define TPB_NET 512
 __global__ void cudaNeurons(Network** network)
 {
     int n = threadIdx.x + (blockIdx.x * blockDimx.x);
