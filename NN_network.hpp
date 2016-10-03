@@ -108,26 +108,3 @@ class Network
 //         printf("Synapse: %p\n", snet);
     }
 };
-
-	
-// CUDA implementation
-__global__ void cudaNeurons(Network** network)
-{
-    int n = threadIdx.x + (blockIdx.x * blockDimx.x);
-    (*(**network).getNeuron(n)).update();
-}
-	
-__global__ void cudaSynapses(Network** network)
-{
-    int s = threadIdx.x + (blockId.x * blockDimx.x);
-    (*(**network).getSynapse(s)).transmit();
-}
-
-Network::cudaPropagate()
-{
-    Network** dev_net;
-    int size = sizeof(Network*);
-    cudaMemcpy(dev_net, &this, size, cudaMemcpyHostToDevice);
-    cudaNeurons<<<getNeuronCount()/TPB_NET, TBP_NET>>>(dev_net);
-    cudaSynapses<<<getNeuronCount()/TPB_NET, TBP_NET>>>(dev_net);
-}
