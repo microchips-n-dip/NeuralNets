@@ -1,19 +1,15 @@
-#include <string>
-#include "NN_neuron.hpp"
-#include "NN_synapse.hpp"
-#include "NN_network.hpp"
+#include <stdlib.h>
+#include <stdio.h>
+#include <math.h>
+#include <cmath>
 
-// CUDA implementation inclusion
-#define CUDA_SUPPORT 0 // I did this conditional stuff a bit lazily
-#if CUDA_SUPPORT 1
-#include "netCUDA.cu"
-#endif
-
+#define CUDA_SUPPORT 0
+#include "nnfull.cuh"
 
 int main(void)
 {
     Network network;
 
     // Impulses
-    NeuronDecay 
+    NeuronDecay nd1;
 }

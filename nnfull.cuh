@@ -1,5 +1,5 @@
 // The neuron classes
-class NeuronBase {
+class Neuron {
   public:
     double nv = 0.0; // Value of neuron
     double nvt = 0.0; // Temporary value of synaptic input
@@ -7,7 +7,7 @@ class NeuronBase {
     virtual void update() = 0; // Empty function, defined in other neuron classes
 };
 
-class NeuronDecay: public NeuronBase {
+class NeuronDecay: public Neuron {
   public:
     double baseline; // Baseline value of neuron
     double decay; // Rate of decay towards baseline
@@ -49,8 +49,21 @@ class Network {
     unsigned int n_neur; // Number of neurons in the network
     unsigned int n_syn; // Number of synapses in the network
     // Note: I would use vectors, but I need to copy the arrays to the GPGPU, and I feel this would be a better way
+
+    void addNeuron(Neuron* neuron)
+    {
+	Neuron** temp_neur = (Neuron**) malloc(n_neur * sizeof(Neuron*)); // Create temp to store current neurons
+	for(int i = 0; i < n_neur; i++) temp_neur[i] = neur[i]; // Copy neurons to temp
+	free(neur);
+
+	neur = (Neuron**) malloc((n_neur + 1) * sizeof(Neuron*));
+	for(int i = 0; i < n_neur; i++) neur[i] = temp_neur[i];
+	neur[n_neur] = neuron;
+
+	n_neur++;
+    }
     
-#if CUDA_SUPPORT 1
+#if CUDA_SUPPORT == 1
     __global__ void cudaNeuron(Neuron ***neuron) // Use the GPU to update neurons
     {
         int n = threadIdx.x + (blockIdx.x * blockDim.x); // Thread index (neuron number)
@@ -70,7 +83,7 @@ class Network {
     }
 #endif
 
-#if CUDA_SUPPORT 0
+#if CUDA_SUPPORT == 0
     void propagate() // Propagate data through the network
     {
         for(int n = 0; n < n_syn; n++) { // Iterate over all synapses
