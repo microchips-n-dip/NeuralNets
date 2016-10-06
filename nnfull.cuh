@@ -96,15 +96,21 @@ class Network {
 		// Note: Multiple streams not yet implemented
 		cudaStream_t* streams = (cudaStream_t*) malloc(n_gpu*sizeof(cudaStream_t)); // Array to store CUDA streams
 		cudaEvent_t* events = (cudaEvent_t*) malloc(n_gpu*sizeof(cudaStream_t)); // Array to store CUDA events
-		
-		cudaMalloc((void***)&dev_neur, n_neur*sizeof(Neuron*)); // Allocate the neuron array on the GPU(s)
+        
+        cudaMalloc((void***)&dev_neur, n_neur*sizeof(Neuron*)); // Allocate the neuron array on the GPU(s)
 		cudaMalloc((void***)&dev_syn, n_syn*sizeof(Synapse*)); // Allocate the synapse array on the GPU(s)
 		
 		cudaMemcpy(dev_neur, neur, n_neur*sizeof(Neuron*), cudaMemcpyHostToDevice); // Copy the neuron array to the GPU(s)
-		cudaMemcpu(dev_syn, syn, n_syn*sizeof(Synapse*), cudaMemcpyHostToDevice); // Copy the synapse array to the GPU(s)
+		cudaMemcpy(dev_syn, syn, n_syn*sizeof(Synapse*), cudaMemcpyHostToDevice); // Copy the synapse array to the GPU(s)
+        
+        for(int i = 0; i < n_gpu; i++) {
+            cudaSetDevice(i);
+            cudaStreamCreate(&streams[i]);
+            cudaEventCreate(&events[i]);
 		
-		cudaSynapse<<<n_syn, 1>>>(dev_syn); // Execute the synapse updates on the GPU(s)
-        cudaNeuron<<<n_neur, 1>>>(dev_neur); // Execute the neuron updates on the GPU(s)
+		    cudaSynapse<<<n_syn/n_gpu, streams[i]>>>(dev_syn); // Execute the synapse updates on the GPU(s)
+            cudaNeuron<<<n_neur/n_gpu, streams[i]>>>(dev_neur); // Execute the neuron updates on the GPU(s)
+        }
     }
 #endif
 
