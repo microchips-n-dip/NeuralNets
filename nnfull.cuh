@@ -7,6 +7,7 @@ class Neuron {
     virtual void update() = 0; // Empty function, defined in other neuron classes
 };
 
+// Decaying update neuron
 class NeuronDecay: public Neuron {
   public:
     double baseline; // Baseline value of neuron
@@ -52,28 +53,30 @@ class Network {
 
     void addNeuron(Neuron* neuron)
     {
-	Neuron** temp_neur = (Neuron**) malloc(n_neur * sizeof(Neuron*)); // Create temp to store current neurons
-	for(int i = 0; i < n_neur; i++) temp_neur[i] = neur[i]; // Copy neurons to temp
-	free(neur); // Free up neurons, will allocate again later
+	    Neuron** temp_neur = (Neuron**) malloc(n_neur * sizeof(Neuron*)); // Create temp to store current neurons
+    	for(int i = 0; i < n_neur; i++) temp_neur[i] = neur[i]; // Copy neurons to temp
+		free(neur); // Free up neurons, will allocate again later
 
-	neur = (Neuron**) malloc((n_neur + 1) * sizeof(Neuron*)); // Allocate the new neuron array
-	for(int i = 0; i < n_neur; i++) neur[i] = temp_neur[i]; // Copy the temp back to the neuron array
-	neur[n_neur] = neuron; // Add the new neuron to the neuron array
+		neur = (Neuron**) malloc((n_neur + 1) * sizeof(Neuron*)); // Allocate the new neuron array
+		for(int i = 0; i < n_neur; i++) neur[i] = temp_neur[i]; // Copy the temp back to the neuron array
+		neur[n_neur] = neuron; // Add the new neuron to the neuron array
+		free(temp_neur); // Free the temporary array for storing the neurons
 
-	n_neur++; // Increment the size
+		n_neur++; // Increment the size
     }
 	
     void addSynapse(Synapse* synapse)
     {
-	Synapse** temp_syn = (Synapse**) malloc(n_syn * sizeof(Synapse*)); // Create temp to store current synapses
-	for(int i = 0; i < n_syn; i++) temp_syn[i] = syn[i]; // Copy synapses to temp
-	free(syn); // Free up synapses, will allocate again later
+		Synapse** temp_syn = (Synapse**) malloc(n_syn * sizeof(Synapse*)); // Create temp to store current synapses
+		for(int i = 0; i < n_syn; i++) temp_syn[i] = syn[i]; // Copy synapses to temp
+		free(syn); // Free up synapses, will allocate again later
 
-	syn = (Synapse**) malloc((n_syn + 1) * sizeof(Synapse*)); // Allocate the new synapse array
-	for(int i = 0; i < n_syn; i++) syn[i] = temp_syn[i]; // Copy the temp back to the synapse array
-	syn[n_syn] = synapse; // Add the new synapse to the synapse array
+		syn = (Synapse**) malloc((n_syn + 1) * sizeof(Synapse*)); // Allocate the new synapse array
+		for(int i = 0; i < n_syn; i++) syn[i] = temp_syn[i]; // Copy the temp back to the synapse array
+		syn[n_syn] = synapse; // Add the new synapse to the synapse array
+		free(temp_syn); // Free the temporary array for storing the synapses
 
-	n_syn++; // Increment the size
+		n_syn++; // Increment the size
     }
     
 #if CUDA_SUPPORT == 1
@@ -97,20 +100,23 @@ class Network {
 		cudaStream_t* streams = (cudaStream_t*) malloc(n_gpu*sizeof(cudaStream_t)); // Array to store CUDA streams
 		cudaEvent_t* events = (cudaEvent_t*) malloc(n_gpu*sizeof(cudaStream_t)); // Array to store CUDA events
         
-        cudaMalloc((void***)&dev_neur, n_neur*sizeof(Neuron*)); // Allocate the neuron array on the GPU(s)
-		cudaMalloc((void***)&dev_syn, n_syn*sizeof(Synapse*)); // Allocate the synapse array on the GPU(s)
-		
-		cudaMemcpy(dev_neur, neur, n_neur*sizeof(Neuron*), cudaMemcpyHostToDevice); // Copy the neuron array to the GPU(s)
-		cudaMemcpy(dev_syn, syn, n_syn*sizeof(Synapse*), cudaMemcpyHostToDevice); // Copy the synapse array to the GPU(s)
-        
         for(int i = 0; i < n_gpu; i++) {
-            cudaSetDevice(i);
-            cudaStreamCreate(&streams[i]);
-            cudaEventCreate(&events[i]);
+            cudaSetDevice(i); // Set to GPU number "i"
+            cudaStreamCreate(&streams[i]); // Create a stream for GPU number "i"
+            cudaEventCreate(&events[i]); // Create an event for GPU number "i"
+			
+			cudaMalloc((void***)&dev_neur, (n_neur/n_gpu)*sizeof(Neuron*)); // Allocate the neuron array on the GPU(s)
+			cudaMalloc((void***)&dev_syn, (n_syn/n_gpu)*sizeof(Synapse*)); // Allocate the synapse array on the GPU(s)
+		
+			cudaMemcpy(dev_neur, neur, (n_neur/n_gpu)*sizeof(Neuron*), cudaMemcpyHostToDevice); // Copy the neuron array to the GPU(s)
+			cudaMemcpy(dev_syn, syn, (n_syn/n_gpu)*sizeof(Synapse*), cudaMemcpyHostToDevice); // Copy the synapse array to the GPU(s)
 		
 		    cudaSynapse<<<n_syn/n_gpu, streams[i]>>>(dev_syn); // Execute the synapse updates on the GPU(s)
             cudaNeuron<<<n_neur/n_gpu, streams[i]>>>(dev_neur); // Execute the neuron updates on the GPU(s)
         }
+		
+		free(streams); // Free the streams
+		free(events); // Free the events
     }
 #endif
 
