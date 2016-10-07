@@ -80,7 +80,7 @@ class Network {
     }
     
 #if CUDA_SUPPORT == 1
-	int n_gpu = 1; // Default number of GPUs
+    int n_gpu = 1; // Default number of GPUs
 	
     __global__ void cudaNeuron(Neuron **neuron) // Use the GPU to update neurons
     {
