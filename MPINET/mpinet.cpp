@@ -8,13 +8,14 @@ using namespace std;
 
 int main(void)
 {
+    Network network;
+
     MPI_Init(NULL, NULL);
     int rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
     int n_neur = 5;
 
-    Network network;
     if(rank == 0) {
 	for(int i = 0; i < n_neur; i++) network.neur.push_back(new NeuronDecay(0.1, 0.0));
 	for(int i = 0; i < n_neur; i++) {
