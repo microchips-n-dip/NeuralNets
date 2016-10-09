@@ -83,30 +83,5 @@ class Network {
 
 	syn_per_proc[world_rank] = floor((double)(syn.size())/(double)(n_proc)); // Set the initial value for the numver of synapses per process
 	if(world_rank < (syn.size() % syn_per_proc[world_rank])) syn_per_proc[world_rank] += 1; // Add the remainders
-
-	MPI_Barrier(MPI_COMM_WORLD); // Sync all processes
-
-	int neur_offset = 0; // Neuron offset for this process
-	int syn_offset = 0; // Synapse offset for this process
-	for(int i = 0; i < world_rank; i++) {
-	    neur_offset += neur_per_proc[i]; // Calculate the neuron offset
-	    syn_offset += neur_per_proc[i]; // Calculate the synapse offset
-	}
-
-	if(world_rank == 0) { // Some testing things
-	printf("Neuron updates per process: %i\n", neur_per_proc[world_rank]);
-	printf("Synapse updates per process: %i\n", syn_per_proc[world_rank]);
-	}
-
-	for(int i = 0; i < syn_per_proc[world_rank]; i++) {
-	    (*syn.at(i+syn_offset)).transmit(); // Run transmit for every synapse in this process
-	}
-
-	for(int i = 0; i < neur_per_proc[world_rank]; i++) {
-	    (*neur.at(i+neur_offset)).update(); // Run update for every neuron in this process
-	}
-
-	free(neur_per_proc); // Free up the pointer to the neurons per process array
-	free(syn_per_proc); // Free up the pointer to the synapses per process array
     }
 };
