@@ -15,6 +15,12 @@ class NeuronDecay: public Neuron {
     double decay = 0.0;
     double baseline = 0.0;
 
+    NeuronDecay(double d, double b)
+    {
+	decay = d;
+	baseline = b;
+    }
+
     void update()
     {
 	if(nv > baseline) nv -= decay;
@@ -30,7 +36,7 @@ class NeuronDecay: public Neuron {
 // Synapses
 class Synapse {
   public:
-    double w;
+    double w = 0.0;
     Neuron* Source;
     Neuron* Target;
 
@@ -60,17 +66,36 @@ class Network {
 	MPI_Comm_size(MPI_COMM_WORLD, &n_proc);
 	MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
 
-	int neur_per_proc = ceil((double)(neur.size())/(double)(n_proc));
-	int syn_per_proc = ceil((double)(syn.size())/(double)(n_proc));
-	int neur_offset = world_rank * neur_per_proc;
-	int syn_offset = world_rank * syn_per_proc;
+	int *neur_per_proc = (int*) malloc(n_proc*sizeof(int));
+	neur_per_proc[world_rank] = floor((double)(neur.size())/(double)(n_proc));
+	if(world_rank < (neur.size() % neur_per_proc[world_rank])) neur_per_proc[world_rank] += 1;
 
-	for(int i = 0; i < syn_per_proc; i++) {
+	int *syn_per_proc = (int*) malloc(n_proc*sizeof(int));
+	syn_per_proc[world_rank] = floor((double)(syn.size())/(double)(n_proc));
+	if(world_rank < (syn.size() % syn_per_proc[world_rank])) syn_per_proc[world_rank] += 1;
+
+	int neur_offset = 0;
+	int syn_offset = 0;
+	for(int i = 0; i < world_rank; i++) {
+	    neur_offset += neur_per_proc[i];
+	    syn_offset += neur_per_proc[i];
+	}
+
+//	if(world_rank == 0) {
+	printf("Neuron updates per process: %i\n", neur_per_proc[world_rank]);
+	printf("Synapse updates per process: %i\n", syn_per_proc[world_rank]);
+	printf("Number of processes: %i\n", n_proc);
+//	}
+
+	for(int i = 0; i < syn_per_proc[world_rank]; i++) {
 	    (*syn.at(i+syn_offset)).transmit();
 	}
 
-	for(int i = 0; i < neur_per_proc; i++) {
+	for(int i = 0; i < neur_per_proc[world_rank]; i++) {
 	    (*neur.at(i+neur_offset)).update();
 	}
+
+	free(neur_per_proc);
+	free(syn_per_proc);
     }
 };
