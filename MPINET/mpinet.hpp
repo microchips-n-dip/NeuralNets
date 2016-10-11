@@ -2,6 +2,12 @@
 #include <vector>
 using namespace std;
 
+
+int n_neurons = 0;
+int n_synapses = 0;
+int n_procs = 1;
+
+
 class Neuron {
   public:
     double nv = 0.0; // Value of the neuron
@@ -54,34 +60,31 @@ class Synapse {
 };
 
 
-// Network
 class Network {
   public:
-    vector<Neuron*> neur; // Neuron vector
-    vector<Synapse*> syn; // Synapse vector
+    vector<Neuron*> proc_neur;
+    vector<Synapse*> proc_syn;
 
-    void propagate() // Propagating the network
+    void addNeuron(Neuron *neuron)
     {
-	int n_proc, world_rank; // MPI variables
-	MPI_Comm_size(MPI_COMM_WORLD, &n_proc); // Get the number of processes
-	MPI_Comm_rank(MPI_COMM_WORLD, &world_rank); // Get the world rank of this process
+	// The owner process will be the modulus of the number of neurons and the number of processes
+	int owner = n_neurons % n_procs;
 
-	MPI_Barrier(MPI_COMM_WORLD); // Sync all processes
+	int w_rank;
+	MPI_Comm_rank(MPI_COMM_WORLD, &w_rank);
+	if(w_rank == owner) proc_neur.push_back(neuron);
 
-	int *neur_per_proc; // Pointer to the array storing the number of neurons per process
-	if(world_rank == 0) neur_per_proc = (int*) malloc(n_proc*sizeof(int)); // Allocate on the root
-	MPI_Bcast(neur_per_proc, n_proc, MPI_INT, 0, MPI_COMM_WORLD); // Broadcast the array to the other processes
+	n_neurons++;
+    }
 
-	neur_per_proc[world_rank] = floor((double)(neur.size())/(double)(n_proc)); // Set the initial value for the number of neurons per process
-	if(world_rank < (neur.size() % neur_per_proc[world_rank])) neur_per_proc[world_rank] += 1; // Add the remainders
+    void addSynapse(Synapse *synapse)
+    {
+	int owner = n_synapses % n_procs;
 
-	MPI_Barrier(MPI_COMM_WORLD); // Sync all processes
+	int w_rank;
+	MPI_Comm_rank(MPI_COMM_WORLD, &w_rank);
+	if(w_rank == owner) proc_syn.push_back(synapse);
 
-	int *syn_per_proc; // Pointer to the array storing the number of synapses per process
-	if(world_rank == 0) syn_per_proc = (int*) malloc(n_proc*sizeof(int)); // Allocate on the root
-	MPI_Bcast(syn_per_proc, n_proc, MPI_INT, 0, MPI_COMM_WORLD); // Broadcast the array to the other processes
-
-	syn_per_proc[world_rank] = floor((double)(syn.size())/(double)(n_proc)); // Set the initial value for the numver of synapses per process
-	if(world_rank < (syn.size() % syn_per_proc[world_rank])) syn_per_proc[world_rank] += 1; // Add the remainders
+	n_synapses++;
     }
 };
