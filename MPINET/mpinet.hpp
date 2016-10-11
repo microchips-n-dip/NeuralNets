@@ -5,8 +5,8 @@ using namespace std;
 
 // Some global variables
 // These will be for deciding process ownership
-int proc_neurons;
-int proc_synapses;
+int proc_neurons = 0;
+int proc_synapses = 0;
 int n_procs;
 
 
@@ -23,6 +23,12 @@ class NeuronDecay: public Neuron {
     double decay = 0.0;
     double baseline = 0.0;
 
+    NeuronDecay(double d, double b)
+    {
+	decay = d;
+	baseline = b;
+    }
+
     void update()
     {
 	// Decay in the direction of the baseline
@@ -36,7 +42,7 @@ class NeuronDecay: public Neuron {
     }
 };
 
-struct NeuronLocale {
+class NeuronLocale {
   public:
     int my_owner;
     Neuron *neuron;
@@ -72,7 +78,7 @@ class Synapse {
     NeuronLocale *Target;
 };
 
-struct SynapseLocale {
+class SynapseLocale {
   public:
     int my_owner;
     Synapse *synapse;
@@ -114,8 +120,11 @@ class Network {
 	MPI_Comm_rank(MPI_COMM_WORLD, &w_rank);
 
 	if (w_rank == owner) {
+	    printf("This neuron belongs to process %i\n", w_rank);
+
 	    Neuron *neuron = (*neuronLocale).neuron;
-	    neur.push_back(neuron);
+//	    proc_neur.resize(proc_neur.size() + 1);
+//	    proc_neur.at(proc_neur.size() - 1) = neuron;
 	}
     }
 
@@ -128,7 +137,7 @@ class Network {
 
 	if (w_rank == owner) {
 	    Synapse *synapse = (*synapseLocale).synapse;
-	    syn.push_back(synapse);
+	    proc_syn.push_back(synapse);
 	}
     }
 };

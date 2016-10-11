@@ -12,11 +12,13 @@ int main(void)
 
     int w_rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &w_rank);
-    if(w_rank == 0) MPI_Comm_size(MPI_COMM_WORLD, &n_procs);
+    MPI_Comm_size(MPI_COMM_WORLD, &n_procs);
 
     Network procnet;
-    for(int i = 0; i < 7; i++) procnet.addNeuron(new NeuronDecay(0.1, 0.0));
-    printf("Process %i has %i neurons\n", w_rank, procnet.proc_neur.size());
+    procnet.addNeuron(createNeuron(new NeuronDecay(0.1, 0.0)));
+
+//    for(int i = 0; i < 7; i++) procnet.addNeuron(createNeuron(new NeuronDecay(0.1, 0.0)));
+//    printf("Process %i has %i neurons\n", w_rank, procnet.proc_neur.size());
 
     MPI_Finalize();
 }
