@@ -2,18 +2,12 @@
 #include <vector>
 using namespace std;
 
-<<<<<<< HEAD
 
-int n_neurons = 0;
-int n_synapses = 0;
-int n_procs = 1;
-=======
 // Some global variables
 // These will be for deciding process ownership
 int proc_neurons;
 int proc_synapses;
 int n_procs;
->>>>>>> 627a114578b6bce9569b897b9d782d1b512837b9
 
 
 class Neuron {
@@ -112,29 +106,6 @@ class Network {
     vector<Neuron*> proc_neur;
     vector<Synapse*> proc_syn;
 
-<<<<<<< HEAD
-    void addNeuron(Neuron *neuron)
-    {
-	// The owner process will be the modulus of the number of neurons and the number of processes
-	int owner = n_neurons % n_procs;
-
-	int w_rank;
-	MPI_Comm_rank(MPI_COMM_WORLD, &w_rank);
-	if(w_rank == owner) proc_neur.push_back(neuron);
-
-	n_neurons++;
-    }
-
-    void addSynapse(Synapse *synapse)
-    {
-	int owner = n_synapses % n_procs;
-
-	int w_rank;
-	MPI_Comm_rank(MPI_COMM_WORLD, &w_rank);
-	if(w_rank == owner) proc_syn.push_back(synapse);
-
-	n_synapses++;
-=======
     void addNeuron(NeuronLocale *neuronLocale) // Determining an owner and assigning the neuron
     {
 	int owner = (*neuronLocale).my_owner;
@@ -159,6 +130,5 @@ class Network {
 	    Synapse *synapse = (*synapseLocale).synapse;
 	    syn.push_back(synapse);
 	}
->>>>>>> 627a114578b6bce9569b897b9d782d1b512837b9
     }
 };
