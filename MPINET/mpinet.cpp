@@ -1,3 +1,5 @@
+#ifdef env_mpi
+
 #include <mpi.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -22,3 +24,5 @@ int main(void)
 
     MPI_Finalize();
 }
+
+#endif

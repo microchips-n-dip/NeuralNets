@@ -1,3 +1,5 @@
+#ifdef env_mpi
+
 #include <cmath>
 #include <vector>
 using namespace std;
@@ -141,3 +143,5 @@ class Network {
 	}
     }
 };
+
+#endif
