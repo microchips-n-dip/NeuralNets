@@ -1,22 +1,4 @@
-### Neural net makefile ###
-
-### Defaults
-CPP=g++
-parallel_src=./MPINET
-CFLAGS=-std=c++11 -Wall
-
-### Optional settings based on MAKECMDGOALS
-.PHONY: mpi
-mpi:  mpinet NN
-ifneq ($(filter mpi, $(MAKECMDGOALS) ),)
-CPP:=mpiCC
-LD:=mpiCC
-CFLAGS += -Denv_mpi
-endif
-
-### Rules
-mpinet: $(parallel_src)/mpinet.hpp
-	$(CPP) $(CFLAGS) -c $(parallel_src)/mpinet.cpp -o mpinet.o
+# ### Neural net makefile ###
 
 NN: NN.o
 	$(CPP) NN.o -o NN.exe
