@@ -96,12 +96,22 @@ void distribute(Parallel &mpi)
     unsigned int nn_rem = total_count % nprocs;
     int diff =  local_count - nn_avg;
     
-    if(diff > 0) 
+    if(diff > 0)
     {
-        for(int i = 0; i < diff; i++)
-        {
-            MPI_Send(&proc_neur[i], );
-        }
+        for(int i = local_count - diff; i < local_count; i++)
+	{
+	    MPI_Bcast(proc_neur[i], 1, , mpi.rank, MPI_COMM_WORLD);
+	}
+	proc_neur.resize(local_count - diff + 1);
+    }
+
+    else if(diff < 0)
+    {
+	for(int i = local_count, i < local_count + diff; i++)
+	{
+	    proc_neur.resize(i + 1);
+	    MPI_Bcast(proc_neur[i], 1, , MPI_COMM_WORLD);
+	}
     }
 }
 #endif
