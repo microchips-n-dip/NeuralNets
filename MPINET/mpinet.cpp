@@ -87,4 +87,21 @@ void Network::distribute(Parallel &mpi)
     
 }
 
+// How I see distribute
+void distribute(Parallel &mpi)
+{
+    // This stuff makes plenty of sense, it's just for figuring out how many times to do the send/recv
+    // thing. I'm implementing that
+    unsigned int nn_avg = total_count / nprocs;
+    unsigned int nn_rem = total_count % nprocs;
+    int diff =  local_count - nn_avg;
+    
+    if(diff > 0) 
+    {
+        for(int i = 0; i < diff; i++)
+        {
+            MPI_Send(&proc_neur[i], );
+        }
+    }
+}
 #endif
