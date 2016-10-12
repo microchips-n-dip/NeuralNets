@@ -2,14 +2,15 @@
 
 #include <cmath>
 #include <vector>
-using namespace std;
 
+#include "parallel.hpp"
 
+/// these are not "global" - each process has a completely separate instance of these
 // Some global variables
 // These will be for deciding process ownership
-int proc_neurons = 0;
-int proc_synapses = 0;
-int n_procs;
+// int proc_neurons = 0;
+// int proc_synapses = 0;
+// int n_procs;
 
 
 class Neuron {
@@ -27,121 +28,79 @@ class NeuronDecay: public Neuron {
 
     NeuronDecay(double d, double b)
     {
-	decay = d;
-	baseline = b;
+        decay = d;
+        baseline = b;
     }
 
     void update()
     {
-	// Decay in the direction of the baseline
-	if(nv > baseline) nv -= decay;
-	else if(nv < baseline) nv += decay;
-	if(fabs(nv - baseline) < decay) nv = decay; // Overshoot compensation
+        // Decay in the direction of the baseline
+        if(nv > baseline) nv -= decay;
+        else if(nv < baseline) nv += decay;
+        if(fabs(nv - baseline) < decay) nv = decay; // Overshoot compensation
 
-	// Adding the input, then resetting
-	nv += nvt;
-	nvt = 0.0;
+        // Adding the input, then resetting
+        nv += nvt;
+        nvt = 0.0;
     }
 };
 
-class NeuronLocale {
-  public:
-    int my_owner;
-    Neuron *neuron;
-};
-
-NeuronLocale *createNeuron(Neuron *neuron)
-{
-    NeuronLocale *neuronLocale;
-
-    int n_neurons;
-    MPI_Allreduce(&proc_neurons, &n_neurons, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
-    int owner = n_neurons % n_procs;
-    proc_neurons++;
-
-    int w_rank;
-    MPI_Comm_rank(MPI_COMM_WORLD, &w_rank);
-
-    (*neuronLocale).my_owner = owner;
-    (*neuronLocale).neuron = neuron;
-
-    if (w_rank == owner) {
-	return neuronLocale;
-    } else {
-	return NULL;
-    }
-}
-
+/** NeuronLocale was completely redundant and actually problematic:
+ * -it returned a NULL on every process that didn't match the "owner"
+ * -returned pointer (NEVER return a pointer like that!) was promptly
+ *  dereferenced on each process
+ * -it required synchronization and communication to instantiate something
+ *  locally (sloppy and inefficient)
+ * -it was always asking for the rank of the calling process: this info is best
+ *  kept in a persistent object somewhere and passed-by-reference to the
+ *  function (now done with 'Parallel') or if it's only basic info, set as
+ *  static members of the base class (Neuron)
+ */
 
 class Synapse {
   public:
     double w = 0.0;
-    NeuronLocale *Source;
-    NeuronLocale *Target;
+    
+    /** These have to go: it's super erroneous (and doesn't make sense)
+     * to use pointers to objects on other processes
+     * Replace with source/target rank & list index?
+     */
+//     NeuronLocale *Source;
+//     NeuronLocale *Target;
 };
 
-class SynapseLocale {
-  public:
-    int my_owner;
-    Synapse *synapse;
-};
-
-SynapseLocale *createSynapse(Synapse *synapse)
-{
-    SynapseLocale *synapseLocale;
-
-    int n_synapses;
-    MPI_Allreduce(&proc_synapses, &n_synapses, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
-    int owner = n_synapses % n_procs;
-    proc_synapses++;
-
-    int w_rank;
-    MPI_Comm_rank(MPI_COMM_WORLD, &w_rank);
-
-    (*synapseLocale).my_owner = owner;
-    (*synapseLocale).synapse = synapse;
-
-    if (w_rank == owner) {
-	return synapseLocale;
-    } else {
-	return NULL;
-    }
-}
-
+/// see above for why SynapseLocale was removed
 
 class Network {
+    
+    unsigned int local_count;
+    unsigned int *global_count;
+    unsigned int total_count;
+    int nprocs;
+    
   public:
-    vector<Neuron*> proc_neur;
-    vector<Synapse*> proc_syn;
-
-    void addNeuron(NeuronLocale *neuronLocale) // Determining an owner and assigning the neuron
+    std::vector<Neuron*> proc_neur;
+    std::vector<Synapse*> proc_syn;
+    
+    Network(Parallel &mpi)
     {
-	int owner = (*neuronLocale).my_owner;
-
-	int w_rank;
-	MPI_Comm_rank(MPI_COMM_WORLD, &w_rank);
-
-	if (w_rank == owner) {
-	    printf("This neuron belongs to process %i\n", w_rank);
-
-	    Neuron *neuron = (*neuronLocale).neuron;
-//	    proc_neur.resize(proc_neur.size() + 1);
-//	    proc_neur.at(proc_neur.size() - 1) = neuron;
-	}
+        local_count = 0;
+        total_count = 0;
+        nprocs = mpi.nprocs;
+        global_count = (unsigned int*)calloc(mpi.nprocs,sizeof(unsigned int));
     }
-
-    void addSynapse(SynapseLocale *synapseLocale) // Determining an owner and assigning the synapse
+    ~Network()
     {
-	int owner = (*synapseLocale).my_owner;
-
-	int w_rank;
-	MPI_Comm_rank(MPI_COMM_WORLD, &w_rank);
-
-	if (w_rank == owner) {
-	    Synapse *synapse = (*synapseLocale).synapse;
-	    proc_syn.push_back(synapse);
-	}
+        // destructor frees allocated memory
+        if (global_count != NULL) free(global_count);
     }
+    
+    // Member function prototypes
+    void addNeuron(Neuron *neuron);
+    void addSynapse(Synapse *synapse);
+    void update_global_count();
+    void distribute(Parallel &mpi);
 };
+
 
 #endif
