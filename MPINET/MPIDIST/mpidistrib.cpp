@@ -8,7 +8,7 @@
 #include <vector>
 #include <iostream>
 
-#include "parallel.hpp"
+#include "../parallel.hpp"
 
 double log2(double a)
 {
@@ -22,8 +22,9 @@ void tree(Parallel &mpi, int idata)
     
     int recv;
     int send;
+    MPI_Status *stat;
     
-    for (int layer = 0; layer <= log2(nprocs); layer++)
+    for (int layer = 0; layer <= log2(mpi.nprocs); layer++)
     {
         if (mpi.rank < pow(2, layer))
         {
@@ -34,7 +35,7 @@ void tree(Parallel &mpi, int idata)
         else if (mpi.rank >= pow(2, layer) && mpi.rank < pow(2, layer + 1))
         {
             send = mpi.rank - pow(2, layer);
-            MPI_Recv(data, 1, MPI_INT, send, 0, MPI_COMM_WORLD);
+            MPI_Recv(data, 1, MPI_INT, send, 0, MPI_COMM_WORLD, stat);
             printf("Process %i just got the message\n", mpi.rank);
             printf("Received value of %i\n", *data);
         }
@@ -44,7 +45,7 @@ void tree(Parallel &mpi, int idata)
 int main(void)
 {
     MPI_Init(NULL, NULL);
-    Parallel mpi();
+    Parallel mpi = Parallel();
     
     int number;
     
