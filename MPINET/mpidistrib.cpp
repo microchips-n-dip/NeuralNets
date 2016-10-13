@@ -51,7 +51,7 @@ int main(void)
     }
     
     // Now for the tree
-    tree(mpi, number, 0);
+    tree(mpi, number);
 
     MPI_Finalize();
 }
