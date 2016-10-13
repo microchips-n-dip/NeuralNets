@@ -20,6 +20,9 @@ void tree(Parallel &mpi, int idata)
     int *data;
     if (mpi.rank == 0) data = &idata;
     
+    int recv;
+    int send;
+    
     for (int layer = 0; layer <= log2(nprocs); layer++)
     {
         if (mpi.rank < pow(2, layer))
