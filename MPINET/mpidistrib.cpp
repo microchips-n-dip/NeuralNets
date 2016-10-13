@@ -1,7 +1,9 @@
+#ifdef env_mpi
+
+#include <mpi.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include <mpi.h>
 
 #include <vector>
 #include <iostream>
@@ -49,5 +51,9 @@ int main(void)
     }
     
     // Now for the tree
-    tree(mpi, number, 0)
+    tree(mpi, number, 0);
+
+    MPI_Finalize();
 }
+
+#endif

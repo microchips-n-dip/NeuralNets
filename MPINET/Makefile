@@ -20,6 +20,10 @@ mpinet: mpinet.hpp parallel.hpp
 	$(CPP) $(CFLAGS) mpinet.o -o mpinet
 	@echo "Compiled successfully"
 
+mpidistrib: parallel.hpp
+	$(CPP) $(CFLAGS) -c mpidistrib.cpp -o mpidistrib.o
+	$(CPP) $(CFLAGS) mpidistrib.o -o mpidistrib.exe
+
 clean:
 	rm *.o
 	rm mpinet
