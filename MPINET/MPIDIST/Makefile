@@ -22,4 +22,4 @@ mpidistrib: ../parallel.hpp
 
 clean:
 	rm *.o
-	rm mpinet
+	rm mpidistrib
