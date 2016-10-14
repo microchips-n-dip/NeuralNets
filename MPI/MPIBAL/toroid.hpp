@@ -5,6 +5,9 @@ class Toroid
   public:
     int nprocs;
     int dx, dz;
+
+    int xlocal;
+    int zlocal;
   
     Toroid(Parallel &mpi)
     {
@@ -12,6 +15,9 @@ class Toroid
         
         dz = sqrt(nprocs);
         dx = ceil(nprocs / dz) + (nprocs % dz);
+
+	xlocal = floor(mpi.rank / dx);
+	zlocal = mpi.rank % dx;
     }
 };
 

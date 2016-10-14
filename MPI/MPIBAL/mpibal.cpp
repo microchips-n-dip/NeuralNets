@@ -14,13 +14,9 @@ int main(void)
     MPI_Init(NULL, NULL);
     Parallel mpi = Parallel();
     Toroid nt = Toroid(mpi);
-  
-    if (mpi.rank == 0)
-    {
-        printf("Created a toroid of %i processes\n", mpi.nprocs);
-        printf("dx = %i\n", nt.dx);
-        printf("dz = %i\n", nt.dz);
-    }
+
+    for (int i = 0; i < mpi.nprocs; i++) if (mpi.rank == i)
+    printf("Process %i is at (%i, %i)\n", mpi.rank, nt.xlocal, nt.zlocal);
 
     MPI_Finalize();
 }
