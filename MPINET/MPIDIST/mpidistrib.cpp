@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <ctime>
 
 #include <vector>
 #include <iostream>
@@ -15,11 +16,8 @@ double log2(double a)
     return log(a) / log(2);
 }
 
-void tree(Parallel &mpi, int idata)
+void tree(Parallel &mpi, int *data)
 {
-    int *data;
-    if (mpi.rank == 0) data = &idata;
-    
     int recv;
     int send;
     
@@ -37,8 +35,7 @@ void tree(Parallel &mpi, int idata)
         {
             send = mpi.rank - pow(2, layer);
             MPI_Recv(data, 1, MPI_INT, send, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-            printf("Process %i just got the message\n", mpi.rank);
-            printf("Received value of %i\n", *data);
+            printf("Process %i received %i\n", mpi.rank, *data);
         }
     }
 }
@@ -52,11 +49,15 @@ int main(void)
     
     if (mpi.rank == 0)
     {
-        number = 3;
+	std::cout << "Input a number to send around the network\n> ";
+        std::cin >> number;
     }
     
     // Now for the tree
-    tree(mpi, number);
+    clock_t start_time;
+    if (mpi.rank == 0) start_time = clock();
+    tree(mpi, &number);
+    if (mpi.rank == 0) printf("Finished in %f seconds\n", (double)(clock() - start_time)/1000.0);
 
     MPI_Finalize();
 }
