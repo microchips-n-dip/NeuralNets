@@ -3,28 +3,20 @@
 #include <mpi.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
+#include <cmath>
 
-class Node
+#include "parallel.hpp"
+#include "toroid.hpp"
+
+int main(void)
 {
-  public:
-    int nprocs;
-    int rank;
+    Parallel mpi = Parallel();
+    Toroid nt = Toroid(mpi);
+  
+    printf("Created a toroid of %i processes\n", mpi.nprocs);
+    printf("dx = %i\n", nt.dx);
+    printf("dz = %i\n", nt.dz);
+}
 
-    vector<int> data;
-
-    Node(Parallel &mpi)
-    {
-	nprocs = mpi.nprocs;
-	rank = mpi.rank;
-    }
-
-    void distribute()
-    {
-	int *send_data = (int *) calloc(diff/(nprocs-1), sizeof(int));
-
-	for (int i = 0; i < nprocs; i++) if (i != rank)
-	{
-	    
-	}
-    }
-};
+#endif
