@@ -11,7 +11,7 @@ class Toroid
         nprocs = mpi.nprocs;
         
         dz = sqrt(nprocs);
-        dx = (dz + nprocs % dz);
+        dx = ceil(nprocs / dz) + (nprocs % dz);
     }
 };
 

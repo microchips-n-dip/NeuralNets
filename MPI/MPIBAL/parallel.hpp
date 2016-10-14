@@ -2,6 +2,7 @@
 
 class Parallel
 {
+  public:
     int nprocs;
     int rank;
 

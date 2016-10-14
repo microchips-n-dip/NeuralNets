@@ -11,12 +11,18 @@
 
 int main(void)
 {
+    MPI_Init(NULL, NULL);
     Parallel mpi = Parallel();
     Toroid nt = Toroid(mpi);
   
-    printf("Created a toroid of %i processes\n", mpi.nprocs);
-    printf("dx = %i\n", nt.dx);
-    printf("dz = %i\n", nt.dz);
+    if (mpi.rank == 0)
+    {
+        printf("Created a toroid of %i processes\n", mpi.nprocs);
+        printf("dx = %i\n", nt.dx);
+        printf("dz = %i\n", nt.dz);
+    }
+
+    MPI_Finalize();
 }
 
 #endif
