@@ -42,7 +42,7 @@ double cDiff(double cDnaut, double Ea, double T)
 // ni is the intrinsic carrier concentration
 // tp is the carrier lifetime of holes
 // tn is the carrier lifetime of electrons
-double Is(double cDp, double cDn, double ND, double NA, double ni, double tp, double tn, double A)
+double _Is_(double cDp, double cDn, double ND, double NA, double ni, double tp, double tn, double A)
 {
     // The first half for holes
     double Is_H = sqrt(cDp / tp) * (pow(ni, 2) / ND);
@@ -55,6 +55,25 @@ double Is(double cDp, double cDn, double ND, double NA, double ni, double tp, do
     return ec * A * (Is_H + Is_E);
 }
 
+double Is(double I, double V, double T)
+{
+    double VT = bk * (T / ec);
+    
+    
+    // Calculating the intrinsic carrier concentration
+    // Ns is a rough estimate of the number of states available per cubic centimeter
+    double Ns = 1e+19;
+    double Eg = 0.67; // Energy gap of germanium (in eV) at 273K
+    double ni = Ns * exp(-Eg / (2 * bk * T));
+    
+    // Ideality factor
+    double n = ni * exp((ec * V) / (2 * bk * T));
+    
+    
+    double _Is = I / (exp(V / (n * VT)) - 1);
+    return _Is;
+}
+
 
 // Main
 int main(void)
@@ -62,12 +81,8 @@ int main(void)
     // This test is to find the voltage output of a circuit
     // The test circuit uses and Op-Amp to calculate an exponent
     
-    // An equation for activation energy
-    double Ea = 1 / ((1 / (2.303 * gR * log(k2 / k1))) * (1 / t1 - 1 / t2));
-    
-    // So, the values for the diode 'n stuff
-    double cDp = cDiff()
     
     // The final voltage
-    double Vout = -R * C_Is;
+    double Vout = -R * Is(0.1, 3.3, 273);
+    std::cout << Vout << std::endl;
 }
