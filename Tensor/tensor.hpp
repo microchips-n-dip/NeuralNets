@@ -145,7 +145,7 @@ class Tensor
     }
 
     // General overload for arbitrary rank
-    template <unsigned int R, typename A>
+    template <typename A>
       Type& at(std::initializer_list<A> args)
     {
         return _data[get_index(args)];
