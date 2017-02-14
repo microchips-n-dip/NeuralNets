@@ -116,7 +116,7 @@ void vectout(vector<double> x) {
     }
 }
 
-std::complex<double> cplxGLQ(std::complex<double> (*f)(std::complex<double>), unsigned n, double a, double b)
+/*std::complex<double> cplxGLQ(std::complex<double> (*f)(std::complex<double>), unsigned n, double a, double b)
 {
     vector<double> x = rootP(n);
 
@@ -144,7 +144,7 @@ std::complex<double> cplxGLQ(std::complex<double> (*f)(std::complex<double>), un
     r = 0;
 
     return std::complex<double>(r1, r2);
-}
+}*/
 
 #define __GQ_HPP
 #endif
