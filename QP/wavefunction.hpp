@@ -58,32 +58,32 @@ class Wave1D
 		
 		// Final wave at (x - x0)
 		Q = R * exp(std::complex<double>(0, -omega * t));
-		printf("Wave value output: %f + %fi\n", Q.real(), Q.imag());
 	}
 	
 	void schrodingerCheck()
 	{
 		// Momentum calculation
-		/*
+		
 		double perturb = 1e-4;
 		double init = x0;
-		x0 = init + perturb;
+		x = init + perturb;
 		wave();
 		std::complex<double> loss1 = Q;
-		x0 = init - perturb;
+		x = init - perturb;
 		wave();
 		std::complex<double> loss2 = Q;
 		std::complex<double> deriv = (loss1 - loss2) / (2 * perturb);
-		x0 = init;
+		x = init;
 		wave();
-		double p = (imaginary * hbar * deriv / Q).real();
-		*/
-		double p = hbar * k;
-		printf("Found momentum to be %f*10^(-12) for Schrodinger check\n", p*pow(10, 12));
+		printf("Derivative is %f + %fi\n", Q.real(), Q.imag());
+		double p = -(imaginary * hbar * deriv / Q).real();
+		
+		//double p = hbar * k;
+		printf("Found momentum to be %f*10^(-50) for Schrodinger check\n", p*pow(10, 50));
 		
 		// Energy calculation
 		double E = hbar * omega;
-		printf("Found energy to be %f*10^(-12) for Schrodinger check\n", E*pow(10, 12));
+		printf("Found energy to be %f for Schrodinger check\n", E);
 		
 		if (p * c > E)
 		{
