@@ -9,8 +9,12 @@
 
 #include "GQ.hpp"
 
+#define N 25
 #define c 299792458.0
 #define hbar 1.0545718e-34
+
+const std::vector<double> u = rootP(n);
+const std::vector<double> w = wGen(u, n);
 const std::complex<double> imaginary = std::complex<double>(0, 1);
 
 class Wave1D
@@ -106,10 +110,6 @@ class Wave1D
 	double P(double a, double b, double _t)
 	{
 		t = _t;
-		
-		int n = 3;
-		vector<double> u = rootP(n);
-		std::vector<double> w = wGen(u, n);
 		
 		double r = 0;
 		double R = 0;
