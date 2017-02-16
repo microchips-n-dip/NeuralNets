@@ -13,8 +13,8 @@
 #define c 299792458.0
 #define hbar 1.0545718e-34
 
-const std::vector<double> u = rootP(n);
-const std::vector<double> w = wGen(u, n);
+const std::vector<double> u = rootP(N);
+const std::vector<double> w = wGen(u, N);
 const std::complex<double> imaginary = std::complex<double>(0, 1);
 
 class Wave1D
@@ -23,6 +23,7 @@ class Wave1D
 	// Wave information
 	double omega;
 	double k;
+	double norm = 1;
 	// Position information
 	double x;
 	double x0;
@@ -38,30 +39,27 @@ class Wave1D
 	
 	void wave()
 	{
-		int n = 3;
 		// K is supposed to be infinite, but we need to use a limit
 		double K = 1e+300;
-		double b = K;
+		/*double b = K;
 		double a = -K;
 		
 		// Integration
-		std::vector<double> u = rootP(n);
-		std::vector<double> w = wGen(u, n);
-		
 		double r1 = 0;
 		double r2 = 0;
 		double R = 0;
 		
-		for(int i = 0; i < n; i++)
+		for(int i = 0; i < N; i++)
 		{
 			r1 += w[i]*semiwave(0.5*(b-a)*u[i] + 0.5*(b+a)).real();
 			r2 += w[i]*semiwave(0.5*(b-a)*u[i] + 0.5*(b+a)).imag();
 		}
 
-		R = 0.125 * acos(-1) * (r1 + r2);
+		R = 0.125 * acos(-1) * (r1 + r2);*/
 		
 		// Final wave at (x - x0)
-		Q = R * exp(std::complex<double>(0, -omega * t));
+		double R = sin(K * (x - x0)) / (acos(-1) * (x - x0));
+		Q = norm * R * exp(std::complex<double>(0, -omega * t));
 	}
 	
 	void schrodingerCheck()
@@ -98,15 +96,6 @@ class Wave1D
 		}
 	}
 	
-	Wave1D(double _omega, double _k, double _x0)
-	{
-		omega = _omega;
-		k = _k;
-		x0 = _x0;
-		
-		schrodingerCheck();
-	}
-	
 	double P(double a, double b, double _t)
 	{
 		t = _t;
@@ -114,7 +103,7 @@ class Wave1D
 		double r = 0;
 		double R = 0;
 		
-		for(int i = 0; i < n; i++) {
+		for(int i = 0; i < N; i++) {
 			x = 0.5*(b-a)*u[i] + 0.5*(b+a);
 			wave();
 			r += w[i] * (Q*std::conj(Q)).real();
@@ -123,6 +112,18 @@ class Wave1D
 		R = 0.5*(b-a)*r;
 		
 		return R;
+	}
+	
+	Wave1D(double _omega, double _k, double _x0)
+	{
+		omega = _omega;
+		k = _k;
+		x0 = _x0;
+		
+		schrodingerCheck();
+		
+		double a = P(-1e+250, 1e+250, 0);
+		norm = sqrt(1 / a);
 	}
 };
 
