@@ -40,7 +40,7 @@ class Wave1D
 	void wave()
 	{
 		// K is supposed to be infinite, but we need to use a limit
-		double K = 1e+300;
+		double K = 1e+250;
 		/*double b = K;
 		double a = -K;
 		
