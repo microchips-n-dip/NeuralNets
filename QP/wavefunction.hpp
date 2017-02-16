@@ -59,7 +59,7 @@ class Wave1D
 		
 		// Final wave at (x - x0)
 		double R = sin(K * (x - x0)) / (acos(-1) * (x - x0));
-		Q = norm * R * exp(std::complex<double>(0, -omega * t));
+		Q = norm * R;// * exp(std::complex<double>(0, -omega * t));
 	}
 	
 	void schrodingerCheck()
