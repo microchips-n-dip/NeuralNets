@@ -122,7 +122,7 @@ class Wave1D
 		
 		schrodingerCheck();
 		
-		double a = P(-1e+250, 1e+250, 0);
+		double a = P(-1e+150, 1e+150, 0);
 		norm = sqrt(1 / a);
 	}
 };
