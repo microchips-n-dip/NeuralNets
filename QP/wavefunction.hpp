@@ -9,7 +9,7 @@
 
 #include "GQ.hpp"
 
-#define N 25
+#define N 5
 #define c 299792458.0
 #define hbar 1.0545718e-34
 
