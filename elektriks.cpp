@@ -58,16 +58,19 @@ double _Is_(double cDp, double cDn, double ND, double NA, double ni, double tp, 
 double Is(double I, double V, double T)
 {
     double VT = bk * (T / ec);
+    std::cout << "Voltage temperature: " << VT << std::endl;
     
     
     // Calculating the intrinsic carrier concentration
     // Ns is a rough estimate of the number of states available per cubic centimeter
     double Ns = 1e+19;
     double Eg = 0.67; // Energy gap of germanium (in eV) at 273K
-    double ni = Ns * exp(-Eg / (2 * bk * T));
+    long double ni = Ns * exp(-Eg / (2 * bk * T));
+    std::cout << "Intrinsic carrier concentration: " << ni << std::endl;
     
     // Ideality factor
     double n = ni * exp((ec * V) / (2 * bk * T));
+    std::cout << "Ideality: " << n << std::endl;
     
     
     double _Is = I / (exp(V / (n * VT)) - 1);
@@ -78,11 +81,15 @@ double Is(double I, double V, double T)
 // Main
 int main(void)
 {
+    std::cout << "Boltzmann constant: " << bk << std::endl;
+
     // This test is to find the voltage output of a circuit
     // The test circuit uses and Op-Amp to calculate an exponent
     
     
     // The final voltage
-    double Vout = -R * Is(0.1, 3.3, 273);
+    double R = 100;
+    double T = 300000000000000001000.0;
+    double Vout = -R * Is(0.1, 3.3, T);
     std::cout << Vout << std::endl;
 }
