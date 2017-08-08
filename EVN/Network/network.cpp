@@ -77,16 +77,14 @@ double Network::net_cost()
       net_run(NetNumAllowedCycles);
 
       for (unsigned int j = 0; j < sz_sample; ++j) {
-        if (output[j] != m_output[j]) {
-          misaligned += 1.0;
-        }
+        misaligned += output[j] - m_output[j];
       }
     }
 
     cost_saved = misaligned;
     cost_saved_valid = true;
 
-    return misaligned;
+    return std::fabs(misaligned);
   }
 }
 
