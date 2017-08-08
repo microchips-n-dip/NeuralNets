@@ -66,13 +66,13 @@ void Nodeon::node_mutate()
   // Reset for connecton drift
   network->mu.reset_nd(csz, 0.5);
   int connecton_drift = network->mu.get_nd();
-	// Normalize
-	if (connecton_drift > 5)
-		connecton_drift = 5;
-	if (connecton_drift < -5)
-		connecton_drift = -5;
+  // Normalize
+  if (connecton_drift > 5)
+    connecton_drift = 5;
+  if (connecton_drift < -5)
+    connecton_drift = -5;
 
-	connecton_drift = (csz + connecton_drift > 0) ? connecton_drift : -csz;
+  connecton_drift = (int(csz) > -connecton_drift) ? connecton_drift : 1 - csz;
 
   // Add/remove connectons until satisfied
   while (csz + connecton_drift != src_connectons.size()) {

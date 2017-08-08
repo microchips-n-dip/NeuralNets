@@ -13,6 +13,8 @@ class Network
   std::vector<Nodeon*> nodeons;
   std::vector<Connecton*> connectons;
 
+  unsigned int network_id;
+
   unsigned int global_i;
   unsigned int global_j;
 
@@ -48,7 +50,7 @@ class Network
 
   void run(unsigned int cycles);
 
-  Network();
+  Network(unsigned int _network_id);
 };
 
 #endif

@@ -37,7 +37,7 @@ void Network::mutate()
   if (nodeon_drift < -2)
     nodeon_drift = -2;
 
-  nodeon_drift = (nsz + nodeon_drift > 0) ? nodeon_drift : -nsz;
+  nodeon_drift = (int(nsz) > -nodeon_drift) ? nodeon_drift : 1 - nsz;
 
   // Add/remove nodeons until satisfied
   while (nsz + nodeon_drift != nodeons.size()) {
@@ -116,9 +116,10 @@ void Network::run(unsigned int cycles)
   net_run(NetNumAllowedCycles);
 }
 
-Network::Network()
+Network::Network(unsigned int _network_id)
 {
-  mu = Mutator<double>();
+  network_id = _network_id;
+  mu = Mutator<double>(network_id);
 
   global_i = 0;
   global_j = 0;
