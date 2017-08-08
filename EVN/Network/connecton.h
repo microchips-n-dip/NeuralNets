@@ -12,26 +12,26 @@ class Connecton
  public:
   Nodeon* src;
   Nodeon* dst;
-	
-	unsigned int loc_in_src;
-	unsigned int loc_in_dst;
-	unsigned int loc_in_net;
-  
+
+  unsigned int loc_in_src;
+  unsigned int loc_in_dst;
+  unsigned int loc_in_net;
+
   double weight;
   double pending;
 
   double c; // Eligibility
-  
+
   Network* network;
-  
-  
-  
+
+
+
   Connecton(Nodeon* _src, Nodeon* _dst, Network* _network, bool need_set_src = true);
-  
+
   void self_destruct();
-  
+
   void transmit();
-  
+
   void stdp();
 };
 

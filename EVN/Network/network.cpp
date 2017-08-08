@@ -27,18 +27,18 @@ void Network::mutate()
   // Sizes
   unsigned int nsz = nodeons.size();
   unsigned int csz = connectons.size();
-  
+
   // Reset for nodeon drift
   mu.reset_nd(nsz, 0.3);
   int nodeon_drift = mu.get_nd();
-	// Normalize
-	if (nodeon_drift > 2)
-		nodeon_drift = 2;
-	if (nodeon_drift < -2)
-		nodeon_drift = -2;
-	
+  // Normalize
+  if (nodeon_drift > 2)
+    nodeon_drift = 2;
+  if (nodeon_drift < -2)
+    nodeon_drift = -2;
+
   nodeon_drift = (nsz + nodeon_drift > 0) ? nodeon_drift : -nsz;
-  
+
   // Add/remove nodeons until satisfied
   while (nsz + nodeon_drift != nodeons.size()) {
     if (nsz + nodeon_drift - nodeons.size() > 0)
@@ -46,13 +46,13 @@ void Network::mutate()
     else if (nsz + nodeon_drift - nodeons.size() < 0)
       remove_random_nodeon(); // Handles any connectons attached
   }
-  
+
   for (unsigned int i = 0; i < nodeons.size(); ++i) {
     nodeons.at(i)->node_mutate();
   }
-	
-	fit_saved_valid = false;
-	cost_saved_valid = false;
+
+  fit_saved_valid = false;
+  cost_saved_valid = false;
 }
 
 void Network::net_run(double time)
@@ -67,43 +67,43 @@ void Network::net_run(double time)
 
 double Network::net_cost()
 {
-	if (cost_saved_valid)
-		return cost_saved;
-	else {
-		double misaligned = 0;
-		for (unsigned int i = 0; i < n_samples; ++i) {
-			std::vector<unsigned int> output;
-			unsigned int sz_sample = load_sample(&m_input, &output, &m_output, i);
-			net_run(NetNumAllowedCycles);
-    
-			for (unsigned int j = 0; j < sz_sample; ++j) {
-				if (output[j] != m_output[j]) {
-					misaligned += 1.0;
-				}
-			}
-		}
-		
-		cost_saved = misaligned;
-		cost_saved_valid = true;
-  
-		return misaligned;
-	}
+  if (cost_saved_valid)
+    return cost_saved;
+  else {
+    double misaligned = 0;
+    for (unsigned int i = 0; i < n_samples; ++i) {
+      std::vector<unsigned int> output;
+      unsigned int sz_sample = load_sample(&m_input, &output, &m_output, i);
+      net_run(NetNumAllowedCycles);
+
+      for (unsigned int j = 0; j < sz_sample; ++j) {
+        if (output[j] != m_output[j]) {
+          misaligned += 1.0;
+        }
+      }
+    }
+
+    cost_saved = misaligned;
+    cost_saved_valid = true;
+
+    return misaligned;
+  }
 }
 
 double Network::net_fitness()
 {
-	if (fit_saved_valid)
-		return fit_saved;
-	else {
-		double c_cost = net_cost();
-		double ret = 1 - exp(-m_net_last_cost / c_cost);
-		m_net_last_cost = c_cost;
-	
-		fit_saved = ret;
-		fit_saved_valid = true;
-	
-		return ret;
-	}
+  if (fit_saved_valid)
+    return fit_saved;
+  else {
+    double c_cost = net_cost();
+    double ret = 1 - exp(-m_net_last_cost / c_cost);
+    m_net_last_cost = c_cost;
+
+    fit_saved = ret;
+    fit_saved_valid = true;
+
+    return ret;
+  }
 }
 
 void Network::run(unsigned int cycles)
@@ -118,15 +118,15 @@ void Network::run(unsigned int cycles)
 
 Network::Network()
 {
-	mu = Mutator<double>();
-	
+  mu = Mutator<double>();
+
   global_i = 0;
   global_j = 0;
-  
+
   network_time = 0;
-  
+
   m_net_last_cost = std::numeric_limits<double>::infinity();
   m_ev_last_cost = std::numeric_limits<double>::infinity();
-	
-	dopamine = 0;
+
+  dopamine = 0;
 }
