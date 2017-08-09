@@ -1,0 +1,6 @@
+>> carrying things:
+locate object
+plan route to object
+grab object
+lift object
+proceed to destination
