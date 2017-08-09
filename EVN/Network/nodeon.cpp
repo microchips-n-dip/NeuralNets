@@ -76,9 +76,9 @@ void Nodeon::node_mutate()
 
   // Add/remove connectons until satisfied
   while (csz + connecton_drift != src_connectons.size()) {
-    if (csz + connecton_drift - src_connectons.size() > 0)
+    if (csz + connecton_drift > src_connectons.size())
       add_connecton_with_random_nodes();
-    else if (csz + connecton_drift - src_connectons.size() < 0)
+    else if (csz + connecton_drift < src_connectons.size())
       remove_random_connecton();
   }
 }

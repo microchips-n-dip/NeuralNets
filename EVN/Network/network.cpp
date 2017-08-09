@@ -41,9 +41,9 @@ void Network::mutate()
 
   // Add/remove nodeons until satisfied
   while (nsz + nodeon_drift != nodeons.size()) {
-    if (nsz + nodeon_drift - nodeons.size() > 0)
+    if (nsz + nodeon_drift > nodeons.size())
       nodeons.push_back(new Nodeon(this));
-    else if (nsz + nodeon_drift - nodeons.size() < 0)
+    else if (nsz + nodeon_drift < nodeons.size())
       remove_random_nodeon(); // Handles any connectons attached
   }
 
