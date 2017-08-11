@@ -13,8 +13,6 @@ class Network
   std::vector<Nodeon*> nodeons;
   std::vector<Connecton*> connectons;
 
-  unsigned int network_id;
-
   unsigned int global_i;
   unsigned int global_j;
 

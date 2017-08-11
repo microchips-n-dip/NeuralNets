@@ -11,7 +11,7 @@ int main(void)
   static const unsigned int NumNets = 100;
   std::vector<Network*> networks;
   for (unsigned int i = 0; i < NumNets; ++i) {
-    networks.push_back(new Network(i));
+    networks.push_back(new Network());
   }
 
   // Sort, kill, reproduce and mutate

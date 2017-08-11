@@ -17,8 +17,7 @@ struct Mutator
   // Random generators
   std::normal_distribution<Derived> nd;
   std::uniform_real_distribution<Derived> ud;
-  std::default_random_engine generator;
-  std::random_device rdevice;
+  std::random_device generator;
 
   // Distribution's standard deviation (default to 0.2)
   constexpr static double s = 0.2;
@@ -38,16 +37,7 @@ struct Mutator
   Derived get_ud()
   { return ud(generator); }
 
-  Mutator(unsigned int seed = 12850932) {
-    generator = std::default_random_engine(rdevice() * seed);
-  }
-
-  void operator=(const Mutator& mu)
-  {
-    nd = mu.nd;
-    ud = mu.ud;
-    generator = mu.generator;
-  }
+  Mutator() { }
 };
 
 #endif

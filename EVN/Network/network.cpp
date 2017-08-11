@@ -117,10 +117,9 @@ void Network::run(unsigned int cycles)
   net_run(NetNumAllowedCycles);
 }
 
-Network::Network(unsigned int _network_id)
+Network::Network()
 {
-  network_id = _network_id;
-  mu = Mutator<double>(network_id);
+  mu = Mutator<double>();
 
   global_i = 0;
   global_j = 0;
