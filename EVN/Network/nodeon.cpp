@@ -31,7 +31,14 @@ void Nodeon::add_connecton_with_random_nodes()
   if (nsz > 0) {
     // Reset for destination nodeon number
     network->mu.reset_ud(0, nsz);
-    unsigned int node_number = network->mu.get_ud();
+    Nodeon* dst_node = network->nodeons.begin() + mu.get_ud();
+
+    for (unsigned int i = 0; i < src_connectons.size(); ++i) {
+      if (src_connectons[i]->dst == dst_node) {
+        ++dst_node;
+        i = 0;
+      }
+    }
 
     src_connectons.push_back(new Connecton(this, network->nodeons[node_number], network, false));
   }
