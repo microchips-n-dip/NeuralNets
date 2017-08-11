@@ -28,14 +28,17 @@ void Network::mutate()
   unsigned int nsz = nodeons.size();
   unsigned int csz = connectons.size();
 
+  // Normal limits
+  const unsigned int nlim = 2;
+
   // Reset for nodeon drift
   mu.reset_nd(nsz, 0.3);
   int nodeon_drift = mu.get_nd();
   // Normalize
-  if (nodeon_drift > 2)
-    nodeon_drift = 2;
-  if (nodeon_drift < -2)
-    nodeon_drift = -2;
+  if (nodeon_drift > nlim)
+    nodeon_drift = nlim;
+  if (nodeon_drift < -nlim)
+    nodeon_drift = -nlim;
 
   nodeon_drift = (int(nsz) > -nodeon_drift) ? nodeon_drift : 1 - nsz;
 
