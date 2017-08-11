@@ -1,5 +1,5 @@
 # NeuralNets
-This isn't a readme
+A repo of a bunch of neural net related stuff. Some robot guts too...
 
 
 
