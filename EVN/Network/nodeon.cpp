@@ -40,7 +40,8 @@ void Nodeon::add_connecton_with_random_nodes()
       }
     }
 
-    src_connectons.push_back(new Connecton(this, network->nodeons[node_number], network, false));
+    if (dst_node < network->nodeons.end())
+      src_connectons.push_back(new Connecton(this, dst_node, network, false));
   }
 }
 
