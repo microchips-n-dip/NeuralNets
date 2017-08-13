@@ -48,7 +48,7 @@ class Network
 
   void run(unsigned int cycles);
 
-  Network(unsigned int _network_id);
+  Network();
 };
 
 #endif
