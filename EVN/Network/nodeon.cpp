@@ -31,26 +31,27 @@ void Nodeon::add_connecton_with_random_nodes()
 {
   // Get sizes
   unsigned int nsz = network->nodeons.size();
+  bool no_duplicates = true;
 
   if (nsz > 0) {
     // Reset for destination nodeon number
     network->mu.reset_ud(0, nsz);
-    Nodeon* dst_node = network->nodeons.begin() + mu.get_ud();
+    std::vector<Nodeon*>::iterator dst_node;
+    std::vector<Connecton*>::iterator it;
 
-    // Check for duplicates, we don't want those
-    for (unsigned int i = 0; i < src_connectons.size(); ++i) {
-      // Exit the loop if all nodeons have been examined
-      if (dst_node >= network->nodeons.end())
+    dst_node = network->nodeons.begin() + network->mu.get_ud();
+
+    // Check for duplicates
+    for (it = src_connectons.begin(); it < src_connectons.end(); ++it) {
+      if ((*it)->dst == *dst_node) {
+        no_duplicates = false;
         break;
-      if (src_connectons[i]->dst == dst_node) {
-        ++dst_node;
-        i = 0;
       }
     }
 
     // If no duplicates are found, create the new connecton
-    if (dst_node < network->nodeons.end())
-      src_connectons.push_back(new Connecton(this, dst_node, network, false));
+    if (no_duplicates)
+      src_connectons.push_back(new Connecton(this, *dst_node, network, false));
   }
 }
 

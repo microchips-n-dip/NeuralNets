@@ -38,7 +38,7 @@ void Network::mutate()
   // Normal limits
   // A way of making sure a network doesn't randomly occupy all the available memory
   // after the first generation
-  const unsigned int nlim = 2;
+  const int nlim = 2;
 
   // Reset for nodeon drift
   mu.reset_nd(nsz, 0.3);
@@ -49,6 +49,7 @@ void Network::mutate()
   if (nodeon_drift < -nlim)
     nodeon_drift = -nlim;
 
+  printf("nodeon_drift: %d\n", nodeon_drift);
   // Double check that there is no underflow problem, otherwise the program will take more than 224 GB
   nodeon_drift = (int(nsz) > -nodeon_drift) ? nodeon_drift : 1 - nsz;
 
@@ -140,6 +141,8 @@ void Network::run(unsigned int cycles)
   std::vector<unsigned int> o = m_output;
   for (unsigned int i = 0; i < cycles - 1; ++i) {
     dopamine = net_fitness();
+    cost_saved_valid = false;
+    fit_saved_valid = false;
   }
   m_output = o;
   net_run(NetNumAllowedCycles);
@@ -147,9 +150,6 @@ void Network::run(unsigned int cycles)
 
 Network::Network()
 {
-  // Initialize mu
-  mu = Mutator<double>();
-
   global_i = 0;
   global_j = 0;
 
