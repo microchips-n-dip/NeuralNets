@@ -21,10 +21,12 @@ int main(void)
       // Mutate this generation
       for (unsigned int j = 0; j < NumNets; ++j)
         networks.at(j)->mutate();
+      printf("Mutate step of generation %d done\n", i);
 
       // Run each network
       for (unsigned int j = 0; j < NumNets; ++j)
         networks.at(j)->run(1);
+      printf("Run step of generation %d done\n", i);
 
       // Sort and reproduce the networks
       sort(networks);
