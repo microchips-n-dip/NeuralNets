@@ -32,6 +32,5 @@ void ParticleSwarm::init()
 
 ParticleSwarm::ParticleSwarm()
 {
-  n_paths = 20;
-  paths = std::vector<Network*>(n_paths);
+  init();
 }

@@ -11,6 +11,10 @@ void Network::net_copy(Network* _network)
     (*node_it)->self_destruct();
   }
 
+  while (nodeons.size() > 0) {
+    nodeons.pop_back();
+  }
+
   NetworkConfiguration cfg = _network->config;
 
   for (unsigned int i = 0; i < cfg.nsz; ++i) {
