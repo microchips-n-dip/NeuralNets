@@ -12,7 +12,7 @@ void ParticleSwarm::path_branch()
 {
   std::vector<NetworkConfiguration>::iterator net_it;
   for (net_it = paths.begin(); net_it < paths.end(); ++net_it) {
-    net_perturb(*net_it);
+    net_permute(*net_it);
     Network* net = new Network(*net_it);
     Network* optnet = new Network(c_net);
 

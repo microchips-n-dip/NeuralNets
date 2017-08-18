@@ -10,6 +10,9 @@
 #include "forwarddeclarations.h"
 #include "samples.h"
 
+extern const unsigned int n_inputs;
+extern const unsigned int n_outputs;
+
 #include "Network/net_config.h"
 #include "Network/nodeon.h"
 #include "Network/connecton.h"

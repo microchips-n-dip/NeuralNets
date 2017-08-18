@@ -4,19 +4,25 @@ const double pi = acos(-1);
 const double npi = std::sqrt(0.25 * pi);
 
 // Nodeon constructor
-Nodeon::Nodeon(Network* _network, std::vector<unsigned int>& ntypes)
+Nodeon::Nodeon(Network* _network)
 {
   // Set the internal pointer to the network
   network = _network;
-
   loc_in_net = network->nodeons.size() - 1;
 
-  // Default type of nodeon
-  ntype = 0;
-
-  m_inp = 0;
-  m_activation = 0;
+  inp = 0;
+  spike = false;
+  respike = true;
   m_llft = 0;
+
+  Mutator<double> mu;
+
+  a = 0.2;
+  b = 0.02;
+
+  double r = mu.get_ud(0.0, 1.0);
+  c = 15 * r * r - 65;
+  d = 8 - 6 * r * r;
 }
 
 // Remove all attached connectons
@@ -37,6 +43,27 @@ void Nodeon::self_destruct()
 // Nodeon activation function
 void Nodeon::lf(double t)
 {
+  if (respike) {
+    double dv = (0.04 * v + 5) * v + 140 - u + inp;
+    double du = a * (b * v - u);
+    v += 0.1 * dv;
+    u += 0.1 * du;
+
+    spike = false;
+
+    if (v >= 30) {
+      u += d;
+      v = c;
+
+      spike = true;
+      m_llft = t;
+    }
+  }
+
+  else {
+    respike = true;
+  }
+
   // Transmit the activation across all connectons with this nodeon as a source
   unsigned int csz = src_connectons.size();
   for (unsigned int i = 0; i < csz; ++i) {
@@ -48,4 +75,7 @@ void Nodeon::lf(double t)
   for (unsigned int i = 0; i < csz; ++i) {
     dst_connectons.at(i)->stdp();
   }
+
+  spike = false;
+  inp = 0;
 }

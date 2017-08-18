@@ -16,7 +16,7 @@ Connecton::Connecton(Nodeon* _src, Nodeon* _dst, Network* _network, bool need_se
   // Copy network pointer
   network = _network;
 
-  pending = 0;
+  pending = false;
   c = 0;
 
   // Add this connecton to the lists
@@ -49,8 +49,8 @@ void Connecton::self_destruct()
 // Transmit function, transmit from source to destination and apply weight
 void Connecton::transmit()
 {
-  dst->m_inp += weight * pending;
-  pending = src->m_activation;
+  if (pending) dst->inp += weight;
+  pending = src->spike;
 }
 
 // STDP modulation for learning

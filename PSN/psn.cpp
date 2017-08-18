@@ -1,6 +1,9 @@
 #include "psn.h"
 #include <iostream>
 
+const unsigned int n_inputs = 8;
+const unsigned int n_outputs = 8;
+
 int main(void)
 {
   ParticleSwarm ps;
@@ -15,6 +18,6 @@ int main(void)
       ps.path_branch();
     }
 
-    printf("Optimal network contains %d nodesons and %d connectons\n", ps.c_net->nodeons.size(), ps.c_net->connectons.size());
+    printf("Optimal network contains %d nodesons and %d connectons\n", ps.c_net.nc.size(), ps.c_net.cc.size());
   }
 }

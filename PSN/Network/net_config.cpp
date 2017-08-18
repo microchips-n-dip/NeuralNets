@@ -8,8 +8,8 @@ void net_permute(NetworkConfiguration& ncfg)
   int node_drift = mu.get_nd(nsz, 1 - ncfg.fitness);
   nsz += node_drift;
 
-  if (nsz < 0) {
-    nsz = 0;
+  if (nsz < n_inputs + n_outputs) {
+    nsz = n_inputs + n_outputs;
   }
 
   while (nsz != ncfg.nc.size()) {
@@ -48,6 +48,8 @@ void net_permute(NetworkConfiguration& ncfg)
     }
   }
 }
+
+NodeonConfiguration::NodeonConfiguration() { }
 
 ConnectonConfiguration::ConnectonConfiguration(
   unsigned int _src, unsigned int _dst)

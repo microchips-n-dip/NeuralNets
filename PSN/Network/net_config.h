@@ -3,7 +3,7 @@
 
 struct NodeonConfiguration
 {
-  int ntype;
+  NodeonConfiguration();
 };
 
 struct ConnectonConfiguration

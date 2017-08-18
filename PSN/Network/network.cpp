@@ -10,7 +10,6 @@ Network::Network(NetworkConfiguration& ncfg_)
   unsigned int nsz = ncfg->nc.size();
   for (unsigned int i = 0; i < nsz; ++i) {
     nodeons.push_back(new Nodeon(this));
-    nodeons.at(i)->ntype = ncfg->nc.at(i).ntype;
   }
 
   std::vector<ConnectonConfiguration>::iterator connecton_it;
@@ -55,13 +54,37 @@ Network::~Network()
   }
 }
 
+unsigned int Network::c_input(unsigned int idx)
+{
+  return m_input.at(idx);
+}
+
+void Network::c_output(unsigned int data)
+{
+  m_output.at(global_j) = data;
+  ++global_j;
+}
+
 // Simulate each nodeon
 void Network::net_run(double time)
 {
   double stime = network_time;
   for (; network_time < stime + time; network_time += 0.1) {
+    if (global_i < m_input.size()) {
+      nodeons.at(c_input(global_i))->spike = true;
+      nodeons.at(c_input(global_i))->respike = false;
+      ++global_i;
+    }
+
     for (unsigned int i = 0; i < nodeons.size(); ++i) {
       nodeons.at(i)->lf(network_time);
+    }
+
+    for (unsigned int i = n_inputs; i < n_inputs + n_outputs; ++i) {
+      if (nodeons.at(i)->spike) {
+        c_output(i - n_inputs);
+        break;
+      }
     }
   }
 }
@@ -118,7 +141,7 @@ double Network::fitness()
 }
 
 // Run the network with STDP for some cycles
-void Network::run(unsigned int cycles)
+void Network::run(unsigned int cycles = n_samples + 1)
 {
   std::vector<unsigned int> o = m_output;
   for (unsigned int i = 0; i < cycles - 1; ++i) {

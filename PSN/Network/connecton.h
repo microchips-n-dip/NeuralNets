@@ -17,7 +17,7 @@ class Connecton
   unsigned int loc_in_dst;
 
   double weight;
-  double pending;
+  bool pending;
 
   double c; // Eligibility
 

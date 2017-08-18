@@ -23,9 +23,17 @@ class Network
   double dopamine;
   double network_time;
 
+  unsigned int global_i;
+  std::vector<unsigned int> m_input;
+  unsigned int global_j;
+  std::vector<unsigned int> m_output;
+
 
   Network(NetworkConfiguration& ncfg);
   ~Network();
+
+  unsigned int c_input(unsigned int idx);
+  void c_output(unsigned int data);
 
   void net_run(double time);
 
