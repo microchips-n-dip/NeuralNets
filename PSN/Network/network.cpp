@@ -1,97 +1,58 @@
 #include "../psn.h"
 
 const unsigned int n_samples = 1;
-const unsigned int NetNumAllowedCycles = 1024;
-const unsigned int EvNumAllowedCycles = 256;
+const unsigned int NumAllowedCycles = 64;
 
-void Network::net_copy(Network* _network)
+Network::Network(NetworkConfiguration& ncfg_)
 {
+  ncfg = &ncfg_;
+
+  unsigned int nsz = ncfg->nc.size();
+  for (unsigned int i = 0; i < nsz; ++i) {
+    nodeons.push_back(new Nodeon(this));
+    nodeons.at(i)->ntype = ncfg->nc.at(i).ntype;
+  }
+
+  std::vector<ConnectonConfiguration>::iterator connecton_it;
+  for (connecton_it = ncfg->cc.begin(); connecton_it < ncfg->cc.end(); ++connecton_it) {
+    new Connecton(nodeons.at(connecton_it->src), nodeons.at(connecton_it->dst), this, true);
+  }
+
+  last_cost = ncfg->cost;
+  saved_cost = ncfg->cost;
+  saved_cost_valid = false;
+
+  last_fitness = ncfg->fitness;
+  saved_fitness = ncfg->fitness;
+  saved_fitness_valid = false;
+}
+
+Network::~Network()
+{
+  unsigned int nsz = ncfg->nc.size();
+
+  std::vector<ConnectonConfiguration>::iterator connecton_it;
+  std::vector<unsigned int> loc_in_src_(nsz);
+  for (connecton_it = ncfg->cc.begin(); connecton_it < ncfg->cc.begin(); ++connecton_it) {
+    unsigned int node_id = connecton_it->src;
+    unsigned int loc_in_src = loc_in_src_.at(node_id);
+
+    double weight = nodeons.at(node_id)->src_connectons.at(loc_in_src)->weight;
+    double c = nodeons.at(node_id)->src_connectons.at(loc_in_src)->c;
+
+    connecton_it->weight = weight;
+    connecton_it->c = c;
+
+    ++loc_in_src_.at(node_id);
+  }
+
+  ncfg->cost = cost();
+  ncfg->fitness = fitness();
+
   std::vector<Nodeon*>::iterator node_it;
   for (node_it = nodeons.begin(); node_it < nodeons.end(); ++node_it) {
     (*node_it)->self_destruct();
   }
-
-  while (nodeons.size() > 0) {
-    nodeons.pop_back();
-  }
-
-  NetworkConfiguration cfg = _network->config;
-
-  for (unsigned int i = 0; i < cfg.nsz; ++i) {
-    nodeons.push_back(new Nodeon(this));
-  }
-
-  std::vector<ConnectonConfiguration>::iterator it;
-  for (it = cfg.connecton_configuration.begin(); it < cfg.connecton_configuration.end(); ++it) {
-    new Connecton(nodeons.at(it->source), nodeons.at(it->destination), this, true);
-  }
-}
-
-// Get the current input at the location indicated by global_i
-unsigned int Network::c_input()
-{
-  return m_input.at(global_i);
-}
-
-// Write to the current output
-void Network::c_output(unsigned int number)
-{
-  m_output.at(global_j) = number;
-  // It is assumed that a network is never allowed to change the output it has written
-  ++global_j;
-}
-
-// Remove a nodeon
-void Network::remove_random_nodeon()
-{
-  unsigned int nsz = nodeons.size();
-  mu.reset_ud(0, nsz);
-  nodeons.at(mu.get_ud())->self_destruct();
-}
-
-// Add or remove some number of nodeons given by nodeon_drift,
-// then mutate each nodeon
-void Network::mutate()
-{
-  // Sizes
-  // (it's much more convenient to type three letters)
-  unsigned int nsz = nodeons.size();
-  unsigned int csz = connectons.size();
-
-  // Normal limits
-  // A way of making sure a network doesn't randomly occupy all the available memory
-  // after the first generation
-  const int nlim = 2;
-
-  // Reset for nodeon drift
-  mu.reset_nd(nsz, 0.3);
-  int nodeon_drift = mu.get_nd();
-  // Normalize
-  if (nodeon_drift > nlim)
-    nodeon_drift = nlim;
-  if (nodeon_drift < -nlim)
-    nodeon_drift = -nlim;
-
-  printf("nodeon_drift: %d\n", nodeon_drift);
-  // Double check that there is no underflow problem, otherwise the program will take more than 224 GB
-  nodeon_drift = (int(nsz) > -nodeon_drift) ? nodeon_drift : 1 - nsz;
-
-  // Add/remove nodeons until satisfied
-  while (nsz + nodeon_drift != nodeons.size()) {
-    if (nsz + nodeon_drift > nodeons.size())
-      nodeons.push_back(new Nodeon(this));
-    else if (nsz + nodeon_drift < nodeons.size())
-      remove_random_nodeon(); // Handles any connectons attached
-  }
-
-  // Mutate each node
-  for (unsigned int i = 0; i < nodeons.size(); ++i) {
-    nodeons.at(i)->node_mutate();
-  }
-
-  // Invalidate the saved values
-  fit_saved_valid = false;
-  cost_saved_valid = false;
 }
 
 // Simulate each nodeon
@@ -106,11 +67,11 @@ void Network::net_run(double time)
 }
 
 // Compute the cost value the network
-double Network::net_cost()
+double Network::cost()
 {
   // Check for valid saved value, if so return that (massive time saver)
-  if (cost_saved_valid)
-    return cost_saved;
+  if (saved_cost_valid)
+    return saved_cost;
   // If not compute cost from scratch
   else {
     double misaligned = 0;
@@ -120,39 +81,37 @@ double Network::net_cost()
       // Load the sample
       unsigned int sz_sample = load_sample(&m_input, &output, &m_output, i);
       // Run the network for some cycles
-      net_run(NetNumAllowedCycles);
+      net_run(NumAllowedCycles);
 
       // Calculate the misalignment of the outputs
       for (unsigned int j = 0; j < sz_sample; ++j) {
-        misaligned += output[j] - m_output[j];
+        misaligned += std::fabs(output[j] - m_output[j]);
       }
     }
 
     // Save and validate the cost
-    cost_saved = std::fabs(misaligned);
-    cost_saved_valid = true;
+    saved_cost = misaligned;
+    saved_cost_valid = true;
 
-    return std::fabs(misaligned);
+    return misaligned;
   }
 }
 
-// Calculate the fitness of the network
-// Fitness is measured as the networks ability to improve
-double Network::net_fitness()
+double Network::fitness()
 {
   // If there is a valid saved value, return that
-  if (fit_saved_valid)
-    return fit_saved;
+  if (saved_fitness_valid)
+    return saved_fitness;
   else {
     // Compute the cost
-    double c_cost = net_cost();
+    double c_cost = cost();
     // Compare the current cost to the last one
-    double ret = 1 - exp(-m_net_last_cost / c_cost);
-    m_net_last_cost = c_cost;
+    double ret = 1 - exp(-last_cost / c_cost);
+    last_cost = c_cost;
 
     // Save and validate the fitness
-    fit_saved = ret;
-    fit_saved_valid = true;
+    saved_fitness = ret;
+    saved_fitness_valid = true;
 
     return ret;
   }
@@ -163,39 +122,10 @@ void Network::run(unsigned int cycles)
 {
   std::vector<unsigned int> o = m_output;
   for (unsigned int i = 0; i < cycles - 1; ++i) {
-    dopamine = net_fitness();
-    cost_saved_valid = false;
-    fit_saved_valid = false;
+    dopamine = fitness();
+    saved_cost_valid = false;
+    saved_fitness_valid = false;
   }
   m_output = o;
-  net_run(NetNumAllowedCycles);
-}
-
-Network::Network()
-{
-  global_i = 0;
-  global_j = 0;
-
-  network_time = 0;
-
-  // Set the last costs to infinity, to avoid false results
-  m_net_last_cost = std::numeric_limits<double>::infinity();
-  m_ev_last_cost = std::numeric_limits<double>::infinity();
-
-  dopamine = 0;
-}
-
-Network::Network(ParticleSwarm* _swarm)
-{
-  swarm = _swarm;
-
-  global_i = 0;
-  global_j = 0;
-
-  network_time = 0;
-
-  m_net_last_cost = std::numeric_limits<double>::infinity();
-  m_ev_last_cost = std::numeric_limits<double>::infinity();
-
-  dopamine = 0;
+  net_run(NumAllowedCycles);
 }

@@ -15,7 +15,7 @@ enum {
 class Nodeon
 {
  public:
-  int ntype;
+  std::vector<NeuronFunctor*> nfuncs;
 
   std::vector<Connecton*> src_connectons;
   std::vector<Connecton*> dst_connectons;
@@ -26,18 +26,14 @@ class Nodeon
   unsigned int number;
   bool m_spike_happened;
 
+  unsigned int loc_in_net;
+
   Network* network;
 
 
   Nodeon(Network* _network);
 
   void self_destruct();
-
-  void add_connecton_with_random_nodes();
-
-  void remove_random_connecton();
-
-  void node_mutate();
 
   void lf(double t);
 };

@@ -16,45 +16,31 @@ Connecton::Connecton(Nodeon* _src, Nodeon* _dst, Network* _network, bool need_se
   // Copy network pointer
   network = _network;
 
-  // Set the initial weight randomly
-  network->mu.reset_ud(-1.0, 1.0);
-  weight = network->mu.get_ud();
   pending = 0;
-
   c = 0;
-
-  // Record the location of this connecton in the lists,
-  // makes self-destruction much faster
-  loc_in_src = src->src_connectons.size();
-  loc_in_dst = dst->dst_connectons.size();
-  loc_in_net = network->connectons.size();
 
   // Add this connecton to the lists
   if (need_set_src)
     src->src_connectons.push_back(this);
-  else
-    --loc_in_src;
   // We know that src has already added this
   dst->dst_connectons.push_back(this);
-  network->connectons.push_back(this);
 
-  //printf("Created new connecton\n");
+  loc_in_src = src->src_connectons.size() - 1;
+  loc_in_dst = dst->dst_connectons.size() - 1;
 }
 
 // Connecton self-destruct function
 void Connecton::self_destruct()
 {
+  std::vector<Connecton*>::iterator connecton_it;
+
   // Remove this from the source nodeons's list
-  src->src_connectons.at(loc_in_src) = *(src->src_connectons.end() - 1);
-  src->src_connectons.pop_back();
+  connecton_it = src->src_connectons.begin() + loc_in_src;
+  src->src_connectons.erase(connecton_it);
 
   // Remove this from the destination nodeon's list
-  dst->dst_connectons.at(loc_in_dst) = *(dst->dst_connectons.end() - 1);
-  dst->dst_connectons.pop_back();
-
-  // Remove this from the network's list
-  network->connectons.at(loc_in_net) = *(network->connectons.end() - 1);
-  network->connectons.pop_back();
+  connecton_it = dst->src_connectons.begin() + loc_in_src;
+  dst->dst_connectons.erase(connecton_it);
 
   // Delete this
   delete this;

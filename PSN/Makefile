@@ -1,5 +1,8 @@
-psn.exe: nodeon.o connecton.o network.o particle_swarm.o psn.o
-	g++ Network/nodeon.o Network/connecton.o Network/network.o Network/particle_swarm.o psn.o -o psn.exe -std=c++11
+psn.exe: net_config.o nodeon.o connecton.o network.o particle_swarm.o psn.o
+	g++ Network/net_config.o Network/nodeon.o Network/connecton.o Network/network.o Network/particle_swarm.o psn.o -o psn.exe -std=c++11
+
+net_config.o:
+	g++ -c -g Network/net_config.cpp -o Network/net_config.o -std=c++11
 
 nodeon.o:
 	g++ -c -g Network/nodeon.cpp -o Network/nodeon.o -std=c++11

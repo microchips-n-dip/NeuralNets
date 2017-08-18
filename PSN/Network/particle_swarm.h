@@ -5,11 +5,9 @@ class ParticleSwarm
 {
   public:
 
-  Mutator<double> mu;
-
-  Network* c_net;
+  NetworkConfiguration c_net;
   unsigned int n_paths;
-  std::vector<Network*> paths;
+  std::vector<NetworkConfiguration> paths;
 
   void path_reset();
   void path_branch();

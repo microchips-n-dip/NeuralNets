@@ -31,11 +31,23 @@ struct Mutator
   Derived get_nd()
   { return nd(generator); }
 
+  Derived get_nd(double m, double _s)
+  {
+    reset_nd(m, _s);
+    return get_nd();
+  }
+
   void reset_ud(Derived a, Derived b)
   { ud = std::uniform_real_distribution<Derived>(a, b); }
 
   Derived get_ud()
   { return ud(generator); }
+
+  Derived get_ud(double m, double _s)
+  {
+    reset_nd(m, _s);
+    return get_ud();
+  }
 
   Mutator() { }
 };

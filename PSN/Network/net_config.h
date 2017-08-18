@@ -1,20 +1,32 @@
 #ifndef PSN_NET_CONFIG_H
 #define PSN_NET_CONFIG_H
 
+struct NodeonConfiguration
+{
+  int ntype;
+};
+
 struct ConnectonConfiguration
 {
-  unsigned int source;
-  unsigned int destination;
+  unsigned int src;
+  unsigned int dst;
+
+  double c;
   double weight;
+
+  ConnectonConfiguration(unsigned int _src, unsigned int _dst);
 };
 
 struct NetworkConfiguration
 {
-  unsigned int nsz;
-  unsigned int csz;
+  std::vector<NodeonConfiguration> nc;
+  std::vector<ConnectonConfiguration> cc;
 
-  std::vector<ConnectonConfiguration> connecton_configuration;
+  double cost;
+  double fitness;
 };
+
+void net_permute(NetworkConfiguration& ncfg);
 
 #endif
 

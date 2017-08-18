@@ -15,7 +15,6 @@ class Connecton
 
   unsigned int loc_in_src;
   unsigned int loc_in_dst;
-  unsigned int loc_in_net;
 
   double weight;
   double pending;
