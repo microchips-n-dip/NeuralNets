@@ -28,14 +28,18 @@ Nodeon::Nodeon(Network* _network)
 // Remove all attached connectons
 void Nodeon::self_destruct()
 {
+  printf("Destroying node\n");
+
   while (src_connectons.size() > 0)
     (*src_connectons.begin())->self_destruct();
   while (dst_connectons.size() > 0)
     (*dst_connectons.begin())->self_destruct();
 
-  std::vector<Nodeon*>::iterator node_it;
-  node_it = network->nodeons.begin() + loc_in_net;
-  network->nodeons.erase(node_it);
+  printf("Destroyed attached connectons\n");
+
+  (*(network->nodeons.end() - 1))->loc_in_net = loc_in_net;
+  network->nodeons.at(loc_in_net) = *(network->nodeons.end() - 1);
+  network->nodeons.pop_back();
 
   delete this;
 }

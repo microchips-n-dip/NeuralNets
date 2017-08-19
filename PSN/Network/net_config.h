@@ -24,6 +24,8 @@ struct NetworkConfiguration
 
   double cost;
   double fitness;
+
+  NetworkConfiguration();
 };
 
 void net_permute(NetworkConfiguration& ncfg);

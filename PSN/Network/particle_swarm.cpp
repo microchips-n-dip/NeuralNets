@@ -19,6 +19,9 @@ void ParticleSwarm::path_branch()
     if (net->fitness() >= optnet->fitness()) {
       c_net = *net_it;
     }
+
+    delete net;
+    delete optnet;
   }
 }
 
@@ -28,6 +31,7 @@ void ParticleSwarm::init()
   for (unsigned int i = 0; i < n_paths; ++i) {
     paths.push_back(NetworkConfiguration());
   }
+  net_permute(c_net);
 }
 
 ParticleSwarm::ParticleSwarm()

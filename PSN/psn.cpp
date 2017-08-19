@@ -7,7 +7,6 @@ const unsigned int n_outputs = 8;
 int main(void)
 {
   ParticleSwarm ps;
-  ps.init();
 
   while (true) {
     unsigned int n_gens;

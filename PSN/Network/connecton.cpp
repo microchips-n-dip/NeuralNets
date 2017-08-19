@@ -32,16 +32,19 @@ Connecton::Connecton(Nodeon* _src, Nodeon* _dst, Network* _network, bool need_se
 // Connecton self-destruct function
 void Connecton::self_destruct()
 {
-  std::vector<Connecton*>::iterator connecton_it;
+  printf("Destroying connecton\n");
 
   // Remove this from the source nodeons's list
-  connecton_it = src->src_connectons.begin() + loc_in_src;
-  src->src_connectons.erase(connecton_it);
+  (*(src->src_connectons.end() - 1))->loc_in_src = loc_in_src;
+  src->src_connectons.at(loc_in_src) = *(src->src_connectons.end() - 1);
+  src->src_connectons.pop_back();
 
   // Remove this from the destination nodeon's list
-  connecton_it = dst->src_connectons.begin() + loc_in_src;
-  dst->dst_connectons.erase(connecton_it);
+  (*(dst->dst_connectons.end() - 1))->loc_in_dst = loc_in_dst;
+  dst->dst_connectons.at(loc_in_dst) = *(dst->dst_connectons.end() - 1);
+  dst->dst_connectons.pop_back();
 
+  printf("Removed from lists\n");
   // Delete this
   delete this;
 }

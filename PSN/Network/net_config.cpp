@@ -6,28 +6,31 @@ void net_permute(NetworkConfiguration& ncfg)
 
   int nsz = ncfg.nc.size();
   int node_drift = mu.get_nd(nsz, 1 - ncfg.fitness);
-  nsz += node_drift;
+  if (nsz < 20) nsz += node_drift;
 
   if (nsz < n_inputs + n_outputs) {
     nsz = n_inputs + n_outputs;
   }
 
-  while (nsz != ncfg.nc.size()) {
+  while (nsz != int(ncfg.nc.size())) {
     if (nsz > ncfg.nc.size()) {
-      ncfg.nc.push_back(NodeonConfiguration());
+      //printf("ncfg.nc.size(): %d\n", ncfg.nc.size());
+      NodeonConfiguration node = NodeonConfiguration();
+      ncfg.nc.push_back(node);
     }
 
     else if (nsz < ncfg.nc.size()) {
+      std::vector<NodeonConfiguration>::iterator node_it;
       unsigned int node_id = mu.get_ud(0, ncfg.nc.size() - 1);
-      ncfg.nc.at(node_id) = *(ncfg.nc.end() - 1);
-      ncfg.nc.pop_back();
+      node_it = ncfg.nc.begin() + node_id;
+      ncfg.nc.erase(node_it);
     }
   }
 
   for (unsigned int i = 0; i < nsz; ++i) {
     int csz = ncfg.cc.size();
     int connecton_drift = mu.get_nd(csz, 1 - ncfg.fitness);
-    csz += connecton_drift;
+    if (csz < 20) csz += connecton_drift;
 
     if (csz < 0) {
       csz = 0;
@@ -35,8 +38,9 @@ void net_permute(NetworkConfiguration& ncfg)
 
     while (csz!= ncfg.cc.size()) {
       if (csz > ncfg.cc.size()) {
-        unsigned int node_id = mu.get_ud(0, ncfg.nc.size() - 1);
-        ncfg.cc.push_back(ConnectonConfiguration(i, node_id));
+        unsigned int node_id = mu.get_ud(0, nsz - 1);
+        ConnectonConfiguration connecton = ConnectonConfiguration(i, node_id);
+        ncfg.cc.push_back(connecton);
       }
 
       else if (csz + connecton_drift < ncfg.cc.size()) {
@@ -47,6 +51,8 @@ void net_permute(NetworkConfiguration& ncfg)
       }
     }
   }
+
+  printf("Produced network of form (%d, %d)\n", ncfg.nc.size(), ncfg.cc.size());
 }
 
 NodeonConfiguration::NodeonConfiguration() { }
@@ -59,4 +65,10 @@ ConnectonConfiguration::ConnectonConfiguration(
 
   Mutator<double> mu;
   weight = mu.get_nd(0, 1.0);
+}
+
+NetworkConfiguration::NetworkConfiguration()
+{
+  fitness = 0;
+  cost = std::numeric_limits<double>::infinity();
 }
