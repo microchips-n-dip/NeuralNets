@@ -23,7 +23,6 @@ Network::Network(NetworkConfiguration& ncfg_)
 
   std::vector<ConnectonConfiguration>::iterator connecton_it;
   for (connecton_it = ncfg->cc.begin(); connecton_it < ncfg->cc.end(); ++connecton_it) {
-    printf("Src id: %d (%d)\n", connecton_it->src, nodeons.size());
     new Connecton(nodeons.at(connecton_it->src), nodeons.at(connecton_it->dst), this, true);
   }
   printf("Finished making new network\n");
