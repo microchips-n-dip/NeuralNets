@@ -25,25 +25,6 @@ Nodeon::Nodeon(Network* _network)
   d = 8 - 6 * r * r;
 }
 
-// Remove all attached connectons
-void Nodeon::self_destruct()
-{
-  printf("Destroying node\n");
-
-  while (src_connectons.size() > 0)
-    (*src_connectons.begin())->self_destruct();
-  while (dst_connectons.size() > 0)
-    (*dst_connectons.begin())->self_destruct();
-
-  printf("Destroyed attached connectons\n");
-
-  (*(network->nodeons.end() - 1))->loc_in_net = loc_in_net;
-  network->nodeons.at(loc_in_net) = *(network->nodeons.end() - 1);
-  network->nodeons.pop_back();
-
-  delete this;
-}
-
 // Nodeon activation function
 void Nodeon::lf(double t)
 {
@@ -82,4 +63,26 @@ void Nodeon::lf(double t)
 
   spike = false;
   inp = 0;
+}
+
+void destroy_nodeon(Nodeon* n)
+{
+  Network* net = n->network;
+
+  Nodeon* end;
+
+  while (n->src_connectons.size() > 0) {
+    destroy_connecton(*(n->src_connectons.begin()));
+  }
+
+  while (n->dst_connectons.size() > 0) {
+    destroy_connecton(*(n->dst_connectons.begin()));
+  }
+
+  end = *(net->nodeons.end() - 1);
+  end->loc_in_net = n-> loc_in_net;
+  net->nodeons.at(n->loc_in_net) = end;
+  net->nodeons.pop_back();
+
+  delete n;
 }

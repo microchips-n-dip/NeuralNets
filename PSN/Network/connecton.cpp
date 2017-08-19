@@ -29,26 +29,6 @@ Connecton::Connecton(Nodeon* _src, Nodeon* _dst, Network* _network, bool need_se
   loc_in_dst = dst->dst_connectons.size() - 1;
 }
 
-// Connecton self-destruct function
-void Connecton::self_destruct()
-{
-  printf("Destroying connecton\n");
-
-  // Remove this from the source nodeons's list
-  (*(src->src_connectons.end() - 1))->loc_in_src = loc_in_src;
-  src->src_connectons.at(loc_in_src) = *(src->src_connectons.end() - 1);
-  src->src_connectons.pop_back();
-
-  // Remove this from the destination nodeon's list
-  (*(dst->dst_connectons.end() - 1))->loc_in_dst = loc_in_dst;
-  dst->dst_connectons.at(loc_in_dst) = *(dst->dst_connectons.end() - 1);
-  dst->dst_connectons.pop_back();
-
-  printf("Removed from lists\n");
-  // Delete this
-  delete this;
-}
-
 // Transmit function, transmit from source to destination and apply weight
 void Connecton::transmit()
 {
@@ -74,4 +54,24 @@ void Connecton::stdp()
 
   // Modify the weight according to the dopamine level and eligibility trace
   weight += network->dopamine * c;
+}
+
+void destroy_connecton(Connecton* c)
+{
+  Nodeon* src = c->src;
+  Nodeon* dst = c->dst;
+
+  Connecton* end;
+
+  end = *(src->src_connectons.end() - 1);
+  end->loc_in_src = c->loc_in_src;
+  src->src_connectons.at(c->loc_in_src) = end;
+  src->src_connectons.pop_back();
+
+  end = *(dst->dst_connectons.end() - 1);
+  end->loc_in_dst = c->loc_in_dst;
+  dst->dst_connectons.at(c->loc_in_dst) = end;
+  dst->dst_connectons.pop_back();
+
+  delete c;
 }

@@ -63,7 +63,7 @@ Network::~Network()
   ncfg->fitness = fitness();
 
   while (nodeons.size() > 0) {
-    (*nodeons.begin())->self_destruct();
+    destroy_nodeon(*nodeons.begin());
   }
 
   printf("Finished destructing network\n");

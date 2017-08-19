@@ -6,5 +6,8 @@ class Connecton;
 class Network;
 class ParticleSwarm;
 
+void destroy_nodeon(Nodeon* n);
+void destroy_connecton(Connecton* c);
+
 #endif
 
