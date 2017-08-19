@@ -27,7 +27,7 @@ class Nodeon
   Network* network;
 
 
-  Nodeon(Network* _network);
+  Nodeon();
 
   void self_destruct();
 

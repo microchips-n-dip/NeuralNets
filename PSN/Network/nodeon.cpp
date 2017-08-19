@@ -4,12 +4,8 @@ const double pi = acos(-1);
 const double npi = std::sqrt(0.25 * pi);
 
 // Nodeon constructor
-Nodeon::Nodeon(Network* _network)
+Nodeon::Nodeon()
 {
-  // Set the internal pointer to the network
-  network = _network;
-  loc_in_net = network->nodeons.size() - 1;
-
   inp = 0;
   spike = false;
   respike = true;
@@ -65,22 +61,31 @@ void Nodeon::lf(double t)
   inp = 0;
 }
 
+void construct_nodeon(Network* net)
+{
+  Nodeon* n = new Nodeon();
+
+  net->nodeons.push_back(n);
+  n->loc_in_net = net->nodeons.size() - 1;
+  n->network = net;
+}
+
 void destroy_nodeon(Nodeon* n)
 {
   Network* net = n->network;
 
   Nodeon* end;
 
-  while (n->src_connectons.size() > 0) {
-    destroy_connecton(*(n->src_connectons.begin()));
+  while (!n->src_connectons.empty()) {
+    destroy_connecton(n->src_connectons.front());
   }
 
-  while (n->dst_connectons.size() > 0) {
-    destroy_connecton(*(n->dst_connectons.begin()));
+  while (!n->dst_connectons.empty()) {
+    destroy_connecton(n->dst_connectons.front());
   }
 
-  end = *(net->nodeons.end() - 1);
-  end->loc_in_net = n-> loc_in_net;
+  end = net->nodeons.back();
+  end->loc_in_net = n->loc_in_net;
   net->nodeons.at(n->loc_in_net) = end;
   net->nodeons.pop_back();
 

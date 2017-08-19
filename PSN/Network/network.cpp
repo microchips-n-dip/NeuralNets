@@ -12,18 +12,16 @@ Network::Network(NetworkConfiguration& ncfg_)
 
   unsigned int nsz = ncfg->nc.size();
   nodeons.reserve(nsz);
-  nodeons.resize(nsz);
 
-  std::vector<Nodeon*>::iterator node_it;
-  for (node_it = nodeons.begin(); node_it < nodeons.end(); ++node_it) {
-    *node_it = new Nodeon(this);
+  while (nodeons.size() < nsz) {
+    construct_nodeon(this);
   }
 
   printf("Finished creating nodes\n");
 
   std::vector<ConnectonConfiguration>::iterator connecton_it;
   for (connecton_it = ncfg->cc.begin(); connecton_it < ncfg->cc.end(); ++connecton_it) {
-    new Connecton(nodeons.at(connecton_it->src), nodeons.at(connecton_it->dst), this, true);
+    construct_connecton(nodeons.at(connecton_it->src), nodeons.at(connecton_it->dst), this);
   }
   printf("Finished making new network\n");
 
@@ -62,8 +60,8 @@ Network::~Network()
   ncfg->cost = cost();
   ncfg->fitness = fitness();
 
-  while (nodeons.size() > 0) {
-    destroy_nodeon(*nodeons.begin());
+  while (!nodeons.empty()) {
+    destroy_nodeon(nodeons.front());
   }
 
   printf("Finished destructing network\n");

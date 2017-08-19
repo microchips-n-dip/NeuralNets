@@ -24,8 +24,7 @@ class Connecton
   Network* network;
 
 
-
-  Connecton(Nodeon* _src, Nodeon* _dst, Network* _network, bool need_set_src = true);
+  Connecton();
 
   void self_destruct();
 

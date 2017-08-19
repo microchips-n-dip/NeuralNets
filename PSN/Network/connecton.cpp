@@ -7,26 +7,10 @@ const double w_T_minus = 0.11;
 const double c_tau = 0.2;
 
 // Connecton constructor
-Connecton::Connecton(Nodeon* _src, Nodeon* _dst, Network* _network, bool need_set_src)
+Connecton::Connecton()
 {
-  // Copy source and destination nodeon pointers
-  src = _src;
-  dst = _dst;
-
-  // Copy network pointer
-  network = _network;
-
   pending = false;
   c = 0;
-
-  // Add this connecton to the lists
-  if (need_set_src)
-    src->src_connectons.push_back(this);
-  // We know that src has already added this
-  dst->dst_connectons.push_back(this);
-
-  loc_in_src = src->src_connectons.size() - 1;
-  loc_in_dst = dst->dst_connectons.size() - 1;
 }
 
 // Transmit function, transmit from source to destination and apply weight
@@ -56,6 +40,21 @@ void Connecton::stdp()
   weight += network->dopamine * c;
 }
 
+void construct_connecton(Nodeon* src, Nodeon* dst, Network* net)
+{
+  Connecton* c = new Connecton();
+
+  c->src = src;
+  c->dst = dst;
+  c->network = net;
+
+  src->src_connectons.push_back(c);
+  dst->dst_connectons.push_back(c);
+
+  c->loc_in_src = src->src_connectons.size() - 1;
+  c->loc_in_dst = dst->dst_connectons.size() - 1;
+}
+
 void destroy_connecton(Connecton* c)
 {
   Nodeon* src = c->src;
@@ -63,12 +62,12 @@ void destroy_connecton(Connecton* c)
 
   Connecton* end;
 
-  end = *(src->src_connectons.end() - 1);
+  end = src->src_connectons.back();
   end->loc_in_src = c->loc_in_src;
   src->src_connectons.at(c->loc_in_src) = end;
   src->src_connectons.pop_back();
 
-  end = *(dst->dst_connectons.end() - 1);
+  end = dst->dst_connectons.back();
   end->loc_in_dst = c->loc_in_dst;
   dst->dst_connectons.at(c->loc_in_dst) = end;
   dst->dst_connectons.pop_back();
