@@ -16,6 +16,9 @@ void ParticleSwarm::path_branch()
     Network* net = new Network(*net_it);
     Network* optnet = new Network(c_net);
 
+    net->run(32);
+    optnet->run(32);
+
     if (net->fitness() >= optnet->fitness()) {
       c_net = *net_it;
     }
