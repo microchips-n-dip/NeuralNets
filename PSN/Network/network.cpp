@@ -7,9 +7,6 @@ Network::Network(NetworkConfiguration& ncfg_)
 {
   ncfg = &ncfg_;
 
-  printf("Number of nodeons: %d\n", ncfg->nc.size());
-  printf("Number of connectons: %d\n", ncfg->cc.size());
-
   unsigned int nsz = ncfg->nc.size();
   nodeons.reserve(nsz);
 
@@ -17,13 +14,10 @@ Network::Network(NetworkConfiguration& ncfg_)
     construct_nodeon(this);
   }
 
-  printf("Finished creating nodes\n");
-
   std::vector<ConnectonConfiguration>::iterator connecton_it;
   for (connecton_it = ncfg->cc.begin(); connecton_it < ncfg->cc.end(); ++connecton_it) {
     construct_connecton(nodeons.at(connecton_it->src), nodeons.at(connecton_it->dst), this);
   }
-  printf("Finished making new network\n");
 
   last_cost = ncfg->cost;
   saved_cost = ncfg->cost;
@@ -37,8 +31,6 @@ Network::Network(NetworkConfiguration& ncfg_)
 Network::~Network()
 {
   unsigned int nsz = ncfg->nc.size();
-
-  printf("Destroying network\n");
 
   std::vector<ConnectonConfiguration>::iterator connecton_it;
   std::vector<unsigned int> loc_in_src_(nsz);
@@ -55,16 +47,12 @@ Network::~Network()
     ++loc_in_src_.at(node_id);
   }
 
-  printf("Copied connecton data\n");
-
   ncfg->cost = cost();
   ncfg->fitness = fitness();
 
   while (!nodeons.empty()) {
     destroy_nodeon(nodeons.front());
   }
-
-  printf("Finished destructing network\n");
 }
 
 unsigned int Network::c_input(unsigned int idx)

@@ -8,7 +8,7 @@ void net_permute(NetworkConfiguration& ncfg)
   int node_drift = mu.get_nd(nsz, 1 - ncfg.fitness);
   if (nsz < 20) nsz += node_drift;
 
-  if (nsz < n_inputs + n_outputs) {
+  if (nsz < int(n_inputs + n_outputs)) {
     nsz = n_inputs + n_outputs;
   }
 
@@ -43,7 +43,7 @@ void net_permute(NetworkConfiguration& ncfg)
         ncfg.cc.push_back(connecton);
       }
 
-      else if (csz + connecton_drift < ncfg.cc.size()) {
+      else if (csz < ncfg.cc.size()) {
         std::vector<ConnectonConfiguration>::iterator connecton_it;
         unsigned int connecton_id = mu.get_ud(0, ncfg.cc.size() - 1);
         connecton_it = ncfg.cc.begin() + connecton_id;
