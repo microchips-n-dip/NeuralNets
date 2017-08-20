@@ -17,6 +17,7 @@ int main(void)
       ps.path_branch();
     }
 
-    printf("Optimal network contains %d nodesons and %d connectons\n", ps.c_net.nc.size(), ps.c_net.cc.size());
+    printf("Optimal network contains %d nodeons and %d connectons\n", ps.c_net.nc.size(), ps.c_net.cc.size());
+    printf("Its fitness is %f\n", ps.c_net.fitness);
   }
 }

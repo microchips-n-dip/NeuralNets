@@ -6,7 +6,7 @@ void net_permute(NetworkConfiguration& ncfg)
 
   int nsz = ncfg.nc.size();
   int node_drift = mu.get_nd(nsz, 1 - ncfg.fitness);
-  if (nsz < 20) nsz += node_drift;
+  nsz += node_drift;
 
   if (nsz < int(n_inputs + n_outputs)) {
     nsz = n_inputs + n_outputs;
@@ -30,7 +30,7 @@ void net_permute(NetworkConfiguration& ncfg)
   for (unsigned int i = 0; i < nsz; ++i) {
     int csz = ncfg.cc.size();
     int connecton_drift = mu.get_nd(csz, 1 - ncfg.fitness);
-    if (csz < 20) csz += connecton_drift;
+    csz += connecton_drift;
 
     if (csz < 0) {
       csz = 0;
