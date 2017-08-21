@@ -19,7 +19,7 @@ void ParticleSwarm::path_branch()
     net->run(32);
     optnet->run(32);
 
-    if (net->fitness() >= optnet->fitness()) {
+    if (net->fitness() > optnet->fitness()) {
       c_net = *net_it;
     }
 
