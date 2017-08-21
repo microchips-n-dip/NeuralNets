@@ -36,6 +36,11 @@ void net_permute(NetworkConfiguration& ncfg)
       csz = 0;
     }
 
+    int nsz2 = nsz * nsz;
+    if (csz > nsz2) {
+      csz = nsz2;
+    }
+
     while (csz!= ncfg.cc.size()) {
       if (csz > ncfg.cc.size()) {
         unsigned int node_id = mu.get_ud(0, nsz - 1);
