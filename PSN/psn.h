@@ -5,6 +5,7 @@
 #include <random>
 #include <stdio.h>
 #include <vector>
+#include <fstream>
 
 #include "Mutator/mutator.h"
 #include "forwarddeclarations.h"

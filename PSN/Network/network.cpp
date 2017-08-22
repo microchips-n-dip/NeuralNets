@@ -1,7 +1,7 @@
 #include "../psn.h"
 
 const unsigned int n_samples = 1;
-const unsigned int NumAllowedCycles = 64;
+const unsigned int NumAllowedCycles = 1024;
 
 Network::Network(NetworkConfiguration& ncfg_)
 {
@@ -81,11 +81,22 @@ void Network::net_run(double time)
       nodeons.at(i)->lf(network_time);
     }
 
+    unsigned int gj = global_j;
+
     for (unsigned int i = n_inputs; i < n_inputs + n_outputs; ++i) {
       if (nodeons.at(i)->spike) {
         c_output(i - n_inputs);
-        break;
       }
+    }
+
+    double misaligned = 0;
+    for (unsigned int i = gj; i < global_j; ++i) {
+      misaligned -= std::fabs(m_output.at(i) - t_output.at(i));
+    }
+
+    dopamine += (1 + erf(misaligned)) * 10;
+    if (dopamine < 0) {
+      dopamine = 0;
     }
   }
 }
@@ -103,13 +114,13 @@ double Network::cost()
     for (unsigned int i = 0; i < n_samples; ++i) {
       std::vector<unsigned int> output;
       // Load the sample
-      unsigned int sz_sample = load_sample(&m_input, &output, &m_output, i);
+      unsigned int sz_sample = load_sample(&m_input, &t_output, &m_output, i);
       // Run the network for some cycles
       net_run(NumAllowedCycles);
 
       // Calculate the misalignment of the outputs
       for (unsigned int j = 0; j < sz_sample; ++j) {
-        misaligned += std::fabs(output[j] - m_output[j]);
+        misaligned += std::fabs(t_output[j] - m_output[j]);
       }
     }
 
@@ -130,9 +141,11 @@ double Network::fitness()
     // Compute the cost
     double c_cost = cost();
     // Compare the current cost to the last one
-    double ret = 1 - exp(-last_cost / c_cost);
+/*    double ret = 1 - exp(-last_cost / c_cost);
     last_cost = c_cost;
+*/
 
+    double ret = 1.0 / (c_cost + 1);
     // Save and validate the fitness
     saved_fitness = ret;
     saved_fitness_valid = true;
@@ -142,14 +155,19 @@ double Network::fitness()
 }
 
 // Run the network with STDP for some cycles
-void Network::run(unsigned int cycles = n_samples + 1)
+/*void Network::run(unsigned int cycles = n_samples + 1)
 {
   std::vector<unsigned int> o = m_output;
   for (unsigned int i = 0; i < cycles - 1; ++i) {
-    dopamine = fitness();
+    dopamine 
     saved_cost_valid = false;
     saved_fitness_valid = false;
+
+    dopamine -= 0.1;
+    if (dopamine < 0) {
+      dopamine = 0;
+    }
   }
   m_output = o;
   net_run(NumAllowedCycles);
-}
+}*/

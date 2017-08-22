@@ -45,7 +45,7 @@ struct Mutator
 
   Derived get_ud(double m, double _s)
   {
-    reset_nd(m, _s);
+    reset_ud(m, _s);
     return get_ud();
   }
 

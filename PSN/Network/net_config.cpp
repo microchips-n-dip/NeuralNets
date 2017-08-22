@@ -12,14 +12,16 @@ void net_permute(NetworkConfiguration& ncfg)
     nsz = n_inputs + n_outputs;
   }
 
+  ncfg.nc.reserve(nsz);
+
   while (nsz != int(ncfg.nc.size())) {
-    if (nsz > ncfg.nc.size()) {
+    if (nsz > int(ncfg.nc.size())) {
       //printf("ncfg.nc.size(): %d\n", ncfg.nc.size());
       NodeonConfiguration node = NodeonConfiguration();
       ncfg.nc.push_back(node);
     }
 
-    else if (nsz < ncfg.nc.size()) {
+    else if (nsz < int(ncfg.nc.size())) {
       std::vector<NodeonConfiguration>::iterator node_it;
       unsigned int node_id = mu.get_ud(0, ncfg.nc.size() - 1);
       node_it = ncfg.nc.begin() + node_id;
@@ -27,8 +29,10 @@ void net_permute(NetworkConfiguration& ncfg)
     }
   }
 
+  nsz = ncfg.nc.size();
+
+  int csz = ncfg.cc.size();
   for (unsigned int i = 0; i < nsz; ++i) {
-    int csz = ncfg.cc.size();
     int connecton_drift = mu.get_nd(csz, 1 - ncfg.fitness);
     csz += connecton_drift;
 
@@ -40,20 +44,23 @@ void net_permute(NetworkConfiguration& ncfg)
     if (csz > nsz2) {
       csz = nsz2;
     }
+  }
 
-    while (csz!= ncfg.cc.size()) {
-      if (csz > ncfg.cc.size()) {
-        unsigned int node_id = mu.get_ud(0, nsz - 1);
-        ConnectonConfiguration connecton = ConnectonConfiguration(i, node_id);
-        ncfg.cc.push_back(connecton);
-      }
+  ncfg.cc.reserve(csz);
 
-      else if (csz < ncfg.cc.size()) {
-        std::vector<ConnectonConfiguration>::iterator connecton_it;
-        unsigned int connecton_id = mu.get_ud(0, ncfg.cc.size() - 1);
-        connecton_it = ncfg.cc.begin() + connecton_id;
-        ncfg.cc.erase(connecton_it);
-      }
+  while (csz != int(ncfg.cc.size())) {
+    if (csz > int(ncfg.cc.size())) {
+      unsigned int src_node_id = mu.get_ud(0, nsz - 1);
+      unsigned int dst_node_id = mu.get_ud(0, nsz - 1);
+      ConnectonConfiguration connecton = ConnectonConfiguration(src_node_id, dst_node_id);
+      ncfg.cc.push_back(connecton);
+    }
+
+    else if (csz < int(ncfg.cc.size())) {
+      std::vector<ConnectonConfiguration>::iterator connecton_it;
+      unsigned int connecton_id = mu.get_ud(0, ncfg.cc.size() - 1);
+      connecton_it = ncfg.cc.begin() + connecton_id;
+      ncfg.cc.erase(connecton_it);
     }
   }
 

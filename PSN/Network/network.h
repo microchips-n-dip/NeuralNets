@@ -27,6 +27,7 @@ class Network
   std::vector<unsigned int> m_input;
   unsigned int global_j;
   std::vector<unsigned int> m_output;
+  std::vector<unsigned int> t_output;
 
 
   Network(NetworkConfiguration& ncfg);
