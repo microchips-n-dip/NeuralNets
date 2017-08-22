@@ -5,11 +5,11 @@ void net_permute(NetworkConfiguration& ncfg)
   Mutator<double> mu;
 
   int nsz = ncfg.nc.size();
-  int node_drift = mu.get_nd(nsz, 1 - ncfg.fitness);
+  int node_drift = mu.get_nd(0, 1 - ncfg.fitness);
   nsz += node_drift;
 
   if (nsz < int(n_inputs + n_outputs)) {
-    nsz = n_inputs + n_outputs;
+    nsz = int(n_inputs + n_outputs);
   }
 
   ncfg.nc.reserve(nsz);
@@ -33,7 +33,7 @@ void net_permute(NetworkConfiguration& ncfg)
 
   int csz = ncfg.cc.size();
   for (unsigned int i = 0; i < nsz; ++i) {
-    int connecton_drift = mu.get_nd(csz, 1 - ncfg.fitness);
+    int connecton_drift = mu.get_nd(0, 1 - ncfg.fitness);
     csz += connecton_drift;
 
     if (csz < 0) {
