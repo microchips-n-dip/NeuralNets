@@ -1,6 +1,6 @@
 #include "ntm.h"
 
-using Eigen::Tensor;
+using namespace Eigen;
 
 Tensor<double, 1> forward(Tensor<double, 1> x)
 {
@@ -12,13 +12,15 @@ Tensor<double, 1> forward(Tensor<double, 1> x)
 
   Tensor<double, 1> concat_input;
   concat_input = concat_input.concatenate(x);
-  concat_input = concat_input.concatenate(prev_Cs.at(0));
   concat_input = concat_input.concatenate(rh);
 
   Tensor<double, 1> h;
   h = concat_input;
 
-  for (unsigned int layer_idx = 1; layer_idx < layers; ++layer_idx) {
+  for (unsigned int layer_idx = 0; layer_idx < layers; ++layer_idx) {
+    prev_o = prev_output_list.at(layer_idx);
+    h = h.concatenate(prev_o);
+
     Tensor<double, 2> w_i_gate = ntm_ig_weights.at(layer_idx);
     Tensor<double, 2> w_f_gate = ntm_fg_weights.at(layer_idx);
     Tensor<double, 2> w_o_gate = ntm_og_weights.at(layer_idx);
