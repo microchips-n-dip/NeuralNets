@@ -47,3 +47,25 @@ Tensor<double, 1> forward(Tensor<double, 1> x)
     output_list.at(layer_idx) = h;
   }
 }
+
+void backprop()
+{
+  for (unsigned int layer_idx = layers - 1; layer_idx > 0; layer_idx--) {
+    Tensor<double, 2> w_i_gate = ntm_ig_weights.at(layer_idx);
+    Tensor<double, 2> w_f_gate = ntm_fg_weights.at(layer_idx);
+    Tensor<double, 2> w_u_gate = ntm_ug_weights.at(layer_idx);
+    Tensor<double, 2> w_o_gate = ntm_og_weights.at(layer_idx);
+
+    std::array<IndexPair<int>, 1> ctr1 = {IndexPair<int>(0, 0)};
+    std::array<IndexPair<int>, 0> ctr2 = {};
+    dhdWo_1 = sigmoid_prime(tco(lambda, w_o_gate, ctr1));
+    dhdWo = dJdh_zu * tco(dhdWo_1, lambda, ctr2);
+
+    std::array<IndexPair<int>, 1> ctr3 = {IndexPair<int>(0, 0)};
+    std::array<IndexPair<int>, 1> ctr4 = {IndexPair<int>(0, 0)};
+    std::array<IndexPair<int>, 0> ctr5 = {};
+    dhdWu_1 = tanh_prime(tco(lambda, w_u_gate, ctr3));
+    dhdWu_2 = tco(tCu, i_gate, ctr4);
+    dhdWu = dJdh_zo * dhdWu_2 * tco(dhdWu_1, lambda, ctr5);
+  }
+}
