@@ -31,12 +31,9 @@ Tensor<double, 1> forward(Tensor<double, 1> x)
 
     std::array<IndexPair<int>, 1> ctr1 = {IndexPair<int>(0, 0)};
     Tensor<double, 1> i_gate = sigmoid(tco(h, w_i_gate, ctr1));
-    std::array<IndexPair<int>, 1> ctr2 = {IndexPair<int>(0, 0)};
-    Tensor<double, 1> f_gate = sigmoid(tco(h, w_g_gate, ctr2));
-    std::array<IndexPair<int>, 1> ctr3 = {IndexPair<int>(0, 0)};
-    Tensor<double, 1> o_gate = sigmoid(tco(h, w_o_gate, ctr3));
-    std::array<IndexPair<int>, 1> ctr4 = {IndexPair<int>(0, 0)};
-    Tensor<double, 1> u_gate = tanh(tco(h, w_u_gate, ctr4));
+    Tensor<double, 1> f_gate = sigmoid(tco(h, w_g_gate, ctr1));
+    Tensor<double, 1> o_gate = sigmoid(tco(h, w_o_gate, ctr1));
+    Tensor<double, 1> u_gate = tanh(tco(h, w_u_gate, ctr1));
 
     Tensor<double, 1> C;
     prev_C = prev_Cs.at(layer_idx);
@@ -58,23 +55,26 @@ void backprop()
 
     tCu = tanh_prime(Cu);
 
-    delta_o = sigmoid_prime(tco(lambda, w_o_gate, ctr1));
-    dudq = tanh_prime(tco(lambda, w_u_gate, ctr1));
-    delta_u = tco(tCu, i_gate, ctr2) * dudq;
-    didq = sigmoid_prime(tco(lambda, w_i_gate, ctr1));
-    delta_i = tco(tCu, u_gate, ctr2) * didq;
-    dfdq = sigmoid_prime(tco(lambda, w_f_gate, ctr1));
-    delta_f = tco(tCu, prev_C, ctr2) * dfdq;
+    std::array<IndexPair<int>, 1> ctr1 = {IndexPair<int>(0, 0)};
+    Tensor<double, 1> delta_o = sigmoid_prime(tco(lambda, w_o_gate, ctr1));
+    Tensor<double, 1> dudq = tanh_prime(tco(lambda, w_u_gate, ctr1));
+    Tensor<double, 1> delta_u = tco(tCu, i_gate, ctr1) * dudq;
+    Tensor<double, 1> didq = sigmoid_prime(tco(lambda, w_i_gate, ctr1));
+    Tensor<double, 1> delta_i = tco(tCu, u_gate, ctr1) * didq;
+    Tensor<double, 1> dfdq = sigmoid_prime(tco(lambda, w_f_gate, ctr1));
+    Tensor<double, 1> delta_f = tco(tCu, prev_C, ctr1) * dfdq;
 
-    dhdWo = tco(delta_o, lambda, ctr3);
-    dhdWu = tco(delta_u, lambda, ctr3);
-    dhdWi = tco(delta_i, lambda, ctr3);
-    dhdWf = tco(delta_f, lambda, ctr3);
+    std::array<Index<int>, 0> ctr2 = {};
+    Tensor<double, 2> dhdWo = tco(delta_o, lambda, ctr2);
+    Tensor<double, 2> dhdWu = tco(delta_u, lambda, ctr2);
+    Tensor<double, 2> dhdWi = tco(delta_i, lambda, ctr2);
+    Tensor<double, 2> dhdWf = tco(delta_f, lambda, ctr2);
 
-    delta_l;
-    delta_l += tco(delta_o, w_o_gate, ctr4);
-    delta_l += tco(delta_u, w_u_gate, ctr4);
-    delta_l += tco(delta_i, w_i_gate, ctr4);
-    delta_l += tco(delta_f, w_f_gate, ctr4);
+    std::array<IndexPair<int>, 1> ctr3 = {IndexPair<int>(0, 1)};
+    Tensor<double, 1> delta_l;
+    delta_l += tco(delta_o, w_o_gate, ctr3);
+    delta_l += tco(delta_u, w_u_gate, ctr3);
+    delta_l += tco(delta_i, w_i_gate, ctr3);
+    delta_l += tco(delta_f, w_f_gate, ctr3);
   }
 }
