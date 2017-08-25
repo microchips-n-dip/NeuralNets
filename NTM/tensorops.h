@@ -23,6 +23,35 @@ template <typename Derived> Derived sigmoid(const Derived& z) {
   return ret;
 }
 
+template <typename Derived>
+Derived sigmoid_prime(const Derived& z)
+{
+  Derived ret(z.dimensions());
+  for (unsigned int i = 0; i < z.size(); ++i) {
+    ret.coeffRef(i) = exp(-z.coeff(i)) / pow(1 + exp(-z.coeff(i)), 2);
+  }
+  return ret;
+}
+
+template <typename Derived>
+Derived tanh(const Derived& z)
+{
+  Derived ret(z.dimensions());
+  for (unsigned int i = 0; i < z.size(); ++i) {
+    ret.coeffRef(i) = tanh(z.coeff(i));
+  }
+  return ret;
+}
+
+template <typename Derived>
+Derived tanh_prime(const Derived& z)
+{
+  Derived ret(z.dimensions());
+  for (unsigned int i = 0; i < z.size(); ++i) {
+    ret.coeffRef(i) = 1.0 / pow(cosh(z.coeff(i)), 2);
+  }
+  return ret;
+}
 
 
 #endif
