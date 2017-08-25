@@ -10,6 +10,10 @@ class NTM
 {
   public:
 
+  unsigned int layers;
+
+  Tensor<double, 1> rh;
+
   std::vector<Tensor<double, 1>> Cs;
   std::vector<Tensor<double, 1>> prev_Cs;
 
