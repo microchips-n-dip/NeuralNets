@@ -53,6 +53,8 @@ Tensor<double, 1> NTM::forward(Tensor<double, 1> x)
     h = tanh(C);
     output_list.at(layer_idx) = h;
   }
+
+  return output_list.back();
 }
 
 void NTM::backprop()
@@ -153,6 +155,13 @@ NTM::NTM(unsigned int _layers,
     output_list.at(i) = Tensor<double, 1>(cell_width);
     prev_output_list.at(i) = Tensor<double, 1>(cell_width);
 
+    if (i == 0) {
+      input_sz = input_sz + head_size + cell_width;
+    }
+    else {
+      input_sz = 2 * cell_width;
+    }
+
     ntm_fg_weights.at(i) = Tensor<double, 2>(input_sz, cell_width);
     ntm_ig_weights.at(i) = Tensor<double, 2>(input_sz, cell_width);
     ntm_ug_weights.at(i) = Tensor<double, 2>(input_sz, cell_width);
@@ -175,4 +184,6 @@ NTM::NTM(unsigned int _layers,
 
     lambda.at(i) = Tensor<double, 1>(input_sz);
   }
+
+  input_sz = _input_sz + head_sz + cell_width;
 }
