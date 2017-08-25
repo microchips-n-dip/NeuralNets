@@ -2,6 +2,7 @@
 #define NTM_H
 
 #include <vector>
+#include <random>
 #include <unsupported/Eigen/CXX11/Tensor>
 
 using Eigen::Tensor;
@@ -44,7 +45,7 @@ class NTM
   NTM(unsigned int _layers,
     unsigned int _cell_width,
     unsigned int _input_sz,
-    unsigned int _head_sz)
+    unsigned int _head_sz);
 };
 
 #endif

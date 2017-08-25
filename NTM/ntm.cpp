@@ -117,6 +117,9 @@ NTM::NTM(unsigned int _layers,
   unsigned int _input_sz,
   unsigned int _head_sz)
 {
+  std::random_device generator;
+  std::uniform_real_distribution<double> ud(-1.0, 1.0);
+
   layers = _layers;
   cell_width = _cell_width;
   input_sz = _input_sz;
@@ -154,6 +157,13 @@ NTM::NTM(unsigned int _layers,
     ntm_ig_weights.at(i) = Tensor<double, 2>(input_sz, cell_width);
     ntm_ug_weights.at(i) = Tensor<double, 2>(input_sz, cell_width);
     ntm_og_weights.at(i) = Tensor<double, 2>(input_sz, cell_width);
+
+    for (unsigned int j = 0; j < input_sz * cell_width; ++j) {
+      ntm_fg_weights.at(i).coeffRef(j) = ud(generator);
+      ntm_ig_weights.at(i).coeffRef(j) = ud(generator);
+      ntm_ug_weights.at(i).coeffRef(j) = ud(generator);
+      ntm_og_weights.at(i).coeffRef(j) = ud(generator);
+    }
 
     ntm_f_gate.at(i) = Tensor<double, 1>(cell_width);
     ntm_i_gate.at(i) = Tensor<double, 1>(cell_width);
