@@ -40,6 +40,11 @@ class NTM
 
   Tensor<double, 1> forward(Tensor<double, 1> x);
   void backprop();
+
+  NTM(unsigned int _layers,
+    unsigned int _cell_width,
+    unsigned int _input_sz,
+    unsigned int _head_sz)
 };
 
 #endif

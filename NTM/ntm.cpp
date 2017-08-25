@@ -111,3 +111,58 @@ void NTM::backprop()
     }
   }
 }
+
+NTM::NTM(unsigned int _layers,
+  unsigned int _cell_width,
+  unsigned int _input_sz,
+  unsigned int _head_sz)
+{
+  layers = _layers;
+  cell_width = _cell_width;
+  input_sz = _input_sz;
+  head_sz = _head_sz;
+
+  Cs = std::vector<Tensor<double, 1>>(layers);
+  prev_Cs = std::vector<Tensor<double, 1>>(layers);
+
+  output_list = std::vector<Tensor<double, 1>>(layers);
+  prev_output_list = std::vector<Tensor<double, 1>>(layers);
+
+  ntm_fg_weights = std::vector<Tensor<double, 2>>(layers);
+  ntm_ig_weights = std::vector<Tensor<double, 2>>(layers);
+  ntm_ug_weights = std::vector<Tensor<double, 2>>(layers);
+  ntm_og_weights = std::vector<Tensor<double, 2>>(layers);
+
+  ntm_f_gate = std::vector<Tensor<double, 1>>(layers);
+  ntm_i_gate = std::vector<Tensor<double, 1>>(layers);
+  ntm_u_gate = std::vector<Tensor<double, 1>>(layers);
+  ntm_o_gate = std::vector<Tensor<double, 1>>(layers);
+
+  zu = std::vector<Tensor<double, 1>>(layers);
+  zo = std::vector<Tensor<double, 1>>(layers);
+
+  lambda = std::vector<Tensor<double, 1>>(layers);
+
+  for (unsigned int i = 0; i < layers; ++i) {
+    Cs.at(i) = Tensor<double, 1>(cell_width);
+    prev_Cs.at(i) = Tensor<double, 1>(cell_width);
+
+    output_list.at(i) = Tensor<double, 1>(cell_width);
+    prev_output_list.at(i) = Tensor<double, 1>(cell_width);
+
+    ntm_fg_weights.at(i) = Tensor<double, 2>(input_sz, cell_width);
+    ntm_ig_weights.at(i) = Tensor<double, 2>(input_sz, cell_width);
+    ntm_ug_weights.at(i) = Tensor<double, 2>(input_sz, cell_width);
+    ntm_og_weights.at(i) = Tensor<double, 2>(input_sz, cell_width);
+
+    ntm_f_gate.at(i) = Tensor<double, 1>(cell_width);
+    ntm_i_gate.at(i) = Tensor<double, 1>(cell_width);
+    ntm_u_gate.at(i) = Tensor<double, 1>(cell_width);
+    ntm_o_gate.at(i) = Tensor<double, 1>(cell_width);
+
+    zu.at(i) = Tensor<double, 1>(cell_width);
+    zo.at(i) = Tensor<double, 1>(cell_width);
+
+    lambda.at(i) = Tensor<double, 1>(input_sz);
+  }
+}
