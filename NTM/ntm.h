@@ -11,6 +11,9 @@ class NTM
   public:
 
   unsigned int layers;
+  unsigned int cell_width;
+  unsigned int input_sz;
+  unsigned int head_sz;
 
   Tensor<double, 1> rh;
 
@@ -32,6 +35,8 @@ class NTM
 
   std::vector<Tensor<double, 1>> output_list;
   std::vector<Tensor<double, 1>> prev_output_list;
+
+  std::vector<Tensor<double, 1>> lambda;
 
   Tensor<double, 1> forward(Tensor<double, 1> x);
   void backprop();

@@ -24,6 +24,8 @@ Tensor<double, 1> NTM::forward(Tensor<double, 1> x)
     prev_o = prev_output_list.at(layer_idx);
     h = h.concatenate(prev_o, 0);
 
+    lambda.at(layer_idx) = h;
+
     Tensor<double, 2> w_i_gate = ntm_ig_weights.at(layer_idx);
     Tensor<double, 2> w_f_gate = ntm_fg_weights.at(layer_idx);
     Tensor<double, 2> w_o_gate = ntm_og_weights.at(layer_idx);
@@ -78,19 +80,24 @@ void NTM::backprop()
     double zeta_u = tco(ph, zu.at(layer_idx), ctr1)(0);
     double zeta_o = tco(ph, zo.at(layer_idx), ctr1)(0);
 
-    Tensor<double, 1> delta_o = zeta_u * sigmoid_prime(tco(lambda, w_o_gate, ctr1));
-    Tensor<double, 1> dudq = tanh_prime(tco(lambda, w_u_gate, ctr1));
+    Tensor<double, 1> delta_o = zeta_u * sigmoid_prime(tco(lambda.at(layer_idx), w_o_gate, ctr1));
+    Tensor<double, 1> dudq = tanh_prime(tco(lambda.at(layer_idx), w_u_gate, ctr1));
     Tensor<double, 1> delta_u = zeta_o * tco(tCu, i_gate, ctr1) * dudq;
-    Tensor<double, 1> didq = sigmoid_prime(tco(lambda, w_i_gate, ctr1));
+    Tensor<double, 1> didq = sigmoid_prime(tco(lambda.at(layer_idx), w_i_gate, ctr1));
     Tensor<double, 1> delta_i = zeta_o * tco(tCu, u_gate, ctr1) * didq;
-    Tensor<double, 1> dfdq = sigmoid_prime(tco(lambda, w_f_gate, ctr1));
+    Tensor<double, 1> dfdq = sigmoid_prime(tco(lambda.at(layer_idx), w_f_gate, ctr1));
     Tensor<double, 1> delta_f = zeta_o * tco(tCu, prev_C, ctr1) * dfdq;
 
     std::array<IndexPair<int>, 0> ctr2 = {};
-    Tensor<double, 2> dhdWo = tco(delta_o, lambda, ctr2);
-    Tensor<double, 2> dhdWu = tco(delta_u, lambda, ctr2);
-    Tensor<double, 2> dhdWi = tco(delta_i, lambda, ctr2);
-    Tensor<double, 2> dhdWf = tco(delta_f, lambda, ctr2);
+    Tensor<double, 2> dhdWo = tco(delta_o, lambda.at(layer_idx), ctr2);
+    Tensor<double, 2> dhdWu = tco(delta_u, lambda.at(layer_idx), ctr2);
+    Tensor<double, 2> dhdWi = tco(delta_i, lambda.at(layer_idx), ctr2);
+    Tensor<double, 2> dhdWf = tco(delta_f, lambda.at(layer_idx), ctr2);
+
+    ntm_og_weights.at(layer_idx) -= dhdWo;
+    ntm_ug_weights.at(layer_idx) -= dhdWu;
+    ntm_ig_weights.at(layer_idx) -= dhdWi;
+    ntm_fg_weights.at(layer_idx) -= dhdWf;
 
     std::array<IndexPair<int>, 1> ctr3 = {IndexPair<int>(0, 1)};
     Tensor<double, 1> delta_l;
@@ -99,6 +106,8 @@ void NTM::backprop()
     delta_l += tco(delta_i, w_i_gate, ctr3);
     delta_l += tco(delta_f, w_f_gate, ctr3);
 
-    ph = delta_l;
+    for (unsigned int i = cell_width; i < input_sz; ++i) {
+      ph(i - cell_width) = delta_l(i);
+    }
   }
 }
