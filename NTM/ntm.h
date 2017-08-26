@@ -15,6 +15,7 @@ class NTM
   unsigned int cell_width;
   unsigned int input_sz;
   unsigned int head_sz;
+  unsigned int mem_length;
 
   Tensor<double, 1> rh;
 
@@ -38,6 +39,8 @@ class NTM
   std::vector<Tensor<double, 1>> prev_output_list;
 
   std::vector<Tensor<double, 1>> lambda;
+
+  Tensor<double, 2> Memory;
 
   Tensor<double, 1> forward(Tensor<double, 1> x);
   void heads_update();

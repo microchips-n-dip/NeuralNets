@@ -91,6 +91,8 @@ void NTM::heads_update()
   Tensor<double, 1> w2 = w1.pow(gamma);
   w = w2 / w2.sum(sum_0);
   prev_w_head = w;
+
+  rh = tco(w, Memory, ctr_0_0);
 }
 
 void NTM::backprop()
@@ -153,7 +155,8 @@ void NTM::backprop()
 NTM::NTM(unsigned int _layers,
   unsigned int _cell_width,
   unsigned int _input_sz,
-  unsigned int _head_sz)
+  unsigned int _head_sz,
+  unsigned int mem_length)
 {
   std::random_device generator;
   std::uniform_real_distribution<double> ud(-1.0, 1.0);
@@ -162,6 +165,7 @@ NTM::NTM(unsigned int _layers,
   cell_width = _cell_width;
   input_sz = _input_sz;
   head_sz = _head_sz;
+  mem_length = _mem_length;
 
   Cs = std::vector<Tensor<double, 1>>(layers);
   prev_Cs = std::vector<Tensor<double, 1>>(layers);
@@ -183,6 +187,8 @@ NTM::NTM(unsigned int _layers,
   zo = std::vector<Tensor<double, 1>>(layers);
 
   lambda = std::vector<Tensor<double, 1>>(layers);
+
+  Memory = Tensor<double, 2>(mem_length, head_sz);
 
   for (unsigned int i = 0; i < layers; ++i) {
     Cs.at(i) = Tensor<double, 1>(cell_width);
