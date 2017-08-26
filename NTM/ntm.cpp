@@ -74,7 +74,7 @@ void NTM::heads_update()
   Tensor<double, 1> w;
 
   double norm_k = tco(k, k, ctr_0_0).sqrt()();
-  Tensor<double, 1> norm_M = Memory.pow(2).sum(sum_1).sqrt();
+  Tensor<double, 1> norm_M = tco(Memory, Memory, ctr_1_1).sum(sum_1).sqrt();
 
   Tensor<double, 1> wc1 = (beta * tco(k, Memory, ctr_0_1) / (norm_k * norm_M)).exp();
   Tensor<double, 1> wc = wc1 / wc1.sum(sum_0);
