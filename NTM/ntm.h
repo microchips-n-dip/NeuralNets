@@ -40,6 +40,7 @@ class NTM
   std::vector<Tensor<double, 1>> lambda;
 
   Tensor<double, 1> forward(Tensor<double, 1> x);
+  void heads_update();
   void backprop();
 
   NTM(unsigned int _layers,

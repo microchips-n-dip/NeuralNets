@@ -31,11 +31,11 @@ Tensor<double, 1> NTM::forward(Tensor<double, 1> x)
     Tensor<double, 2> w_o_gate = ntm_og_weights.at(layer_idx);
     Tensor<double, 2> w_u_gate = ntm_ug_weights.at(layer_idx);
 
-    std::array<IndexPair<int>, 1> ctr1 = {IndexPair<int>(0, 0)};
-    Tensor<double, 1> i_gate = sigmoid(tco(h, w_i_gate, ctr1));
-    Tensor<double, 1> f_gate = sigmoid(tco(h, w_f_gate, ctr1));
-    Tensor<double, 1> o_gate = sigmoid(tco(h, w_o_gate, ctr1));
-    Tensor<double, 1> u_gate = tanh(tco(h, w_u_gate, ctr1));
+    std::array<IndexPair<int>, 1> ctr_0_0 = {IndexPair<int>(0, 0)};
+    Tensor<double, 1> i_gate = sigmoid(tco(h, w_i_gate, ctr_0_0));
+    Tensor<double, 1> f_gate = sigmoid(tco(h, w_f_gate, ctr_0_0));
+    Tensor<double, 1> o_gate = sigmoid(tco(h, w_o_gate, ctr_0_0));
+    Tensor<double, 1> u_gate = tanh(tco(h, w_u_gate, ctr_0_0));
 
     ntm_i_gate.at(layer_idx) = i_gate;
     ntm_f_gate.at(layer_idx) = f_gate;
@@ -55,6 +55,49 @@ Tensor<double, 1> NTM::forward(Tensor<double, 1> x)
   }
 
   return output_list.back();
+}
+
+void NTM::heads_update()
+{
+  std::array<IndexPair<int>, 1> ctr_0_0 = {IndexPair<int>(0, 0)};
+  std::array<IndexPair<int>, 1> ctr_0_1 = {indexPair<int>(0, 1)};
+  std::array<IndexPair<int>, 1> ctr_1_1 = {IndexPair<int>(1, 1)};
+
+  double beta = tco(output_list.back(), head_beta_weights, ctr_0_0)();
+  double g = tco(output_list.back(), head_g_weights, ctr_0_0)();
+  Tensor<double, 1> s = tco(output_list.back(), head_s_weights, ctr_0_0);
+  double gamma = tco(output_list.back(), head_gamma_weights, ctr_0_0)();
+
+  Tensor<double, 1> w;
+
+  double norm_k = tco(k, k, ctr_0_0)();
+  Tensor<double, 1> norm_M(mem_length);
+  Tensor<double, 2> _norm_M = tco(Memory, Memory, ctr_1_1);
+  for (unsigned int i = 0; i < mem_length; ++i) {
+    norm_M(i) = _norm_M(i, i);
+  }
+
+  Tensor<double, 1> wc1 = beta * tco(k, Memory, ctr_0_1) / (norm_k * norm_M);
+  Tensor<double, 1> wc(mem_length);
+  double b_norm = 0;
+  for (unsigned int i = 0; i < mem_length; ++i) {
+    wc1(i) = exp(wc1(i));
+    b_norm += wc1(i);
+  }
+  wc = wc1 / b_norm;
+
+  Tensor<double, 1> wg = g * wc + (1 - g) * prev_w_head;
+
+  Tensor<double, 1> w1(mem_length);
+  for (unsigned int i = 0; i < mem_length; ++i) {
+    for (unsigned int j = 0; j < mem_length; ++j) {
+      w1(i) += wg(j) * s((i - j) % mem_length);
+    }
+  }
+
+  Tensor<double, 1> w2 = w1.pow(gamma);
+  w = w2 / w2.sum();
+  prev_w_head = w;
 }
 
 void NTM::backprop()
@@ -77,36 +120,36 @@ void NTM::backprop()
 
     Tensor<double, 1> prev_C = prev_Cs.at(layer_idx);
 
-    std::array<IndexPair<int>, 1> ctr1 = {IndexPair<int>(0, 0)};
+    std::array<IndexPair<int>, 1> ctr_0_0 = {IndexPair<int>(0, 0)};
 
-    double zeta_u = tco(ph, zu.at(layer_idx), ctr1)(0);
-    double zeta_o = tco(ph, zo.at(layer_idx), ctr1)(0);
+    double zeta_u = tco(ph, zu.at(layer_idx), ctr_0_0)(0);
+    double zeta_o = tco(ph, zo.at(layer_idx), ctr_0_0)(0);
 
-    Tensor<double, 1> delta_o = zeta_u * sigmoid_prime(tco(lambda.at(layer_idx), w_o_gate, ctr1));
-    Tensor<double, 1> dudq = tanh_prime(tco(lambda.at(layer_idx), w_u_gate, ctr1));
-    Tensor<double, 1> delta_u = zeta_o * tco(tCu, i_gate, ctr1) * dudq;
-    Tensor<double, 1> didq = sigmoid_prime(tco(lambda.at(layer_idx), w_i_gate, ctr1));
-    Tensor<double, 1> delta_i = zeta_o * tco(tCu, u_gate, ctr1) * didq;
-    Tensor<double, 1> dfdq = sigmoid_prime(tco(lambda.at(layer_idx), w_f_gate, ctr1));
-    Tensor<double, 1> delta_f = zeta_o * tco(tCu, prev_C, ctr1) * dfdq;
+    Tensor<double, 1> delta_o = zeta_u * sigmoid_prime(tco(lambda.at(layer_idx), w_o_gate, ctr_0_0));
+    Tensor<double, 1> dudq = tanh_prime(tco(lambda.at(layer_idx), w_u_gate, ctr_0_0));
+    Tensor<double, 1> delta_u = zeta_o * tco(tCu, i_gate, ctr_0_0) * dudq;
+    Tensor<double, 1> didq = sigmoid_prime(tco(lambda.at(layer_idx), w_i_gate, ctr_0_0));
+    Tensor<double, 1> delta_i = zeta_o * tco(tCu, u_gate, ctr_0_0) * didq;
+    Tensor<double, 1> dfdq = sigmoid_prime(tco(lambda.at(layer_idx), w_f_gate, ctr_0_0));
+    Tensor<double, 1> delta_f = zeta_o * tco(tCu, prev_C, ctr_0_0) * dfdq;
 
-    std::array<IndexPair<int>, 0> ctr2 = {};
-    Tensor<double, 2> dhdWo = tco(delta_o, lambda.at(layer_idx), ctr2);
-    Tensor<double, 2> dhdWu = tco(delta_u, lambda.at(layer_idx), ctr2);
-    Tensor<double, 2> dhdWi = tco(delta_i, lambda.at(layer_idx), ctr2);
-    Tensor<double, 2> dhdWf = tco(delta_f, lambda.at(layer_idx), ctr2);
+    std::array<IndexPair<int>, 0> no_ctr = {};
+    Tensor<double, 2> dhdWo = tco(delta_o, lambda.at(layer_idx), no_ctr);
+    Tensor<double, 2> dhdWu = tco(delta_u, lambda.at(layer_idx), no_ctr);
+    Tensor<double, 2> dhdWi = tco(delta_i, lambda.at(layer_idx), no_ctr);
+    Tensor<double, 2> dhdWf = tco(delta_f, lambda.at(layer_idx), no_ctr);
 
     ntm_og_weights.at(layer_idx) -= dhdWo;
     ntm_ug_weights.at(layer_idx) -= dhdWu;
     ntm_ig_weights.at(layer_idx) -= dhdWi;
     ntm_fg_weights.at(layer_idx) -= dhdWf;
 
-    std::array<IndexPair<int>, 1> ctr3 = {IndexPair<int>(0, 1)};
+    std::array<IndexPair<int>, 1> ctr_0_1 = {IndexPair<int>(0, 1)};
     Tensor<double, 1> delta_l;
-    delta_l += tco(delta_o, w_o_gate, ctr3);
-    delta_l += tco(delta_u, w_u_gate, ctr3);
-    delta_l += tco(delta_i, w_i_gate, ctr3);
-    delta_l += tco(delta_f, w_f_gate, ctr3);
+    delta_l += tco(delta_o, w_o_gate, ctr_0_1);
+    delta_l += tco(delta_u, w_u_gate, ctr_0_1);
+    delta_l += tco(delta_i, w_i_gate, ctr_0_1);
+    delta_l += tco(delta_f, w_f_gate, ctr_0_1);
 
     for (unsigned int i = cell_width; i < input_sz; ++i) {
       ph(i - cell_width) = delta_l(i);
