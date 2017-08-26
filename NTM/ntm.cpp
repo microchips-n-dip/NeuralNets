@@ -63,6 +63,9 @@ void NTM::heads_update()
   std::array<IndexPair<int>, 1> ctr_0_1 = {indexPair<int>(0, 1)};
   std::array<IndexPair<int>, 1> ctr_1_1 = {IndexPair<int>(1, 1)};
 
+  std::array<int, 1> sum_0 = {0};
+  std::array<int, 1> sum_1 = {1};
+
   double beta = tco(output_list.back(), head_beta_weights, ctr_0_0)();
   double g = tco(output_list.back(), head_g_weights, ctr_0_0)();
   Tensor<double, 1> s = tco(output_list.back(), head_s_weights, ctr_0_0);
@@ -70,21 +73,11 @@ void NTM::heads_update()
 
   Tensor<double, 1> w;
 
-  double norm_k = tco(k, k, ctr_0_0)();
-  Tensor<double, 1> norm_M(mem_length);
-  Tensor<double, 2> _norm_M = tco(Memory, Memory, ctr_1_1);
-  for (unsigned int i = 0; i < mem_length; ++i) {
-    norm_M(i) = _norm_M(i, i);
-  }
+  double norm_k = tco(k, k, ctr_0_0).sqrt()();
+  Tensor<double, 1> norm_M = Memory.pow(2).sum(sum_1).sqrt();
 
-  Tensor<double, 1> wc1 = beta * tco(k, Memory, ctr_0_1) / (norm_k * norm_M);
-  Tensor<double, 1> wc(mem_length);
-  double b_norm = 0;
-  for (unsigned int i = 0; i < mem_length; ++i) {
-    wc1(i) = exp(wc1(i));
-    b_norm += wc1(i);
-  }
-  wc = wc1 / b_norm;
+  Tensor<double, 1> wc1 = (beta * tco(k, Memory, ctr_0_1) / (norm_k * norm_M)).exp();
+  Tensor<double, 1> wc = wc1 / wc1.sum(sum_0);
 
   Tensor<double, 1> wg = g * wc + (1 - g) * prev_w_head;
 
@@ -96,7 +89,7 @@ void NTM::heads_update()
   }
 
   Tensor<double, 1> w2 = w1.pow(gamma);
-  w = w2 / w2.sum();
+  w = w2 / w2.sum(sum_0);
   prev_w_head = w;
 }
 
