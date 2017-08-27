@@ -42,6 +42,17 @@ class NTM
 
   Tensor<double, 2> Memory;
 
+  Tensor<double, 2> head_beta_weights;
+  Tensor<double, 2> head_g_weights;
+  Tensor<double, 2> head_s_weights;
+  Tensor<double, 2> head_gamma_weights;
+
+  Tensor<double, 1> prev_w_head;
+
+  Tensor<double, 2> head_key_weights;
+  Tensor<double, 2> head_erase_weights;
+  Tensor<double, 2> head_add_weights;
+
   Tensor<double, 1> forward(Tensor<double, 1> x);
   void heads_update();
   void backprop();
@@ -49,7 +60,8 @@ class NTM
   NTM(unsigned int _layers,
     unsigned int _cell_width,
     unsigned int _input_sz,
-    unsigned int _head_sz);
+    unsigned int _head_sz,
+    unsigned int _mem_length);
 };
 
 #endif
