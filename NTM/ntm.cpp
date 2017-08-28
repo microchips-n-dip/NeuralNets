@@ -157,8 +157,6 @@ void NTM::backprop()
       ph(i - cell_width) = delta_l(i);
     }
   }
-
-  // Head weight matrices go here
 }
 
 NTM::NTM(unsigned int _layers,
