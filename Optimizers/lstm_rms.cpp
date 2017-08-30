@@ -87,10 +87,10 @@ void LSTM_RMSProp<StateType, WeightType, FlowType>::gradient()
 }
 
 template <typename StateType, typename WeightType, typename FlowType>
-LSTM& get_lstm() { return lstm; }
+LSTM& LSTM_RMSProp<StateType, WeightType, FlowType>::get_lstm() { return lstm; }
 
 template <typename StateType, typename WeightType, typename FlowType>
-LSTMRMSProp<StateType, WeightType, FlowType>::LSTMRMSProp(LSTM& lstm_)
+LSTM_RMSProp<StateType, WeightType, FlowType>::LSTM_RMSProp(LSTM& lstm_)
 {
   lstm = lstm_;
 
