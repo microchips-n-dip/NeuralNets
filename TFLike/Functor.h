@@ -1,10 +1,17 @@
+#ifndef JAPETUS_FUNCTOR_H
+#define JAPETUS_FUNCTOR_H
+
 namespace Japetus {
 
 using namespace Eigen;
 
+template <typename VariableType>
 struct Functor
 {
-  std::vector<Variable& /* ? */> inputs;
+  typedef Functor<VariableType> Self;
+
+  std::vector<VariableType& /* ? */> inputs;
+  VariableType& output;
 
   void gather_inputs()
   {
@@ -13,38 +20,54 @@ struct Functor
     }
   }
 
-  virtual void run();
-  virtual Functor* gradient();
+  virtual void run() = 0;
+  virtual Self* gradient() = 0;
 };
 
-struct SigmoidFunctor : public Functor
+template <typename VariableType>
+struct SigmoidFunctor :
+  public Functor<VariableType>
 {
   void run()
   {
     gather_inputs();
-    return sigmoid(inputs.at(0).tensor);
+    output.tensor = sigmoid(inputs.at(0).tensor);
   }
 
-  Functor* gradient()
+  Self* gradient()
   {
-    return new SigmoidGradient(inputs);
+    return new SigmoidGradient<VariableType>(inputs);
   }
 };
 
-struct TanhFunctor : public Functor
+template <typename VariableType>
+struct TanhFunctor :
+  public Functor<VariableType>
 {
   void run()
   {
     gather_inputs();
-    return tanh(inputs.at(0).tensor);
+    output.tensor tanh(inputs.at(0).tensor);
   }
 
-  Functor* gradient()
+  Self* gradient()
   {
-    return new TanhGradient(inputs);
+    return new TanhGradient<VariableType>(inputs);
   }
 };
 
-struct 
+template <typename VariableType>
+struct HadamardProductFunctor :
+  public Functor<VariableType>
+{
+  void run()
+  {
+    gather_inputs();
+    output.tensor = inputs.at(0).tensor * \
+      inputs.at(1).tensor;
+  }
+};
 
 }
+
+#endif
