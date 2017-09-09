@@ -43,7 +43,14 @@ void HadamardProductFunctor::run(std::vector<Data>* inputs, std::vector<Data>* o
 {
   ECHECK(inputs->size() == 2, "Hadamard product function takes two inputs!");
   ECHECK(outputs->size() == 1, "Hadamard product function gives one output!");
-  outputs->at(0) = hadamard_product(inputs->at(0), inputs->at(2));
+  outputs->at(0) = hadamard_product(inputs->at(0), inputs->at(1));
+}
+
+void ConstFunctor::run(std::vector<Data>* inputs, std::vector<Data>* outputs)
+{
+  ECHECK(inputs->size() == 0, "Const takes no inputs!\n");
+  ECHECK(outputs->size() == 1, "Const gives one output!\n");
+  outputs->at(0) = val_;
 }
 
 }

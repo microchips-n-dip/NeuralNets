@@ -71,7 +71,7 @@ void Graph::release_node(Node* node)
 
 // Addition/removal of nodes
 
-template <typename FunctorType>
+/*template <typename FunctorType>
 Node* Graph::add_node(
   FunctorType func,
   Status* status)
@@ -81,7 +81,7 @@ Node* Graph::add_node(
   node = allocate_node(
     std::make_shared<typename remove_all<FunctorType>::type>(func), nullptr);
   return node;
-}
+}*/
 
 void Graph::remove_node(Node* node)
 {
@@ -131,6 +131,9 @@ Edge* Graph::add_edge(
   Edge* edge = allocate_edge(
     src_node, src_out,
     dst_node, dst_in);
+
+  src_node->out_edges_.push_back(edge);
+  dst_node->in_edges_.push_back(edge);
 
   return edge;
 }

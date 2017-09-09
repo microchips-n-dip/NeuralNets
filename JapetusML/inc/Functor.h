@@ -11,6 +11,12 @@ namespace Japetus {
 // Functor Bases
 struct Functor
 {
+  unsigned int in_size_;
+  unsigned int out_size_;
+
+  unsigned int in_size() const { return (*this).in_size_; }
+  unsigned int out_size() const { return (*this).out_size_; }
+
   virtual void run(std::vector<Data>* inputs, std::vector<Data>* outputs) = 0;
   virtual Functor* gradient(int respect) const = 0;
 };
@@ -24,59 +30,110 @@ struct GradientFunctor :
   { return nullptr; }
 };
 
-// Functor implementations
-#define FUNCTOR(Name) struct Name : public Functor
-#define GRADIENT_FUNCTOR(Name) struct Name : public GradientFunctor
-
-GRADIENT_FUNCTOR(SigmoidGradientFunctor)
+// Functor implementation
+struct SigmoidGradientFunctor :
+  public GradientFunctor
 {
   SigmoidGradientFunctor(int respect)
-  { respect_ = respect; }
+  {
+    in_size_ = 1;
+    out_size_ = 1;
+    respect_ = respect;
+  }
 
   void run(std::vector<Data>* inputs, std::vector<Data>* outputs);
 };
 
-FUNCTOR(SigmoidFunctor)
+struct SigmoidFunctor :
+  public Functor
 {
+  SigmoidFunctor()
+  {
+    in_size_ = 1;
+    out_size_ = 1;
+  }
+
   void run(std::vector<Data>* inputs, std::vector<Data>* outputs);
 
   Functor* gradient(int respect) const
   { return new SigmoidGradientFunctor(respect); }
 };
 
-GRADIENT_FUNCTOR(TanhGradientFunctor)
+struct TanhGradientFunctor :
+  public GradientFunctor
 {
   TanhGradientFunctor(int respect)
-  { respect_ = respect; }
+  {
+    in_size_ = 1;
+    out_size_ = 1;
+    respect_ = respect;
+  }
 
   void run(std::vector<Data>* inputs, std::vector<Data>* outputs);
 };
 
-FUNCTOR(TanhFunctor)
+struct TanhFunctor :
+  public Functor
 {
+  TanhFunctor()
+  {
+    in_size_ = 1;
+    out_size_ = 1;
+  }
+
   void run(std::vector<Data>* inputs, std::vector<Data>* outputs);
 
   Functor* gradient(int respect) const
   { return new TanhGradientFunctor(respect); }
 };
 
-GRADIENT_FUNCTOR(HadamardProductGradientFunctor)
+struct HadamardProductGradientFunctor :
+  public GradientFunctor
 {
   HadamardProductGradientFunctor(int respect)
-  { respect_ = respect; }
+  {
+    in_size_ = 2;
+    out_size_ = 1;
+    respect_ = respect;
+  }
 
   void run(std::vector<Data>* inputs, std::vector<Data>* outputs);
 };
 
-FUNCTOR(HadamardProductFunctor)
+struct HadamardProductFunctor :
+  public Functor
 {
+  HadamardProductFunctor()
+  {
+    in_size_ = 2;
+    out_size_ = 1;
+  }
+
   void run(std::vector<Data>* inputs, std::vector<Data>* outputs);
 
   Functor* gradient(int respect) const
   { return new HadamardProductGradientFunctor(respect); }
 };
 
-FUNCTOR(PlaceholderFunctor)
+struct ConstFunctor:
+  public Functor
+{
+  const Data val_;
+  ConstFunctor(Data val)
+    : val_(val)
+  {
+    in_size_ = 0;
+    out_size_ = 1;
+  }
+
+  void run(std::vector<Data>* inputs, std::vector<Data>* outputs);
+
+  Functor* gradient(int respect) const
+  { return new ConstFunctor(0); }
+};
+
+struct PlaceholderFunctor :
+  public Functor
 {
   void run(std::vector<Data>* inputs, std::vector<Data>* outputs) { }
   Functor* gradient(int respect) const

@@ -1,5 +1,5 @@
-japetus_test.exe: japetus_test.o Graph.o Scope.o Functor.o FunctorImpl.o Functions.o
-	g++ build/Graph.o build/Scope.o build/Functor.o build/FunctorImpl.o build/Functions.o build/japetus_test.o -o japetus_test.exe
+japetus_test.exe: japetus_test.o Graph.o Scope.o Functor.o FunctorImpl.o Functions.o Session.o
+	g++ build/Graph.o build/Scope.o build/Functor.o build/FunctorImpl.o build/Functions.o build/Session.o build/japetus_test.o -o japetus_test.exe
 
 japetus_test.o:
 	g++ -c -g src/japetus_test.cpp -o build/japetus_test.o -std=c++11
@@ -18,6 +18,9 @@ FunctorImpl.o:
 
 Functions.o:
 	g++ -c -g src/Functions.cpp -o build/Functions.o -std=c++11
+
+Session.o:
+	g++ -c -g src/Session.cpp -o build/Session.o -std=c++11
 
 clean:
 	rm build/*.o

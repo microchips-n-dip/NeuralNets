@@ -5,6 +5,7 @@
 #include <functional>
 #include <memory>
 
+#include "../inc/util.h"
 #include "../inc/Functor.h"
 
 namespace Japetus {
@@ -24,6 +25,11 @@ class Node
   void initialize(int id, int cost_id,
     std::shared_ptr<Functor> func);
   void clear();
+
+  std::vector<Edge*> in_edges() const { return in_edges_; }
+  std::vector<Edge*> out_edges() const { return out_edges_; }
+
+  std::shared_ptr<Functor> func() const { return func_; }
 
  private:
   Node();
@@ -99,6 +105,21 @@ class Graph
   std::vector<Edge*> av_edges_;
 };
 
+template <typename FunctorType>
+Node* Graph::add_node(
+  FunctorType func,
+  Status* status)
+{
+  typedef typename remove_all<FunctorType>::type ftype;
+
+  Node* node = nullptr;
+
+  node = allocate_node(
+    std::static_pointer_cast<Functor>(
+      std::make_shared<ftype>
+      (*func)), nullptr);
+  return node;
+}
 
 }
 
