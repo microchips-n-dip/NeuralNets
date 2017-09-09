@@ -17,5 +17,8 @@ int main(void)
   auto h2 = hadamard_product(scope, h1, n3);
 
   auto sess = Session();
-  sess.run(scope, h2);
+  OutputType outputs;
+  sess.run(scope, h2, &outputs);
+
+  printf("Output: %f\n", outputs);
 }

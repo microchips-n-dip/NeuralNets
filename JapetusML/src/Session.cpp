@@ -25,12 +25,13 @@ void Session::recursive_evaluate(
 
 void Session::run(
   const Scope& scope,
-  Node* entry)
+  Node* entry,
+  OutputType* outputs)
 {
   w_scope = const_cast<Scope*>(&scope);
   w_entry = entry;
 
-  recursive_evaluate(w_entry, nullptr, 0);
+  recursive_evaluate(w_entry, outputs, 0);
 }
 
 }

@@ -3,11 +3,13 @@
 
 namespace Japetus {
 
+// Construct uninitialized node
 Node::Node() :
   id_(-1), cost_id_(-1),
   func_(nullptr)
 { }
 
+// Initialize node with settings
 void Node::initialize(int id, int cost_id,
   std::shared_ptr<Functor> func)
 {
@@ -17,6 +19,7 @@ void Node::initialize(int id, int cost_id,
   func_ = std::move(func);
 }
 
+// Clear node configuration
 void Node::clear()
 {
   in_edges_.clear();
@@ -29,6 +32,7 @@ void Node::clear()
   func_ = nullptr;
 }
 
+// Clear edge configuration
 void Edge::clear()
 {
   id_ = -1;
@@ -40,6 +44,8 @@ void Edge::clear()
 
 // Dynamic allocation of nodes
 
+// Allocate memory for a node
+// Checks available nodes to prevent memory tearing
 Node* Graph::allocate_node(
   std::shared_ptr<Functor> func,
   const Node* cost_node)
@@ -62,6 +68,7 @@ Node* Graph::allocate_node(
   return node;
 }
 
+// Release node and mark as available
 void Graph::release_node(Node* node)
 {
   nodes_[node->id()] = nullptr;
@@ -83,6 +90,7 @@ Node* Graph::add_node(
   return node;
 }*/
 
+// Remove node from graph and mark as available
 void Graph::remove_node(Node* node)
 {
   release_node(node);
@@ -90,6 +98,8 @@ void Graph::remove_node(Node* node)
 
 // Dynamic allocation of edges
 
+// Allocate an edge
+// Checks available edges to prevent memory tearing
 Edge* Graph::allocate_edge(
   Node* src_node, int src_out,
   Node* dst_node, int dst_in)
@@ -113,6 +123,7 @@ Edge* Graph::allocate_edge(
   return edge;
 }
 
+// Releae edge and mark as available
 void Graph::release_edge(Edge* edge)
 {
   edges_[edge->id()] = nullptr;
@@ -122,6 +133,7 @@ void Graph::release_edge(Edge* edge)
 
 // Addition/removal of edges
 
+// Add edge to graph
 Edge* Graph::add_edge(
   Node* src_node,
   int src_out,
@@ -138,6 +150,7 @@ Edge* Graph::add_edge(
   return edge;
 }
 
+// Mark edge as avaiable and remove from graph
 void Graph::remove_edge(Edge* edge)
 {
   release_edge(edge);
