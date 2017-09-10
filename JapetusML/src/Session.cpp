@@ -23,6 +23,7 @@ void Session::recursive_evaluate(
   }
 }
 
+// Run the session from a node
 void Session::run(
   const Scope& scope,
   Node* entry,
