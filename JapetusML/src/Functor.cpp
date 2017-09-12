@@ -22,7 +22,7 @@ void TanhGradientFunctor::run(std::vector<Data>* inputs, std::vector<Data>* outp
 {
   ECHECK(inputs->size() == 1, "Tanh gradient takes one input!");
   ECHECK(outputs->size() == 1, "Tanh gradient gives one output!");
-  outputs->at(0) = sigmoid_prime(inputs->at(0));
+  outputs->at(0) = tanh_prime(inputs->at(0));
 }
 
 void TanhFunctor::run(std::vector<Data>* inputs, std::vector<Data>* outputs)

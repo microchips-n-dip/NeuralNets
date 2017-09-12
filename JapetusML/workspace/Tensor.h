@@ -5,6 +5,7 @@ namespace Japetus {
 
 namespace tensor {
 
+// Class for storing Tensor's dimensions
 class Dimensions
 {
  public:
@@ -26,6 +27,7 @@ class Dimensions
   unsigned int ts_;
 };
 
+// Class for storing Tensor's raw data
 template <typename Type>
 class TensorStorage
 {
@@ -55,6 +57,18 @@ class TensorStorage
 
 }
 
+// Tensor base class
+// Dev note: tensor base does not contain any tensor data
+//   Base does contain dimension information and operators
+template <typename Derived>
+class TensorBase
+{
+ public:
+
+ private:
+};
+
+// Binary element wise operations
 template <typename BinaryOp, typename LeftXprType, typename RightXprType>
 class TensorCWiseBinaryOp :
   public TensorBase<TensorCWiseBinaryOp<BinaryOp, LeftXprType, RightXprType>>
@@ -97,6 +111,7 @@ struct TensorEvaluator<TensorCWiseBinaryOp<BinaryOp, LeftArgType, RightArgType>>
   BinaryOp m_functor;
 };
 
+// Tensor axial reduction operation
 template <typename Op, typename Dims, typename XprType>
 class TensorReductionOp
 {
@@ -142,6 +157,7 @@ struct TensorEvaluator<TensorReductionOp<Op, Dims, ArgType>>
   Op m_reducer;
 }
 
+// Tensor contraction operation
 template <typename Dims, typename LeftXprType, typename RightXprType>
 class TensorContractionOp
 {
@@ -163,6 +179,10 @@ template <typename Dims, typename LeftArgType, typename RightArgType>
 struct TensorEvaluator<TensorContractionOp<Dims, LeftArgType, RightArgType>>
 {
   typedef TensorContractionOp<Dims, LeftArgType, RightArgType> XprType;
+
+  // Unlike Eigen, size information is not stored in the templates
+  typedef Dims contract_t;
+  typedef Dims nocontract_t;
 
   TensorEvaluator(XprType& op)
   {
@@ -254,6 +274,25 @@ struct TensorEvaluator<TensorContractionOp<Dims, LeftArgType, RightArgType>>
         }
         ++dim_idx;
         ++nocontract_idx;
+      }
+    }
+  }
+
+  void eval_gemv(Scalar* buffer)
+  {
+    typedef tensor::internal::TensorContractionMapper<> LhsMapper;
+    typedef tensor::internal::TensorContractionMapper<> RhsMapper;
+
+    LhsMapper lhs();
+    RhsMapper rhs();
+    OutputMapper out();
+
+    // TODO: Add multithread support
+    for (unsigned int i = 0; i < LDims - ContractDims; ++i) {
+      for (unsigned int j = 0; j < RDims - ContractDims; ++j) {
+        for (unsigned int k = 0; k < ContractDims; ++k) {
+          out(i, j) += lhs(i, k) * rhs(k, j);
+        }
       }
     }
   }

@@ -32,4 +32,9 @@ Node* hadamard_quotient(Scope& scope, Node* n1, Node* n2)
   return gen_func_node(scope, std::vector<Node*>({n1, n2}), new HadamardQuotientFunctor);
 }
 
+Node* constant(Scope& scope, const Data val)
+{
+  return gen_func_node(scope, std::vector<Node*>(), new ConstFunctor(val));
+}
+
 }
