@@ -115,6 +115,21 @@ struct HadamardProductFunctor :
   { return new HadamardProductGradientFunctor(respect); }
 };
 
+struct HadamardQuotientFunctor :
+  public Functor
+{
+  HadamardQuotientFunctor()
+  {
+    in_size_ = 2;
+    out_size_ = 1;
+  }
+
+  void run(std::vector<Data>* inputs, std::vector<Data>* outputs);
+
+  Functor* gradient(int respect) const
+  { return nullptr; }
+};
+
 struct ConstFunctor:
   public Functor
 {

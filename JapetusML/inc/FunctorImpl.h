@@ -13,6 +13,7 @@ Node* gen_func_node(Scope& scope, std::vector<Node*> nodes, FunctorType func);
 Node* sigmoid(Scope& scope, Node* node);
 Node* tanh(Scope& scope, Node* node);
 Node* hadamard_product(Scope& scope, Node* n1, Node* n2);
+Node* hadamard_quotient(Scope& scope, Node* n1, Node* n2);
 
 }
 

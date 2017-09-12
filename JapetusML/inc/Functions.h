@@ -11,6 +11,7 @@ Data tanh_prime(Data z);
 Data tanh(Data z);
 Data hadamard_product_prime(Data a);
 Data hadamard_product(Data a, Data b);
+Data hadamard_quotient(Data a, Data b);
 
 }
 
