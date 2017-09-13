@@ -6,9 +6,27 @@ namespace Japetus {
 namespace tensor {
 
 template <typename LeftXprType, typename RightXprType>
+struct traits<TensorAssignOp<LeftXprType, RightXprType>>
+{
+  typedef typename LeftXprType::Scalar Scalar;
+  typedef typename promote_index_type<
+    typename traits<LeftXprType>::Index,
+    typename traits<RightXprType>::Index>::type Index;
+  typedef typename promote_indices_type<
+    typename traits<LeftXprType>::Indices,
+    typename traits<RightXprType>::Indices>::type Indices;
+};
+
+template <typename LeftXprType, typename RightXprType>
 class TensorAssignOp : public TensorBase<TensorAssignOp<LeftXprType, RightXprType>>
 {
  public:
+  typedef traits<TensorAssignOp> Traits;
+  typedef typename Traits::Scalar Scalar;
+  typedef Scalar CoeffReturnType;
+  typedef typename Traits::Index Index;
+  typedef typename Traits::Indices Indices;
+
   TensorAssignOp(const LeftXprType& leftImpl, const RightXprType& rightImpl)
   {
     m_leftImpl = leftImpl;
@@ -27,6 +45,9 @@ template <typename LeftArgType, typename RightArgType>
 struct TensorEvaluator<TensorAssignOp<LeftArgType, RightArgType>>
 {
   typedef TensorAssignOp<LeftArgType, RightArgType> XprType;
+  typedef typename XprType::Scalar Scalar;
+  typedef typename XprType::CoeffReturnType CoeffReturnType;
+  typedef typename XprType::Index Index;
 
   TensorEvaluator(const XprType& op)
   {
@@ -36,8 +57,8 @@ struct TensorEvaluator<TensorAssignOp<LeftArgType, RightArgType>>
 
   bool evalSubExprsIfNeeded(Scalar*)
   {
-    m_leftImpl.evalSubExprsIfNeeded(NULL);
-    return m_rightImpl.evalSubExprsIfNeeded(m_lefImpl.data());
+    m_leftImpl.evalSubExprsIfNeeded(nullptr);
+    return m_rightImpl.evalSubExprsIfNeeded(m_leftImpl.data());
   }
 
   void cleanup()
@@ -47,7 +68,7 @@ struct TensorEvaluator<TensorAssignOp<LeftArgType, RightArgType>>
   }
 
   void evalScalar(Index index)
-  { m_lefImpl.coeffRef(index) = m_rightImpl.coeff(index); }
+  { m_leftImpl.coeffRef(index) = m_rightImpl.coeff(index); }
 
   CoeffReturnType coeff(Index index) const
   { return m_leftImpl.coeff(index); }

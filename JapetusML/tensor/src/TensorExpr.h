@@ -6,9 +6,30 @@ namespace Japetus {
 namespace tensor {
 
 template <typename BinaryOp, typename LeftXprType, typename RightXprType>
+struct traits<TensorCWiseBinaryOp<BinaryOp, LeftXprType, RightXprType>>
+{
+  typedef typename std::result_of<
+    BinaryOp(typename LeftXprType::Scalar,
+             typename RightXprType::Scalar)>::type Scalar;
+  // For indical promotion, will probably naevly assume some index type
+  typedef typename promote_index_type<
+    typename traits<LeftXprType>::Index,
+    typename traits<RightXprType>::Index>::type Index;
+  typedef typename promote_indices_type<
+    typename traits<LeftXprType>::Indices,
+    typename traits<RightXprType>::Indices>::type Indices;
+};
+
+template <typename BinaryOp, typename LeftXprType, typename RightXprType>
 class TensorCWiseBinaryOp : public TensorBase<TensorCWiseBinaryOp<BinaryOp, LeftXprType, RightXprType>>
 {
  public:
+  typedef traits<TensorCWiseBinaryOp> Traits;
+  typedef typename Traits::Scalar Scalar;
+  typedef Scalar CoeffReturnType;
+  typedef typename Traits::Index Index;
+  typedef typename Traits::Indices Indices;
+
   TensorCWiseBinaryOp(BinaryOp& op, LeftXprType& leftImpl, RightXprType& rightImpl)
   {
     m_leftImpl = leftImpl;
@@ -30,6 +51,8 @@ template <typename BinaryOp, typename LeftArgType, typename RightArgType>
 struct TensorEvaluator<TensorCWiseBinaryOp<BinaryOp, LeftArgType, RightArgType>>
 {
   typedef TensorCWiseBinaryOp<BinaryOp, LeftArgType, RightArgType> XprType;
+  typedef typename XprType::CoeffReturnType CoeffReturnType;
+  typedef typename XprType::Index Index;
 
   TensorEvaluator(XprType& op)
   {
@@ -40,8 +63,8 @@ struct TensorEvaluator<TensorCWiseBinaryOp<BinaryOp, LeftArgType, RightArgType>>
 
   bool evalSubExprsIfNeeded(CoeffReturnType*)
   {
-    m_leftImpl.evalSubExprsIfNeeded(NULL);
-    m_rightImpl.evalSubExprsIfNeeded(NULL);
+    m_leftImpl.evalSubExprsIfNeeded(nullptr);
+    m_rightImpl.evalSubExprsIfNeeded(nullptr);
     return true;
   }
 

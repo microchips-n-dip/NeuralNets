@@ -1,0 +1,16 @@
+#ifndef JAPETUS_TENSOR
+#define JAPETUS_TENSOR
+
+#include <vector>
+#include <type_trait>
+
+#include "src/jt_util.h"
+#include "src/TensorForwardDeclarations.h"
+#include "src/TensorBase.h"
+#include "src/TensorStorage.h"
+#include "src/TensorAssign.h"
+#include "src/TensorExpr.h"
+#include "src/TensorExecutor.h"
+#include "src/Tensor.h"
+
+#endif

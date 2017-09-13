@@ -19,8 +19,8 @@ int main(void)
   auto h2 = hadamard_product(scope, h1, n3);
 
   auto s1 = sigmoid(scope, h2);
-  s1 = hadamard_product(scope, s1, n4);
   auto q1 = hadamard_quotient(scope, s1, n4);
+  s1 = sigmoid(scope, q1);
 
   auto q2 = hadamard_quotient(scope, h1, n4);
   auto t1 = tanh(scope, q2);
@@ -28,7 +28,7 @@ int main(void)
   // Create and run the first session
   auto sess1 = Session();
   OutputType output1;
-  sess1.run(scope, q1, &output1);
+  sess1.run(scope, s1, &output1);
 
   // Create and run the second session
   auto sess2 = Session();
