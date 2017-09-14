@@ -27,14 +27,14 @@ class TensorAssignOp : public TensorBase<TensorAssignOp<LeftXprType, RightXprTyp
   typedef typename Traits::Index Index;
   typedef typename Traits::Indices Indices;
 
-  TensorAssignOp(const LeftXprType& leftImpl, const RightXprType& rightImpl)
-  {
-    m_leftImpl = leftImpl;
-    m_rightImpl = rightImpl;
-  }
+  TensorAssignOp(const LeftXprType& leftImpl, const RightXprType& rightImpl) :
+    m_leftImpl(leftImpl),
+    m_rightImpl(rightImpl)
+  { }
 
-  LeftXprType lhsExpression() const { return m_leftImpl; }
-  RightXprType rhsExpression() const { return m_rightImpl; }
+  typename remove_all<LeftXprType>::type& lhsExpression() const
+  { return *((typename remove_all<LeftXprType>::type*)&m_leftImpl); }
+  const typename remove_all<RightXprType>::type& rhsExpression() const { return m_rightImpl; }
 
  private:
   LeftXprType m_leftImpl;
@@ -42,18 +42,18 @@ class TensorAssignOp : public TensorBase<TensorAssignOp<LeftXprType, RightXprTyp
 };
 
 template <typename LeftArgType, typename RightArgType>
-struct TensorEvaluator<TensorAssignOp<LeftArgType, RightArgType>>
+struct TensorEvaluator<const TensorAssignOp<LeftArgType, RightArgType>>
 {
   typedef TensorAssignOp<LeftArgType, RightArgType> XprType;
   typedef typename XprType::Scalar Scalar;
   typedef typename XprType::CoeffReturnType CoeffReturnType;
   typedef typename XprType::Index Index;
+  typedef typename TensorEvaluator<RightArgType>::Dimensions Dimensions;
 
-  TensorEvaluator(const XprType& op)
-  {
-    m_leftImpl = op.lhsExpression();
-    m_rightImpl = op.rhsExpression();
-  }
+  TensorEvaluator(const XprType& op) :
+    m_leftImpl(op.lhsExpression()),
+    m_rightImpl(op.rhsExpression())
+  { }
 
   bool evalSubExprsIfNeeded(Scalar*)
   {
@@ -66,6 +66,8 @@ struct TensorEvaluator<TensorAssignOp<LeftArgType, RightArgType>>
     m_leftImpl.cleanup();
     m_rightImpl.cleanup();
   }
+
+  const Dimensions& dimensions() const { return m_rightImpl.dimensions(); }
 
   void evalScalar(Index index)
   { m_leftImpl.coeffRef(index) = m_rightImpl.coeff(index); }

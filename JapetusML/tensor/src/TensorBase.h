@@ -17,12 +17,9 @@ class TensorBase
 
   typedef TensorDimensions<Index, Indices> Dimensions;
 
-  Dimensions dimensions() const { return dimensions_; }
-  Index total_size() const { return dimensions_.total_size(); }
-
   template <typename OtherDerived, typename BinaryOp>
   TensorCWiseBinaryOp<BinaryOp, Derived, OtherDerived>
-  binaryOp(OtherDerived& other, BinaryOp& op)
+  binaryOp(const OtherDerived& other, const BinaryOp& op)
   {
     return TensorCWiseBinaryOp<BinaryOp, Derived, OtherDerived>(
       derived(), other.derived(), op);
@@ -48,10 +45,8 @@ class TensorBase
   operator/(OtherDerived& other)
   { return binaryOp(other, scalar_division_op<Scalar>()); }
 
-  Derived& derived() const { return *static_cast<Derived*>(this); }
-
- private:
-  Dimensions dimensions_;
+  Derived& derived() { return *static_cast<Derived*>(this); }
+  const Derived& derived() const { return *static_cast<const Derived*>(this); }
 };
 
 }

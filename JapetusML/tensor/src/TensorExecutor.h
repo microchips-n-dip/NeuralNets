@@ -14,8 +14,8 @@ struct TensorExecutor
     TensorEvaluator<Expression> evaluator(expr);
     const bool needs_assign = evaluator.evalSubExprsIfNeeded(nullptr);
     if (needs_assign) {
-      for (Index i = 0; i < evaluator.total_size(); ++i) {
-        evalScalar(i);
+      for (Index i = 0; i < evaluator.dimensions().total_size(); ++i) {
+        evaluator.evalScalar(i);
       }
     }
     evaluator.cleanup();

@@ -1,15 +1,23 @@
 #ifndef JAPETUS_TENSOR
 #define JAPETUS_TENSOR
 
+#include <stdlib.h>
+#include <memory.h>
+#include <new>
+#include <string.h>
 #include <vector>
-#include <type_trait>
+#include <type_traits>
 
+#include "../inc/util.h"
 #include "src/jt_util.h"
 #include "src/TensorForwardDeclarations.h"
+
+#include "src/TensorFunctors.h"
+#include "src/TensorExpr.h"
 #include "src/TensorBase.h"
+
 #include "src/TensorStorage.h"
 #include "src/TensorAssign.h"
-#include "src/TensorExpr.h"
 #include "src/TensorExecutor.h"
 #include "src/Tensor.h"
 

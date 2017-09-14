@@ -30,36 +30,38 @@ class TensorCWiseBinaryOp : public TensorBase<TensorCWiseBinaryOp<BinaryOp, Left
   typedef typename Traits::Index Index;
   typedef typename Traits::Indices Indices;
 
-  TensorCWiseBinaryOp(BinaryOp& op, LeftXprType& leftImpl, RightXprType& rightImpl)
-  {
-    m_leftImpl = leftImpl;
-    m_rightImpl = rightImpl;
-    m_functor = op;
-  }
+  TensorCWiseBinaryOp(const LeftXprType& leftImpl, const RightXprType& rightImpl, const BinaryOp& op) :
+    m_leftImpl(leftImpl),
+    m_rightImpl(rightImpl),
+    m_functor(op)
+  { }
 
-  LeftXprType lhsExpression() const { return m_leftImpl; }
-  RightXprType rhsExpression() const { return m_rightImpl; }
-  BinaryOp functor() const { return m_functor; }
+  const typename remove_all<LeftXprType>::type& lhsExpression() const { return m_leftImpl; }
+  const typename remove_all<RightXprType>::type& rhsExpression() const { return m_rightImpl; }
+  const BinaryOp& functor() const { return m_functor; }
 
  private:
   LeftXprType m_leftImpl;
   RightXprType m_rightImpl;
-  BinaryOp m_functor;
+  const BinaryOp m_functor;
 };
 
 template <typename BinaryOp, typename LeftArgType, typename RightArgType>
-struct TensorEvaluator<TensorCWiseBinaryOp<BinaryOp, LeftArgType, RightArgType>>
+struct TensorEvaluator<const TensorCWiseBinaryOp<BinaryOp, LeftArgType, RightArgType>>
 {
   typedef TensorCWiseBinaryOp<BinaryOp, LeftArgType, RightArgType> XprType;
-  typedef typename XprType::CoeffReturnType CoeffReturnType;
+  typedef typename XprType::Scalar Scalar;
+  typedef typename traits<XprType>::Scalar CoeffReturnType;
   typedef typename XprType::Index Index;
+  typedef typename TensorEvaluator<LeftArgType>::Dimensions Dimensions;
 
-  TensorEvaluator(XprType& op)
-  {
-    m_leftImpl = op.lhsExpression();
-    m_rightImpl = op.rhsExpression();
-    m_functor = op.functor();
-  }
+  TensorEvaluator(const XprType& op) :
+    m_leftImpl(op.lhsExpression()),
+    m_rightImpl(op.rhsExpression()),
+    m_functor(op.functor())
+  { }
+
+  void cleanup() { }
 
   bool evalSubExprsIfNeeded(CoeffReturnType*)
   {
@@ -71,9 +73,11 @@ struct TensorEvaluator<TensorCWiseBinaryOp<BinaryOp, LeftArgType, RightArgType>>
   CoeffReturnType coeff(Index index) const
   { return m_functor(m_leftImpl.coeff(index), m_rightImpl.coeff(index)); }
 
+  const Dimensions& dimensions() const { return m_leftImpl.dimensions(); }
+
   TensorEvaluator<LeftArgType> m_leftImpl;
   TensorEvaluator<RightArgType> m_rightImpl;
-  BinaryOp m_functor;
+  const BinaryOp m_functor;
 };
 
 }
