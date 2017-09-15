@@ -92,7 +92,8 @@ struct TensorEvaluator
   typedef typename Derived::Scalar CoeffReturnType;
   typedef typename Derived::Dimensions Dimensions;
 
-  typedef typename traits<Derived>::template MakePointer<Scalar>::Type Data;
+  typedef typename traits<Derived>::template \
+    MakePointer<Scalar>::Type Data;
 
   TensorEvaluator(const Derived& m) :
     m_data(const_cast<Data>(m.data())),
@@ -140,7 +141,8 @@ struct TensorEvaluator<const Derived>
   typedef typename Derived::CoeffReturnType CoeffReturnType;
   typedef typename Derived::Dimensions Dimensions;
 
-  typedef typename traits<Derived>::template MakePointer<Scalar>::Type Data;
+  typedef typename traits<Derived>::template \
+    MakePointer<Scalar>::Type Data;
 
   TensorEvaluator(const Derived& m) :
     m_data(m.data()),
