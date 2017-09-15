@@ -3,10 +3,12 @@
 
 #include <vector>
 #include "../inc/Functions.h"
-
-typedef double Data;
+#include "../tensor/Tensor"
 
 namespace Japetus {
+
+typedef tensor::Tensor<double> Data;
+typedef std::reference_wrapper<Data> DataRef;
 
 // Functor Bases
 struct Functor
@@ -17,7 +19,7 @@ struct Functor
   unsigned int in_size() const { return (*this).in_size_; }
   unsigned int out_size() const { return (*this).out_size_; }
 
-  virtual void run(std::vector<Data>* inputs, std::vector<Data>* outputs) = 0;
+  virtual void run(std::vector<DataRef>* inputs, std::vector<DataRef>* outputs) = 0;
   virtual Functor* gradient(int respect) const = 0;
 };
 
@@ -41,7 +43,7 @@ struct SigmoidGradientFunctor :
     respect_ = respect;
   }
 
-  void run(std::vector<Data>* inputs, std::vector<Data>* outputs);
+  void run(std::vector<DataRef>* inputs, std::vector<DataRef>* outputs);
 };
 
 struct SigmoidFunctor :
@@ -53,7 +55,7 @@ struct SigmoidFunctor :
     out_size_ = 1;
   }
 
-  void run(std::vector<Data>* inputs, std::vector<Data>* outputs);
+  void run(std::vector<DataRef>* inputs, std::vector<DataRef>* outputs);
 
   Functor* gradient(int respect) const
   { return new SigmoidGradientFunctor(respect); }
@@ -69,7 +71,7 @@ struct TanhGradientFunctor :
     respect_ = respect;
   }
 
-  void run(std::vector<Data>* inputs, std::vector<Data>* outputs);
+  void run(std::vector<DataRef>* inputs, std::vector<DataRef>* outputs);
 };
 
 struct TanhFunctor :
@@ -81,7 +83,7 @@ struct TanhFunctor :
     out_size_ = 1;
   }
 
-  void run(std::vector<Data>* inputs, std::vector<Data>* outputs);
+  void run(std::vector<DataRef>* inputs, std::vector<DataRef>* outputs);
 
   Functor* gradient(int respect) const
   { return new TanhGradientFunctor(respect); }
@@ -97,7 +99,7 @@ struct HadamardProductGradientFunctor :
     respect_ = respect;
   }
 
-  void run(std::vector<Data>* inputs, std::vector<Data>* outputs);
+  void run(std::vector<DataRef>* inputs, std::vector<DataRef>* outputs);
 };
 
 struct HadamardProductFunctor :
@@ -109,7 +111,7 @@ struct HadamardProductFunctor :
     out_size_ = 1;
   }
 
-  void run(std::vector<Data>* inputs, std::vector<Data>* outputs);
+  void run(std::vector<DataRef>* inputs, std::vector<DataRef>* outputs);
 
   Functor* gradient(int respect) const
   { return new HadamardProductGradientFunctor(respect); }
@@ -124,7 +126,7 @@ struct HadamardQuotientFunctor :
     out_size_ = 1;
   }
 
-  void run(std::vector<Data>* inputs, std::vector<Data>* outputs);
+  void run(std::vector<DataRef>* inputs, std::vector<DataRef>* outputs);
 
   Functor* gradient(int respect) const
   { return nullptr; }
@@ -141,7 +143,7 @@ struct ConstFunctor:
     out_size_ = 1;
   }
 
-  void run(std::vector<Data>* inputs, std::vector<Data>* outputs);
+  void run(std::vector<DataRef>* inputs, std::vector<DataRef>* outputs);
 
   Functor* gradient(int respect) const
   { return new ConstFunctor(0); }
@@ -150,7 +152,7 @@ struct ConstFunctor:
 struct PlaceholderFunctor :
   public Functor
 {
-  void run(std::vector<Data>* inputs, std::vector<Data>* outputs) { }
+  void run(std::vector<DataRef>* inputs, std::vector<DataRef>* outputs) { }
   Functor* gradient(int respect) const
   { return new PlaceholderFunctor; }
 };

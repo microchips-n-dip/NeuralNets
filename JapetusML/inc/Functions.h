@@ -1,17 +1,19 @@
 #ifndef JAPETUS_FUNCTIONS_H
 #define JAPETUS_FUNCTIONS_H
 
-typedef double Data;
+#include "../tensor/Tensor"
 
 namespace Japetus {
 
-Data sigmoid_prime(Data z);
-Data sigmoid(Data z);
-Data tanh_prime(Data z);
-Data tanh(Data z);
-Data hadamard_product_prime(Data a);
-Data hadamard_product(Data a, Data b);
-Data hadamard_quotient(Data a, Data b);
+typedef tensor::Tensor<double> Data;
+
+Data sigmoid_prime(const Data& z);
+Data sigmoid(const Data& z);
+Data tanh_prime(const Data& z);
+Data tanh(const Data& z);
+Data hadamard_product_prime(const Data& a);
+Data hadamard_product(const Data& a, const Data& b);
+Data hadamard_quotient(const Data& a, const Data& b);
 
 }
 
