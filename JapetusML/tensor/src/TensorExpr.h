@@ -41,8 +41,8 @@ class TensorCWiseBinaryOp : public TensorBase<TensorCWiseBinaryOp<BinaryOp, Left
   const BinaryOp& functor() const { return m_functor; }
 
  private:
-  LeftXprType m_leftImpl;
-  RightXprType m_rightImpl;
+  const LeftXprType& m_leftImpl;
+  const RightXprType& m_rightImpl;
   const BinaryOp m_functor;
 };
 

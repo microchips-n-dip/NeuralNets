@@ -27,7 +27,7 @@ class TensorAssignOp : public TensorBase<TensorAssignOp<LeftXprType, RightXprTyp
   typedef typename Traits::Index Index;
   typedef typename Traits::Indices Indices;
 
-  TensorAssignOp(const LeftXprType& leftImpl, const RightXprType& rightImpl) :
+  TensorAssignOp(LeftXprType& leftImpl, const RightXprType& rightImpl) :
     m_leftImpl(leftImpl),
     m_rightImpl(rightImpl)
   { }
@@ -37,8 +37,8 @@ class TensorAssignOp : public TensorBase<TensorAssignOp<LeftXprType, RightXprTyp
   const typename remove_all<RightXprType>::type& rhsExpression() const { return m_rightImpl; }
 
  private:
-  LeftXprType m_leftImpl;
-  RightXprType m_rightImpl;
+  typename remove_all<LeftXprType>::type& m_leftImpl;
+  const typename remove_all<RightXprType>::type& m_rightImpl;
 };
 
 template <typename LeftArgType, typename RightArgType>

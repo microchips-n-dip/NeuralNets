@@ -75,12 +75,7 @@ class TensorStorage
   const Index& total_size() const { return dimensions_.total_size(); }
   const Dimensions& dimensions() const { return dimensions_; }
 
-  Derived* data() const
-  {
-    if (data_ && ts_gooddata_flag) {
-      return data_;
-    }
-  }
+  Derived* data() const { return data_; }
 
   void resize(const Dimensions& dims)
   {
@@ -89,11 +84,9 @@ class TensorStorage
     ts_allocate(dimensions_.total_size());
   }
 
-  TensorStorage()
-  {
-    ts_allocate(0);
-    ts_gooddata_flag = true;
-  }
+  TensorStorage() :
+    dimensions_()
+  { ts_allocate(1); }
 
   TensorStorage(const Dimensions& dims) :
     dimensions_(dims)
@@ -106,20 +99,18 @@ class TensorStorage
   void ts_allocate(const Index& sz)
   {
     data_ = new Derived[sz];
-    ts_gooddata_flag = true;
   }
 
   void ts_deallocate()
   {
-    if (data_ && ts_gooddata_flag) {
+    if (data_) {
       delete[] data_;
     }
-    ts_gooddata_flag = false;
+    data_ = nullptr;
   }
 
   Derived* data_;
   Dimensions dimensions_;
-  bool ts_gooddata_flag;
 };
 
 }
