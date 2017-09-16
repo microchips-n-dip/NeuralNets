@@ -16,6 +16,8 @@ template <typename Derived, typename Index, typename Indices> class TensorStorag
 template <typename Scalar_, typename Index_ = unsigned int, typename Indices_ = std::vector<Index_>>
 class Tensor;
 
+template <typename PlainObjectType> class TensorRef;
+
 template <typename Derived> struct traits;
 template <typename Derived> struct traits<const Derived> : traits<Derived> { };
 

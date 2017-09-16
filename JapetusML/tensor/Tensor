@@ -15,6 +15,7 @@
 #include "src/TensorFunctors.h"
 #include "src/TensorExpr.h"
 #include "src/TensorBase.h"
+#include "src/TensorRef.h"
 
 #include "src/TensorStorage.h"
 #include "src/TensorAssign.h"

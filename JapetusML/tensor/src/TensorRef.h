@@ -27,7 +27,7 @@ class TensorLazyEvaluatorBase
   void decrRefCount() { --m_refcount; }
 
  private:
-  TensorLazyEvaluatorBase(const TensorLazyEvaluator& other);
+  TensorLazyEvaluatorBase(const TensorLazyEvaluatorBase& other);
   TensorLazyEvaluatorBase& operator=(const TensorLazyEvaluatorBase& other);
 
   Index m_refcount;
@@ -54,13 +54,13 @@ class TensorLazyEvaluatorReadOnly : public TensorLazyEvaluatorBase<Dimensions, t
 
   virtual const Scalar coeff(Index index) const { return m_impl.coeff(index); }
 
-  virtual Scalar& coeffRef(Index index) const
+  virtual Scalar& coeffRef(Index index)
   {
     ECHECK(false, "Cannot request reference to coeff of ReadOnly evaluator!");
     return m_dummy;
   }
 
- private:
+ protected:
   TensorEvaluator<Expr> m_impl;
   Dimensions m_dims;
   Scalar m_dummy;
@@ -85,26 +85,7 @@ class TensorLazyEvaluatorWritable : public TensorLazyEvaluatorReadOnly<Dimension
 };
 
 template <typename Dimensions, typename Expr>
-class TensorLazyEvaluator;
-
-template <typename Dimensions, typename Expr>
-class TensorLazyEvaluator<Dimensions, const Expr> :
-  public TensorLazyEvaluatorReadOnly<Dimensions, const Expr>
-{
- public:
-  typedef TensorLazyEvaluatorReadOnly<Dimensions, const Expr> Base;
-  typedef typename Base::Scalar;
-  typedef typename Base::Index;
-
-  TensorLazyEvaluator(const Expr& expr) :
-    Base(expr)
-  { }
-
-  virtual ~TensorLazyEvaluator() { }
-};
-
-template <typename Dimensions, typename Expr>
-class TensorLazyEvaluator<Dimensions, Expr> :
+class TensorLazyEvaluator :
   public TensorLazyEvaluatorWritable<Dimensions, Expr>
 {
  public:
@@ -117,6 +98,31 @@ class TensorLazyEvaluator<Dimensions, Expr> :
   { }
 
   virtual ~TensorLazyEvaluator() { }
+};
+
+template <typename Dimensions, typename Expr>
+class TensorLazyEvaluator<Dimensions, const Expr> :
+  public TensorLazyEvaluatorReadOnly<Dimensions, const Expr>
+{
+ public:
+  typedef TensorLazyEvaluatorReadOnly<Dimensions, const Expr> Base;
+  typedef typename Base::Scalar Scalar;
+  typedef typename Base::Index Index;
+
+  TensorLazyEvaluator(const Expr& expr) :
+    Base(expr)
+  { }
+
+  virtual ~TensorLazyEvaluator() { }
+};
+
+template <typename Derived>
+struct traits<TensorRef<Derived>>
+{
+  typedef traits<Derived> BaseTraits;
+  typedef typename BaseTraits::Scalar Scalar;
+  typedef typename BaseTraits::Index Index;
+  typedef typename BaseTraits::Indices Indices;
 };
 
 template <typename PlainObjectType>
@@ -134,8 +140,38 @@ class TensorRef : TensorBase<TensorRef<PlainObjectType>>
 
   template <typename Expression>
   TensorRef(const Expression& expr) :
-    m_evaluator(new TensorLazyEvaluatorBase<Dimensions, Expression>(expr))
+    m_evaluator(new TensorLazyEvaluator<Dimensions, Expression>(expr))
   { }
+
+ private:
+  TensorLazyEvaluatorBase<Dimensions, Scalar>* m_evaluator;
+};
+
+template <typename Derived>
+struct TensorEvaluator<const TensorRef<Derived>>
+{
+  typedef typename Derived::Index Index;
+  typedef typename Derived::Scalar Scalar;
+  typedef typename Derived::CoeffReturnType CoeffReturnType;
+  typedef typename Derived::Dimensions Dimensions;
+
+  TensorEvaluator(const TensorRef<Derived>& m) :
+    m_ref(m)
+  { }
+
+  const Dimensions& dimensions() const { return m_ref.dimensions(); }
+
+  bool evalSubExprsIfNeeded(Scalar*) { return true; }
+
+  void cleanup() { }
+
+  CoeffReturnType coeff(Index index) const { return m_ref.coeff(index); }
+
+  Scalar& coeffRef(Index index) { return m_ref.coeffRef(index); }
+
+  Scalar* data() const { return m_ref.data(); }
+
+  TensorRef<Derived> m_ref;
 };
 
 }

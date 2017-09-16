@@ -5,10 +5,13 @@ namespace Japetus {
 
 namespace tensor {
 
-template <typename Index, typename Indices>
+template <typename Index_, typename Indices_>
 class TensorDimensions
 {
  public:
+  typedef Index_ Index;
+  typedef Indices_ Indices;
+
   const Index n_dims() const { return ndims_; }
   const Index total_size() const { return total_sz_; }
   const Indices dimensions() const { return dimensions_; }

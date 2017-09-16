@@ -8,7 +8,7 @@
 namespace Japetus {
 
 typedef tensor::Tensor<double> Data;
-typedef std::reference_wrapper<Data> DataRef;
+typedef tensor::TensorRef<Data> DataRef;
 
 // Functor Bases
 struct Functor
