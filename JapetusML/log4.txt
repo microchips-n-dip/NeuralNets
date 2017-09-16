@@ -1,0 +1,101 @@
+In file included from src/../inc/../tensor/Tensor:17:0,
+                 from src/../inc/Functor.h:5,
+                 from src/Functor.cpp:2:
+src/../inc/../tensor/src/TensorExpr.h: In instantiation of ‘Japetus::tensor::TensorEvaluator<const Japetus::tensor::TensorCWiseBinaryOp<BinaryOp, LeftXprType, RightXprType> >::TensorEvaluator(const XprType&) [with BinaryOp = Japetus::tensor::scalar_product_op<double, double>; LeftArgType = Japetus::tensor::TensorRef<Japetus::tensor::Tensor<double> >; RightArgType = Japetus::tensor::TensorRef<Japetus::tensor::Tensor<double> >; Japetus::tensor::TensorEvaluator<const Japetus::tensor::TensorCWiseBinaryOp<BinaryOp, LeftXprType, RightXprType> >::XprType = Japetus::tensor::TensorCWiseBinaryOp<Japetus::tensor::scalar_product_op<double, double>, Japetus::tensor::TensorRef<Japetus::tensor::Tensor<double> >, Japetus::tensor::TensorRef<Japetus::tensor::Tensor<double> > >]’:
+src/../inc/../tensor/src/TensorRef.h:46:22:   required from ‘Japetus::tensor::TensorLazyEvaluatorReadOnly<Dimensions, Expr>::TensorLazyEvaluatorReadOnly(const Expr&) [with Dimensions = Japetus::tensor::TensorDimensions<unsigned int, std::vector<unsigned int, std::allocator<unsigned int> > >; Expr = const Japetus::tensor::TensorCWiseBinaryOp<Japetus::tensor::scalar_product_op<double, double>, Japetus::tensor::TensorRef<Japetus::tensor::Tensor<double> >, Japetus::tensor::TensorRef<Japetus::tensor::Tensor<double> > >]’
+src/../inc/../tensor/src/TensorRef.h:102:14:   required from ‘Japetus::tensor::TensorLazyEvaluator<Dimensions, Expr>::TensorLazyEvaluator(const Expr&) [with Dimensions = Japetus::tensor::TensorDimensions<unsigned int, std::vector<unsigned int, std::allocator<unsigned int> > >; Expr = Japetus::tensor::TensorCWiseBinaryOp<Japetus::tensor::scalar_product_op<double, double>, Japetus::tensor::TensorRef<Japetus::tensor::Tensor<double> >, Japetus::tensor::TensorRef<Japetus::tensor::Tensor<double> > >]’
+src/../inc/../tensor/src/TensorRef.h:144:17:   required from ‘Japetus::tensor::TensorRef<PlainObjectType>& Japetus::tensor::TensorRef<PlainObjectType>::operator=(const Expression&) [with Expression = Japetus::tensor::TensorCWiseBinaryOp<Japetus::tensor::scalar_product_op<double, double>, Japetus::tensor::TensorRef<Japetus::tensor::Tensor<double> >, Japetus::tensor::TensorRef<Japetus::tensor::Tensor<double> > >; PlainObjectType = Japetus::tensor::Tensor<double>]’
+src/Functor.cpp:45:20:   required from here
+src/../inc/../tensor/src/TensorExpr.h:65:27: error: no matching function for call to ‘Japetus::tensor::TensorEvaluator<Japetus::tensor::TensorRef<Japetus::tensor::Tensor<double> > >::TensorEvaluator(const type&)’
+     m_functor(op.functor())
+                           ^
+src/../inc/../tensor/src/TensorExpr.h:65:27: note: candidates are:
+In file included from src/../inc/../tensor/Tensor:18:0,
+                 from src/../inc/Functor.h:5,
+                 from src/Functor.cpp:2:
+src/../inc/../tensor/src/TensorRef.h:230:3: note: Japetus::tensor::TensorEvaluator<Japetus::tensor::TensorRef<Derived> >::TensorEvaluator(Japetus::tensor::TensorRef<Derived>&) [with Derived = Japetus::tensor::Tensor<double>]
+   TensorEvaluator(TensorRef<Derived>& m) :
+   ^
+src/../inc/../tensor/src/TensorRef.h:230:3: note:   no known conversion for argument 1 from ‘const type {aka const Japetus::tensor::TensorRef<Japetus::tensor::Tensor<double> >}’ to ‘Japetus::tensor::TensorRef<Japetus::tensor::Tensor<double> >&’
+src/../inc/../tensor/src/TensorRef.h:221:8: note: Japetus::tensor::TensorEvaluator<Japetus::tensor::TensorRef<Japetus::tensor::Tensor<double> > >::TensorEvaluator(const Japetus::tensor::TensorEvaluator<Japetus::tensor::TensorRef<Japetus::tensor::Tensor<double> > >&)
+ struct TensorEvaluator<TensorRef<Derived>> : public TensorEvaluator<const TensorRef<Derived>>
+        ^
+src/../inc/../tensor/src/TensorRef.h:221:8: note:   no known conversion for argument 1 from ‘const type {aka const Japetus::tensor::TensorRef<Japetus::tensor::Tensor<double> >}’ to ‘const Japetus::tensor::TensorEvaluator<Japetus::tensor::TensorRef<Japetus::tensor::Tensor<double> > >&’
+src/../inc/../tensor/src/TensorRef.h:221:8: note: Japetus::tensor::TensorEvaluator<Japetus::tensor::TensorRef<Japetus::tensor::Tensor<double> > >::TensorEvaluator(Japetus::tensor::TensorEvaluator<Japetus::tensor::TensorRef<Japetus::tensor::Tensor<double> > >&&)
+src/../inc/../tensor/src/TensorRef.h:221:8: note:   no known conversion for argument 1 from ‘const type {aka const Japetus::tensor::TensorRef<Japetus::tensor::Tensor<double> >}’ to ‘Japetus::tensor::TensorEvaluator<Japetus::tensor::TensorRef<Japetus::tensor::Tensor<double> > >&&’
+In file included from src/../inc/../tensor/Tensor:17:0,
+                 from src/../inc/Functor.h:5,
+                 from src/Functor.cpp:2:
+src/../inc/../tensor/src/TensorExpr.h:65:27: error: no matching function for call to ‘Japetus::tensor::TensorEvaluator<Japetus::tensor::TensorRef<Japetus::tensor::Tensor<double> > >::TensorEvaluator(const type&)’
+     m_functor(op.functor())
+                           ^
+src/../inc/../tensor/src/TensorExpr.h:65:27: note: candidates are:
+In file included from src/../inc/../tensor/Tensor:18:0,
+                 from src/../inc/Functor.h:5,
+                 from src/Functor.cpp:2:
+src/../inc/../tensor/src/TensorRef.h:230:3: note: Japetus::tensor::TensorEvaluator<Japetus::tensor::TensorRef<Derived> >::TensorEvaluator(Japetus::tensor::TensorRef<Derived>&) [with Derived = Japetus::tensor::Tensor<double>]
+   TensorEvaluator(TensorRef<Derived>& m) :
+   ^
+src/../inc/../tensor/src/TensorRef.h:230:3: note:   no known conversion for argument 1 from ‘const type {aka const Japetus::tensor::TensorRef<Japetus::tensor::Tensor<double> >}’ to ‘Japetus::tensor::TensorRef<Japetus::tensor::Tensor<double> >&’
+src/../inc/../tensor/src/TensorRef.h:221:8: note: Japetus::tensor::TensorEvaluator<Japetus::tensor::TensorRef<Japetus::tensor::Tensor<double> > >::TensorEvaluator(const Japetus::tensor::TensorEvaluator<Japetus::tensor::TensorRef<Japetus::tensor::Tensor<double> > >&)
+ struct TensorEvaluator<TensorRef<Derived>> : public TensorEvaluator<const TensorRef<Derived>>
+        ^
+src/../inc/../tensor/src/TensorRef.h:221:8: note:   no known conversion for argument 1 from ‘const type {aka const Japetus::tensor::TensorRef<Japetus::tensor::Tensor<double> >}’ to ‘const Japetus::tensor::TensorEvaluator<Japetus::tensor::TensorRef<Japetus::tensor::Tensor<double> > >&’
+src/../inc/../tensor/src/TensorRef.h:221:8: note: Japetus::tensor::TensorEvaluator<Japetus::tensor::TensorRef<Japetus::tensor::Tensor<double> > >::TensorEvaluator(Japetus::tensor::TensorEvaluator<Japetus::tensor::TensorRef<Japetus::tensor::Tensor<double> > >&&)
+src/../inc/../tensor/src/TensorRef.h:221:8: note:   no known conversion for argument 1 from ‘const type {aka const Japetus::tensor::TensorRef<Japetus::tensor::Tensor<double> >}’ to ‘Japetus::tensor::TensorEvaluator<Japetus::tensor::TensorRef<Japetus::tensor::Tensor<double> > >&&’
+In file included from src/../inc/../tensor/Tensor:17:0,
+                 from src/../inc/Functor.h:5,
+                 from src/Functor.cpp:2:
+src/../inc/../tensor/src/TensorExpr.h: In instantiation of ‘Japetus::tensor::TensorEvaluator<const Japetus::tensor::TensorCWiseBinaryOp<BinaryOp, LeftXprType, RightXprType> >::TensorEvaluator(const XprType&) [with BinaryOp = Japetus::tensor::scalar_division_op<double, double>; LeftArgType = Japetus::tensor::TensorRef<Japetus::tensor::Tensor<double> >; RightArgType = Japetus::tensor::TensorRef<Japetus::tensor::Tensor<double> >; Japetus::tensor::TensorEvaluator<const Japetus::tensor::TensorCWiseBinaryOp<BinaryOp, LeftXprType, RightXprType> >::XprType = Japetus::tensor::TensorCWiseBinaryOp<Japetus::tensor::scalar_division_op<double, double>, Japetus::tensor::TensorRef<Japetus::tensor::Tensor<double> >, Japetus::tensor::TensorRef<Japetus::tensor::Tensor<double> > >]’:
+src/../inc/../tensor/src/TensorRef.h:46:22:   required from ‘Japetus::tensor::TensorLazyEvaluatorReadOnly<Dimensions, Expr>::TensorLazyEvaluatorReadOnly(const Expr&) [with Dimensions = Japetus::tensor::TensorDimensions<unsigned int, std::vector<unsigned int, std::allocator<unsigned int> > >; Expr = const Japetus::tensor::TensorCWiseBinaryOp<Japetus::tensor::scalar_division_op<double, double>, Japetus::tensor::TensorRef<Japetus::tensor::Tensor<double> >, Japetus::tensor::TensorRef<Japetus::tensor::Tensor<double> > >]’
+src/../inc/../tensor/src/TensorRef.h:102:14:   required from ‘Japetus::tensor::TensorLazyEvaluator<Dimensions, Expr>::TensorLazyEvaluator(const Expr&) [with Dimensions = Japetus::tensor::TensorDimensions<unsigned int, std::vector<unsigned int, std::allocator<unsigned int> > >; Expr = Japetus::tensor::TensorCWiseBinaryOp<Japetus::tensor::scalar_division_op<double, double>, Japetus::tensor::TensorRef<Japetus::tensor::Tensor<double> >, Japetus::tensor::TensorRef<Japetus::tensor::Tensor<double> > >]’
+src/../inc/../tensor/src/TensorRef.h:144:17:   required from ‘Japetus::tensor::TensorRef<PlainObjectType>& Japetus::tensor::TensorRef<PlainObjectType>::operator=(const Expression&) [with Expression = Japetus::tensor::TensorCWiseBinaryOp<Japetus::tensor::scalar_division_op<double, double>, Japetus::tensor::TensorRef<Japetus::tensor::Tensor<double> >, Japetus::tensor::TensorRef<Japetus::tensor::Tensor<double> > >; PlainObjectType = Japetus::tensor::Tensor<double>]’
+src/Functor.cpp:52:18:   required from here
+src/../inc/../tensor/src/TensorExpr.h:65:27: error: no matching function for call to ‘Japetus::tensor::TensorEvaluator<Japetus::tensor::TensorRef<Japetus::tensor::Tensor<double> > >::TensorEvaluator(const type&)’
+     m_functor(op.functor())
+                           ^
+src/../inc/../tensor/src/TensorExpr.h:65:27: note: candidates are:
+In file included from src/../inc/../tensor/Tensor:18:0,
+                 from src/../inc/Functor.h:5,
+                 from src/Functor.cpp:2:
+src/../inc/../tensor/src/TensorRef.h:230:3: note: Japetus::tensor::TensorEvaluator<Japetus::tensor::TensorRef<Derived> >::TensorEvaluator(Japetus::tensor::TensorRef<Derived>&) [with Derived = Japetus::tensor::Tensor<double>]
+   TensorEvaluator(TensorRef<Derived>& m) :
+   ^
+src/../inc/../tensor/src/TensorRef.h:230:3: note:   no known conversion for argument 1 from ‘const type {aka const Japetus::tensor::TensorRef<Japetus::tensor::Tensor<double> >}’ to ‘Japetus::tensor::TensorRef<Japetus::tensor::Tensor<double> >&’
+src/../inc/../tensor/src/TensorRef.h:221:8: note: Japetus::tensor::TensorEvaluator<Japetus::tensor::TensorRef<Japetus::tensor::Tensor<double> > >::TensorEvaluator(const Japetus::tensor::TensorEvaluator<Japetus::tensor::TensorRef<Japetus::tensor::Tensor<double> > >&)
+ struct TensorEvaluator<TensorRef<Derived>> : public TensorEvaluator<const TensorRef<Derived>>
+        ^
+src/../inc/../tensor/src/TensorRef.h:221:8: note:   no known conversion for argument 1 from ‘const type {aka const Japetus::tensor::TensorRef<Japetus::tensor::Tensor<double> >}’ to ‘const Japetus::tensor::TensorEvaluator<Japetus::tensor::TensorRef<Japetus::tensor::Tensor<double> > >&’
+src/../inc/../tensor/src/TensorRef.h:221:8: note: Japetus::tensor::TensorEvaluator<Japetus::tensor::TensorRef<Japetus::tensor::Tensor<double> > >::TensorEvaluator(Japetus::tensor::TensorEvaluator<Japetus::tensor::TensorRef<Japetus::tensor::Tensor<double> > >&&)
+src/../inc/../tensor/src/TensorRef.h:221:8: note:   no known conversion for argument 1 from ‘const type {aka const Japetus::tensor::TensorRef<Japetus::tensor::Tensor<double> >}’ to ‘Japetus::tensor::TensorEvaluator<Japetus::tensor::TensorRef<Japetus::tensor::Tensor<double> > >&&’
+In file included from src/../inc/../tensor/Tensor:17:0,
+                 from src/../inc/Functor.h:5,
+                 from src/Functor.cpp:2:
+src/../inc/../tensor/src/TensorExpr.h:65:27: error: no matching function for call to ‘Japetus::tensor::TensorEvaluator<Japetus::tensor::TensorRef<Japetus::tensor::Tensor<double> > >::TensorEvaluator(const type&)’
+     m_functor(op.functor())
+                           ^
+src/../inc/../tensor/src/TensorExpr.h:65:27: note: candidates are:
+In file included from src/../inc/../tensor/Tensor:18:0,
+                 from src/../inc/Functor.h:5,
+                 from src/Functor.cpp:2:
+src/../inc/../tensor/src/TensorRef.h:230:3: note: Japetus::tensor::TensorEvaluator<Japetus::tensor::TensorRef<Derived> >::TensorEvaluator(Japetus::tensor::TensorRef<Derived>&) [with Derived = Japetus::tensor::Tensor<double>]
+   TensorEvaluator(TensorRef<Derived>& m) :
+   ^
+src/../inc/../tensor/src/TensorRef.h:230:3: note:   no known conversion for argument 1 from ‘const type {aka const Japetus::tensor::TensorRef<Japetus::tensor::Tensor<double> >}’ to ‘Japetus::tensor::TensorRef<Japetus::tensor::Tensor<double> >&’
+src/../inc/../tensor/src/TensorRef.h:221:8: note: Japetus::tensor::TensorEvaluator<Japetus::tensor::TensorRef<Japetus::tensor::Tensor<double> > >::TensorEvaluator(const Japetus::tensor::TensorEvaluator<Japetus::tensor::TensorRef<Japetus::tensor::Tensor<double> > >&)
+ struct TensorEvaluator<TensorRef<Derived>> : public TensorEvaluator<const TensorRef<Derived>>
+        ^
+src/../inc/../tensor/src/TensorRef.h:221:8: note:   no known conversion for argument 1 from ‘const type {aka const Japetus::tensor::TensorRef<Japetus::tensor::Tensor<double> >}’ to ‘const Japetus::tensor::TensorEvaluator<Japetus::tensor::TensorRef<Japetus::tensor::Tensor<double> > >&’
+src/../inc/../tensor/src/TensorRef.h:221:8: note: Japetus::tensor::TensorEvaluator<Japetus::tensor::TensorRef<Japetus::tensor::Tensor<double> > >::TensorEvaluator(Japetus::tensor::TensorEvaluator<Japetus::tensor::TensorRef<Japetus::tensor::Tensor<double> > >&&)
+src/../inc/../tensor/src/TensorRef.h:221:8: note:   no known conversion for argument 1 from ‘const type {aka const Japetus::tensor::TensorRef<Japetus::tensor::Tensor<double> >}’ to ‘Japetus::tensor::TensorEvaluator<Japetus::tensor::TensorRef<Japetus::tensor::Tensor<double> > >&&’
+In file included from src/../inc/../tensor/Tensor:23:0,
+                 from src/../inc/Functor.h:5,
+                 from src/Functor.cpp:2:
+src/../inc/../tensor/src/Tensor.h: In instantiation of ‘Japetus::tensor::TensorEvaluator<const Derived>::TensorEvaluator(const Derived&) [with Derived = Japetus::tensor::Tensor<double>]’:
+src/../inc/../tensor/src/TensorRef.h:46:22:   required from ‘Japetus::tensor::TensorLazyEvaluatorReadOnly<Dimensions, Expr>::TensorLazyEvaluatorReadOnly(const Expr&) [with Dimensions = Japetus::tensor::TensorDimensions<unsigned int, std::vector<unsigned int, std::allocator<unsigned int> > >; Expr = const Japetus::tensor::Tensor<double>]’
+src/../inc/../tensor/src/TensorRef.h:102:14:   required from ‘Japetus::tensor::TensorLazyEvaluator<Dimensions, Expr>::TensorLazyEvaluator(const Expr&) [with Dimensions = Japetus::tensor::TensorDimensions<unsigned int, std::vector<unsigned int, std::allocator<unsigned int> > >; Expr = Japetus::tensor::Tensor<double>]’
+src/../inc/../tensor/src/TensorRef.h:144:17:   required from ‘Japetus::tensor::TensorRef<PlainObjectType>& Japetus::tensor::TensorRef<PlainObjectType>::operator=(const Expression&) [with Expression = Japetus::tensor::Tensor<double>; PlainObjectType = Japetus::tensor::Tensor<double>]’
+src/Functor.cpp:59:18:   required from here
+src/../inc/../tensor/src/Tensor.h:158:13: error: invalid conversion from ‘const Scalar* {aka const double*}’ to ‘Japetus::tensor::TensorEvaluator<const Japetus::tensor::Tensor<double> >::Data {aka double*}’ [-fpermissive]
+     m_impl(m)
+             ^

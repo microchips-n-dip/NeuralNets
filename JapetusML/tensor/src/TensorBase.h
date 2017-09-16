@@ -46,6 +46,10 @@ class TensorBase
   { return binaryOp(other, scalar_division_op<Scalar>()); }
 
   Derived& derived() { return *static_cast<Derived*>(this); }
+
+ protected:
+  template <typename OtherDerived> friend class TensorBase;
+
   const Derived& derived() const { return *static_cast<const Derived*>(this); }
 };
 

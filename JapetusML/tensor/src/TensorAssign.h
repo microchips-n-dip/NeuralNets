@@ -15,6 +15,10 @@ struct traits<TensorAssignOp<LeftXprType, RightXprType>>
   typedef typename promote_indices_type<
     typename traits<LeftXprType>::Indices,
     typename traits<RightXprType>::Indices>::type Indices;
+
+  enum {
+    Flags = 0
+  };
 };
 
 template <typename LeftXprType, typename RightXprType>
@@ -74,6 +78,8 @@ struct TensorEvaluator<const TensorAssignOp<LeftArgType, RightArgType>>
 
   CoeffReturnType coeff(Index index) const
   { return m_leftImpl.coeff(index); }
+
+  CoeffReturnType* data() const { return m_leftImpl.data(); }
 
   TensorEvaluator<LeftArgType> m_leftImpl;
   TensorEvaluator<RightArgType> m_rightImpl;

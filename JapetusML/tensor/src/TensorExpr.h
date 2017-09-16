@@ -18,6 +18,10 @@ struct traits<TensorCWiseBinaryOp<BinaryOp, LeftXprType, RightXprType>>
   typedef typename promote_indices_type<
     typename traits<LeftXprType>::Indices,
     typename traits<RightXprType>::Indices>::type Indices;
+
+  enum {
+    Flags = 0
+  };
 };
 
 template <typename BinaryOp, typename LeftXprType, typename RightXprType>
@@ -74,6 +78,8 @@ struct TensorEvaluator<const TensorCWiseBinaryOp<BinaryOp, LeftArgType, RightArg
   { return m_functor(m_leftImpl.coeff(index), m_rightImpl.coeff(index)); }
 
   const Dimensions& dimensions() const { return m_leftImpl.dimensions(); }
+
+  CoeffReturnType* data() const { return nullptr; }
 
   TensorEvaluator<LeftArgType> m_leftImpl;
   TensorEvaluator<RightArgType> m_rightImpl;

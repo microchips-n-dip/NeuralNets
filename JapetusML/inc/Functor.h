@@ -2,7 +2,6 @@
 #define JAPETUS_FUNCTOR_H
 
 #include <vector>
-#include "../inc/Functions.h"
 #include "../tensor/Tensor"
 
 namespace Japetus {

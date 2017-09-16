@@ -9,12 +9,12 @@
 #include <type_traits>
 
 #include "../inc/util.h"
-#include "src/jt_util.h"
 #include "src/TensorForwardDeclarations.h"
+#include "src/jt_util.h"
 
 #include "src/TensorFunctors.h"
-#include "src/TensorExpr.h"
 #include "src/TensorBase.h"
+#include "src/TensorExpr.h"
 #include "src/TensorRef.h"
 
 #include "src/TensorStorage.h"

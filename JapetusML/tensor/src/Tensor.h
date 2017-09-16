@@ -12,6 +12,10 @@ struct traits<Tensor<Scalar_, Index_, Indices_>>
   typedef Index_ Index;
   typedef Indices_ Indices;
 
+  enum {
+    Flags = is_const<Scalar_>::value ? LvalueBit : 0
+  };
+
   template <typename T> struct MakePointer
   { typedef T* Type; };
 };
@@ -92,8 +96,10 @@ struct TensorEvaluator
   typedef typename Derived::Scalar CoeffReturnType;
   typedef typename Derived::Dimensions Dimensions;
 
-  typedef typename traits<Derived>::template \
-    MakePointer<Scalar>::Type Data;
+//  typedef typename traits<Derived>::template \
+//    MakePointer<Scalar>::Type Data;
+
+  typedef Scalar* Data;
 
   TensorEvaluator(const Derived& m) :
     m_data(const_cast<Data>(m.data())),
@@ -138,11 +144,13 @@ struct TensorEvaluator<const Derived>
 {
   typedef typename Derived::Index Index;
   typedef typename Derived::Scalar Scalar;
-  typedef typename Derived::CoeffReturnType CoeffReturnType;
+  typedef typename Derived::Scalar CoeffReturnType;
   typedef typename Derived::Dimensions Dimensions;
 
-  typedef typename traits<Derived>::template \
-    MakePointer<Scalar>::Type Data;
+//  typedef typename traits<Derived>::template \
+//    MakePointer<Scalar>::Type Data;
+
+  typedef Scalar* Data;
 
   TensorEvaluator(const Derived& m) :
     m_data(m.data()),

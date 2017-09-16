@@ -1,0 +1,8 @@
+In file included from src/../tensor/Tensor:23:0,
+                 from src/japetus_test.cpp:2:
+src/../tensor/src/Tensor.h: In instantiation of ‘Japetus::tensor::Tensor<Scalar_, Index_, Indices_>::Tensor(Japetus::tensor::Tensor<Scalar_, Index_, Indices_>::Index, IndexTypes ...) [with IndexTypes = {int}; Scalar_ = double; Index_ = unsigned int; Indices_ = std::vector<unsigned int, std::allocator<unsigned int> >; Japetus::tensor::Tensor<Scalar_, Index_, Indices_>::Index = unsigned int]’:
+src/japetus_test.cpp:15:56:   required from here
+src/../tensor/src/Tensor.h:84:57: warning: narrowing conversion of ‘other_indices#0’ from ‘int’ to ‘unsigned int’ inside { } [-Wnarrowing]
+     storage_(Dimensions({first_index, other_indices...}))
+                                                         ^
+src/../tensor/src/Tensor.h:84:57: warning: narrowing conversion of ‘other_indices#0’ from ‘int’ to ‘unsigned int’ inside { } [-Wnarrowing]
