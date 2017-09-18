@@ -7,11 +7,11 @@ namespace Japetus {
 // I still have to figure out how on earth tf does it
 void Session::recursive_evaluate(
   Node* node,
-  OutputType* nli,
+  DataRef* nli,
   int out_edge_id)
 {
-  std::vector<InputType> inputs((*node->func()).in_size());
-  std::vector<OutputType> outputs((*node->func()).out_size());
+  std::vector<DataRef> inputs((*node->func()).in_size());
+  std::vector<DataRef> outputs((*node->func()).out_size());
   for (auto edge : node->in_edges()) {
     recursive_evaluate(edge->src(),
       &(inputs.at(edge->dst_input())),
@@ -27,7 +27,7 @@ void Session::recursive_evaluate(
 void Session::run(
   const Scope& scope,
   Node* entry,
-  OutputType* outputs)
+  DataRef* outputs)
 {
   w_scope = const_cast<Scope*>(&scope);
   w_entry = entry;

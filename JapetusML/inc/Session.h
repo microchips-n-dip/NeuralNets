@@ -6,11 +6,12 @@
 #include "../inc/Graph.h"
 #include "../inc/Scope.h"
 
-// Placeholder types
-typedef double InputType;
-typedef double OutputType;
+#include "../tensor/Tensor"
 
 namespace Japetus {
+
+typedef tensor::Tensor<double> Data;
+typedef tensor::TensorRef<Data> DataRef;
 
 // Session class
 class Session
@@ -18,10 +19,10 @@ class Session
  public:
   // Recursively evaluate functors
   void recursive_evaluate(Node* node,
-    OutputType* nli, int out_edge_id);
+    DataRef* nli, int out_edge_id);
   // Run session from node
   void run(const Scope& scope, Node* entry,
-    OutputType* outputs);
+    DataRef* outputs);
 
  private:
   Scope* w_scope;

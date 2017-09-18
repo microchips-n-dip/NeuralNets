@@ -134,8 +134,8 @@ struct HadamardQuotientFunctor :
 struct ConstFunctor:
   public Functor
 {
-  const Data val_;
-  ConstFunctor(Data val)
+  DataRef val_;
+  ConstFunctor(DataRef val)
     : val_(val)
   {
     in_size_ = 0;
@@ -145,7 +145,7 @@ struct ConstFunctor:
   void run(std::vector<DataRef>* inputs, std::vector<DataRef>* outputs);
 
   Functor* gradient(int respect) const
-  { return new ConstFunctor(0); }
+  { return new ConstFunctor(Data(1)); }
 };
 
 struct PlaceholderFunctor :
