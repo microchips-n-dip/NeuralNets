@@ -5,6 +5,25 @@ namespace Japetus {
 
 namespace tensor {
 
+template <typename T>
+struct scalar_sigmoid_op
+{
+  typedef T result_type;
+  const result_type operator()(const T& z) const
+  {
+    const T one = T(1);
+    return one / (one + exp(-z));
+  }
+};
+
+template <typename T>
+struct scalar_tanh_op
+{
+  typedef T result_type;
+  const result_type operator()(const T& z) const
+  { return tanh(z); }
+};
+
 template <typename ScalarA, typename ScalarB, typename BinaryOp>
 struct ScalarBinaryOpTraits
 { };

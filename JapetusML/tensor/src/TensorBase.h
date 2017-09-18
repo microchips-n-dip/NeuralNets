@@ -17,6 +17,22 @@ class TensorBase
 
   typedef TensorDimensions<Index, Indices> Dimensions;
 
+  template <typename UnaryOp>
+  TensorCWiseUnaryOp<UnaryOp, const Derived>
+  unaryOp(const UnaryOp& op)
+  {
+    return TensorCWiseUnaryOp<UnaryOp, const Derived>(
+      derived(), op);
+  }
+
+  TensorCWiseUnaryOp<scalar_sigmoid_op<Scalar>, const Derived>
+  sigmoid()
+  { return unaryOp(scalar_sigmoid_op<Scalar>()); }
+
+  TensorCWiseUnaryOp<scalar_tanh_op<Scalar>, const Derived>
+  tanh()
+  { return unaryOp(scalar_tanh_op<Scalar>()); }
+
   template <typename OtherDerived, typename BinaryOp>
   TensorCWiseBinaryOp<BinaryOp, const Derived, const OtherDerived>
   binaryOp(const OtherDerived& other, const BinaryOp& op)

@@ -24,12 +24,17 @@ template <typename Derived> struct traits<const Derived> : traits<Derived> { };
 template <typename Expression> struct TensorEvaluator;
 template <typename Expression> struct TensorExecutor;
 
+template <typename UnaryOp, typename XprType>
+class TensorCWiseUnaryOp;
+
 template <typename BinaryOp, typename LeftXprType, typename RightXprType>
 class TensorCWiseBinaryOp;
 
 template <typename LeftXprType, typename RightXprType>
 class TensorAssignOp;
 
+template <typename T> struct scalar_sigmoid_op;
+template <typename T> struct scalar_tanh_op;
 template <typename LhsScalar, typename RhsScalar = LhsScalar> struct scalar_sum_op;
 template <typename LhsScalar, typename RhsScalar = LhsScalar> struct scalar_difference_op;
 template <typename LhsScalar, typename RhsScalar = LhsScalar> struct scalar_product_op;

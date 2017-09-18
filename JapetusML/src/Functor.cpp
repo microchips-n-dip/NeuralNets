@@ -14,7 +14,7 @@ void SigmoidFunctor::run(std::vector<DataRef>* inputs, std::vector<DataRef>* out
 {
   ECHECK(inputs->size() == 1, "Sigmoid function takes one input!");
   ECHECK(outputs->size() == 1, "Sigmoid function gives one output!");
-//  outputs->at(0) = sigmoid(inputs->at(0));
+  outputs->at(0) = inputs->at(0).sigmoid();
 }
 
 void TanhGradientFunctor::run(std::vector<DataRef>* inputs, std::vector<DataRef>* outputs)
@@ -28,7 +28,7 @@ void TanhFunctor::run(std::vector<DataRef>* inputs, std::vector<DataRef>* output
 {
   ECHECK(inputs->size() == 1, "Tanh function takes one input!");
   ECHECK(outputs->size() == 1, "Tanh function gives one output!");
-//  outputs->at(0) = tanh(inputs->at(0));
+  outputs->at(0) = inputs->at(0).tanh();
 }
 
 void HadamardProductGradientFunctor::run(std::vector<DataRef>* inputs, std::vector<DataRef>* outputs)

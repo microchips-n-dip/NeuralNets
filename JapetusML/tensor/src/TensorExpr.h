@@ -5,6 +5,70 @@ namespace Japetus {
 
 namespace tensor {
 
+template <typename UnaryOp, typename XprType>
+struct traits<TensorCWiseUnaryOp<UnaryOp, XprType>> :
+  public traits<XprType>
+{
+  typedef typename std::result_of<
+    UnaryOp(typename XprType::Scalar)>::type Scalar;
+  typedef traits<XprType> XprTraits;
+};
+
+template <typename UnaryOp, typename XprType>
+class TensorCWiseUnaryOp : public TensorBase<TensorCWiseUnaryOp<UnaryOp, XprType>>
+{
+ public:
+  typedef traits<XprType> Traits;
+  typedef typename Traits::Scalar Scalar;
+  typedef typename Traits::Index Index;
+
+  TensorCWiseUnaryOp(const XprType& impl, const UnaryOp& op) :
+    m_impl(impl),
+    m_functor(op)
+  { }
+
+  const UnaryOp& functor() const { return m_functor; }
+
+  const typename remove_all<XprType>::type& nestedExpression() const { return m_impl; }
+
+ private:
+  XprType m_impl;
+  const UnaryOp m_functor;
+};
+
+template <typename UnaryOp, typename ArgType>
+struct TensorEvaluator<const TensorCWiseUnaryOp<UnaryOp, ArgType>>
+{
+  typedef TensorCWiseUnaryOp<UnaryOp, ArgType> XprType;
+  typedef typename XprType::Scalar Scalar;
+  typedef typename XprType::Index Index;
+  typedef typename traits<XprType>::Scalar CoeffReturnType;
+  typedef typename TensorEvaluator<ArgType>::Dimensions Dimensions;
+
+  TensorEvaluator(const XprType& op) :
+    m_functor(op.functor()),
+    m_impl(op.nestedExpression())
+  { }
+
+  const Dimensions& dimensions() const { return m_impl.dimensions(); }
+
+  bool evalSubExprsIfNeeded(Scalar*)
+  {
+    m_impl.evalSubExprsIfNeeded(nullptr);
+    return true;
+  }
+
+  void cleanup() { m_impl.cleanup(); }
+
+  CoeffReturnType coeff(Index index) const
+  { return m_functor(m_impl.coeff(index)); }
+
+  CoeffReturnType* data() const { return nullptr; }
+
+  const UnaryOp m_functor;
+  TensorEvaluator<ArgType> m_impl;
+};
+
 template <typename BinaryOp, typename LeftXprType, typename RightXprType>
 struct traits<TensorCWiseBinaryOp<BinaryOp, LeftXprType, RightXprType>>
 {

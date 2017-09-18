@@ -21,8 +21,6 @@ TODO:
 
  - Tensor reduction.
 
- - Tensor unary operators.
-
  - Tensor streams.
 
  - Multi-index coefficient access.

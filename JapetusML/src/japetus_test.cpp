@@ -16,6 +16,12 @@ int main(void)
   auto n2 = constant(scope, tensor::Tensor<double>(3, 3));
   auto p1 = hadamard_product(scope, n1, n2);
 
-  auto sess = Session();
-  sess.run(scope, p1, nullptr);
+  auto s1 = sigmoid(scope, p1);
+  auto t1 = tanh(scope, p1);
+
+  auto sess1 = Session();
+  sess1.run(scope, s1, nullptr);
+
+  auto sess2 = Session();
+  sess2.run(scope, t1, nullptr);
 }
