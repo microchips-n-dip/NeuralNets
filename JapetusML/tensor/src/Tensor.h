@@ -148,7 +148,7 @@ struct TensorEvaluator<const Derived>
   typedef typename Derived::Dimensions Dimensions;
 
   typedef typename traits<Derived>::template \
-    MakePointer<Scalar>::Type Data;
+    MakePointer<const Scalar>::Type Data;
 
 //  typedef Scalar* Data;
 
