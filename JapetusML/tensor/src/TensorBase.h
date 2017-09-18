@@ -18,36 +18,37 @@ class TensorBase
   typedef TensorDimensions<Index, Indices> Dimensions;
 
   template <typename OtherDerived, typename BinaryOp>
-  TensorCWiseBinaryOp<BinaryOp, Derived, OtherDerived>
+  TensorCWiseBinaryOp<BinaryOp, const Derived, const OtherDerived>
   binaryOp(const OtherDerived& other, const BinaryOp& op)
   {
-    return TensorCWiseBinaryOp<BinaryOp, Derived, OtherDerived>(
+    return TensorCWiseBinaryOp<BinaryOp, const Derived, const OtherDerived>(
       derived(), other.derived(), op);
   }
 
   template <typename OtherDerived>
-  TensorCWiseBinaryOp<scalar_sum_op<Scalar>, Derived, OtherDerived>
-  operator+(OtherDerived& other)
+  TensorCWiseBinaryOp<scalar_sum_op<Scalar>, const Derived, const OtherDerived>
+  operator+(const OtherDerived& other)
   { return binaryOp(other, scalar_sum_op<Scalar>()); }
 
   template <typename OtherDerived>
-  TensorCWiseBinaryOp<scalar_difference_op<Scalar>, Derived, OtherDerived>
-  operator-(OtherDerived& other)
+  TensorCWiseBinaryOp<scalar_difference_op<Scalar>, const Derived, const OtherDerived>
+  operator-(const OtherDerived& other)
   { return binaryOp(other, scalar_difference_op<Scalar>()); }
 
   template <typename OtherDerived>
-  TensorCWiseBinaryOp<scalar_product_op<Scalar>, Derived, OtherDerived>
-  operator*(OtherDerived& other)
+  TensorCWiseBinaryOp<scalar_product_op<Scalar>, const Derived, const OtherDerived>
+  operator*(const OtherDerived& other)
   { return binaryOp(other, scalar_product_op<Scalar>()); }
 
   template <typename OtherDerived>
-  TensorCWiseBinaryOp<scalar_division_op<Scalar>, Derived, OtherDerived>
-  operator/(OtherDerived& other)
+  TensorCWiseBinaryOp<scalar_division_op<Scalar>, const Derived, const OtherDerived>
+  operator/(const OtherDerived& other)
   { return binaryOp(other, scalar_division_op<Scalar>()); }
 
   Derived& derived() { return *static_cast<Derived*>(this); }
 
  protected:
+  template <typename Scalar_, typename Index_, typename Indices_> friend class Tensor;
   template <typename OtherDerived> friend class TensorBase;
 
   const Derived& derived() const { return *static_cast<const Derived*>(this); }

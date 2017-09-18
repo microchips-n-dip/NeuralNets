@@ -132,10 +132,12 @@ class TensorRef : public TensorBase<TensorRef<PlainObjectType>>
 
   typedef typename PlainObjectType::Dimensions Dimensions;
 
+  TensorRef() : m_evaluator(nullptr) { }
+
   template <typename Expression>
   TensorRef(const Expression& expr) :
     m_evaluator(new TensorLazyEvaluator<Dimensions, Expression>(expr))
-  { }
+  { m_evaluator->incrRefCount(); }
 
   template <typename Expression>
   TensorRef& operator=(const Expression& expr)
