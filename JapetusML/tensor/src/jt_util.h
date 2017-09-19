@@ -1,15 +1,6 @@
 #ifndef JAPETUS_TENSOR_UTIL_H
 #define JAPETUS_TENSOR_UTIL_H
 
-template <bool condition, typename Then, typename Else>
-struct conditional { };
-
-template <typename Then, typename Else>
-struct conditional<true, Then, Else> { typedef Then type; };
-
-template <typename Then, typename Else>
-struct conditional<false, Then, Else> { typedef Else type; };
-
 namespace Japetus {
 
 namespace tensor {

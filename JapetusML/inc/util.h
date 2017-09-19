@@ -26,4 +26,13 @@ template<typename T> struct remove_all<T&>        { typedef typename remove_all<
 template<typename T> struct remove_all<T const*>  { typedef typename remove_all<T>::type type; };
 template<typename T> struct remove_all<T*>        { typedef typename remove_all<T>::type type; };
 
+template <bool condition, typename Then, typename Else>
+struct conditional { };
+
+template <typename Then, typename Else>
+struct conditional<true, Then, Else> { typedef Then type; };
+
+template <typename Then, typename Else>
+struct conditional<false, Then, Else> { typedef Else type; };
+
 #endif
