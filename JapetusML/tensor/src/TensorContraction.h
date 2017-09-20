@@ -74,6 +74,8 @@ struct TensorContractionEvaluatorBase
   typedef typename XprType::Indices Indices;
   typedef typename XprType::CoeffReturnType CoeffReturnType;
 
+  typedef typename TensorEvaluator<XprType>::Dimensions Dimensions;
+
   const int LDims;
   const int RDims;
   const int ContractDims;
@@ -88,6 +90,8 @@ struct TensorContractionEvaluatorBase
     Indices eval_left_dims(LDims);
     Indices eval_right_dims(RDims);
     IndexPairs eval_op_indices(ContractDims);
+
+    m_dimensions = Dimensions(LDims + RDims - 2 * ContractDims);
 
     for (int i = 0; i < LDims; ++i) {
       eval_left_dims[i] = m_leftImpl.dimensions()[i];
@@ -207,6 +211,29 @@ struct TensorContractionEvaluatorBase
     }
   }
 
+  const Dimensions& dimensions() const { return m_dimensions; }
+
+  bool evalSubExprsIfNeeded(Scalar* data)
+  {
+    m_leftImpl.evalSubExprsIfNeeded(nullptr);
+    m_rightImpl.evalSubExprsIfNeeded(nullptr);
+    if (data) {
+      eval_to(data);
+      return true;
+    } else {
+      m_result = new Scalar[dimensions().total_size()];
+      eval_to(m_result);
+      return true;
+    }
+  }
+
+  void eval_to(Scalar* buffer)
+  {
+    static_cast<const Derived*>(this)->template eval_product(buffer);
+  }
+
+  
+
   Indices m_k_strides;
   Indices m_left_contracting_strides;
   Indices m_right_contracting_strides;
@@ -222,6 +249,8 @@ struct TensorContractionEvaluatorBase
 
   TensorEvaluator<LeftArgType> m_leftImpl;
   TensorEvaluator<RightArgType> m_rightImpl;
+
+  Scalar* m_result;
 };
 
 }

@@ -12,18 +12,30 @@ class TensorDimensions
   typedef Index_ Index;
   typedef Indices_ Indices;
 
-  const Index n_dims() const { return ndims_; }
-  const Index total_size() const { return total_sz_; }
+  const Index n_dims() const { compute_resized_values(); return ndims_; }
+  const Index total_size() const { compute_resized_values(); return total_sz_; }
   const Indices dimensions() const { return dimensions_; }
 
   const Index operator[](Index index) const
   { return dimensions_.at(index); }
+
+  Index& operator[](Index index)
+  {
+    flag_compute_resized_values = true;
+    return dimensions_.at(index);
+  }
 
   TensorDimensions()
   {
     total_sz_ = 1;
     ndims_ = 0;
     dimensions_ = Indices({1});
+  }
+
+  TensorDimensions(const Index ndims)
+  {
+    ndims_ = ndims;
+    dimensions_ = Indices(ndims_);
   }
 
   TensorDimensions(const TensorDimensions& other)
@@ -48,12 +60,9 @@ class TensorDimensions
 
   TensorDimensions(const Indices& dims)
   {
-    total_sz_ = Index(1);
     ndims_ = dims.size();
     dimensions_ = dims;
-    for (Index i = 0; i < ndims_; ++i) {
-      total_sz_ *= dimensions_.at(i);
-    }
+    compute_total_size();
   }
 
   ~TensorDimensions()
@@ -64,6 +73,25 @@ class TensorDimensions
   }
 
  private:
+  void compute_total_size()
+  {
+    total_sz_ = Index(1);
+    for (Index i = 0; i < ndims_; ++i) {
+      total_sz_ *= dimensions_.at(i);
+    }
+  }
+
+  void compute_resized_values()
+  {
+    if (flag_compute_resized_values) {
+      ndims_ = dimensions_.size();
+      compute_total_size();
+      flag_compute_resized_values = false;
+    }
+  }
+
+  bool flag_compute_resized_values;
+
   Indices dimensions_;
   Index total_sz_;
   Index ndims_;
