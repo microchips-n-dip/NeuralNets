@@ -74,9 +74,16 @@ struct TensorContractionEvaluatorBase
   typedef typename XprType::Indices Indices;
   typedef typename XprType::CoeffReturnType CoeffReturnType;
 
+  const int LDims;
+  const int RDims;
+  const int ContractDims;
+
   TensorContractionEvaluatorBase(const XprType& op) :
     m_leftImpl(op.lhsExpression()),
-    m_rightImpl(op.rhsExpression())
+    m_rightImpl(op.rhsExpression()),
+    LDims(m_leftImpl.dimensions().n_dims()),
+    RDims(m_rightImpl.dimensions().n_dims()),
+    ContractDims(op.indices().size())
   {
     Indices eval_left_dims(LDims);
     Indices eval_right_dims(RDims);
@@ -131,6 +138,9 @@ struct TensorContractionEvaluatorBase
     int dim_idx = 0;
     unsigned int nocontract_idx;
 
+    m_left_nocontract_strides = Indices(LDims);
+    m_right_nocontract_strides = Indices(RDims);
+
     nocontract_idx = 0;
     for (int i = 0; i < LDims; ++i) {
       bool contracting = false;
@@ -176,7 +186,42 @@ struct TensorContractionEvaluatorBase
         ++nocontract_idx;
       }
     }
+
+    m_left_contracting_strides = Indices(ContractDims);
+    m_right_contracting_strides = Indices(ContractDims);
+
+    for (int i = 0; i < ContractDims; ++i) {
+      Index left = eval_op_indices[i].first;
+      Index right = eval_op_indices[i].second;
+
+      Index size = eval_left_dims[left];
+      ECHECK(size == eval_right_dims[right], "Contraction axes must be same size!");
+
+      if (i + 1 < static_cast<int>(ContractDims)) {
+        m_k_strides[i + 1] = m_k_strides[i] * size;
+      } else {
+        m_k_size = m_k_strides[i] * size;
+      }
+      m_left_contracting_strides[i] = lhs_strides[left];
+      m_right_contracting_strides[i] = rhs_strides[right];
+    }
   }
+
+  Indices m_k_strides;
+  Indices m_left_contracting_strides;
+  Indices m_right_contracting_strides;
+
+  Indices m_i_strides;
+  Indices m_j_strides;
+  Indices m_left_nocontract_strides;
+  Indices m_right_nocontract_strides;
+
+  Index m_i_size;
+  Index m_j_size;
+  Index m_k_size;
+
+  TensorEvaluator<LeftArgType> m_leftImpl;
+  TensorEvaluator<RightArgType> m_rightImpl;
 };
 
 }
