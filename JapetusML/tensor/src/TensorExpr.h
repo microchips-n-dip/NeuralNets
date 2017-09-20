@@ -10,7 +10,8 @@ struct traits<TensorCWiseUnaryOp<UnaryOp, XprType>> :
   public traits<XprType>
 {
   typedef typename std::result_of<
-    UnaryOp(typename XprType::Scalar)>::type Scalar;
+    UnaryOp(typename XprType::Scalar)
+  >::type Scalar;
   typedef traits<XprType> XprTraits;
 };
 
@@ -21,6 +22,7 @@ class TensorCWiseUnaryOp : public TensorBase<TensorCWiseUnaryOp<UnaryOp, XprType
   typedef traits<XprType> Traits;
   typedef typename Traits::Scalar Scalar;
   typedef typename Traits::Index Index;
+  typedef typename Traits::Indices Indices;
 
   TensorCWiseUnaryOp(const XprType& impl, const UnaryOp& op) :
     m_impl(impl),
@@ -74,14 +76,17 @@ struct traits<TensorCWiseBinaryOp<BinaryOp, LeftXprType, RightXprType>>
 {
   typedef typename std::result_of<
     BinaryOp(typename LeftXprType::Scalar,
-             typename RightXprType::Scalar)>::type Scalar;
-  // For indical promotion, will probably naevly assume some index type
+             typename RightXprType::Scalar)
+  >::type Scalar;
+
   typedef typename promote_index_type<
     typename traits<LeftXprType>::Index,
-    typename traits<RightXprType>::Index>::type Index;
+    typename traits<RightXprType>::Index
+  >::type Index;
   typedef typename promote_indices_type<
     typename traits<LeftXprType>::Indices,
-    typename traits<RightXprType>::Indices>::type Indices;
+    typename traits<RightXprType>::Indices
+  >::type Indices;
 
   enum {
     Flags = 0

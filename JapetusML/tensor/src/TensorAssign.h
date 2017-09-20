@@ -11,10 +11,12 @@ struct traits<TensorAssignOp<LeftXprType, RightXprType>>
   typedef typename LeftXprType::Scalar Scalar;
   typedef typename promote_index_type<
     typename traits<LeftXprType>::Index,
-    typename traits<RightXprType>::Index>::type Index;
+    typename traits<RightXprType>::Index
+  >::type Index;
   typedef typename promote_indices_type<
     typename traits<LeftXprType>::Indices,
-    typename traits<RightXprType>::Indices>::type Indices;
+    typename traits<RightXprType>::Indices
+  >::type Indices;
 
   enum {
     Flags = 0
