@@ -5,6 +5,11 @@ namespace Japetus {
 
 namespace tensor {
 
+enum {
+  Rhs = 0,
+  Lhs = 1
+};
+
 template <typename Tensor>
 struct CoeffLoader
 {
@@ -23,10 +28,10 @@ class TensorContractionMapper
 {
  public:
 
-  Scalar operator(Index i) const
-  { return operator(i, 0); }
+  Scalar operator()(Index i) const
+  { return operator()(i, 0); }
 
-  Scalar operator(Index i, Index j) const
+  Scalar operator()(Index i, Index j) const
   { return m_tensor.coeff(compute_index(i, j)); }
 
   Index compute_index(Index row, Index col) const
@@ -34,6 +39,9 @@ class TensorContractionMapper
     const bool Left = side == Lhs;
     Index nocontract_val = Left ? row : col;
     Index linidx = 0;
+
+    Index nocontract_sz = m_nocontract_strides.size();
+    Index contract_sz = m_contract_strides.size();
 
     for (int i = static_cast<int>(nocontract_sz) - 1; i > 0; i--) {
       const Index idx = nocontract_val / m_ij_strides[i];
@@ -59,7 +67,7 @@ class TensorContractionMapper
   const contract_t m_contract_strides;
   const contract_t m_k_strides;
 
-  CoeffLoader<Tensor> m_tensor
+  CoeffLoader<Tensor> m_tensor;
 };
 
 }

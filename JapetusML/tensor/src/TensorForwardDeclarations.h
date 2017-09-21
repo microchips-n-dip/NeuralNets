@@ -33,6 +33,9 @@ class TensorCWiseBinaryOp;
 template <typename LeftXprType, typename RightXprType>
 class TensorAssignOp;
 
+template <typename IndexPairs, typename LhsXprType, typename RhsXprType>
+class TensorContractionOp;
+
 template <typename T> struct scalar_sigmoid_op;
 template <typename T> struct scalar_tanh_op;
 template <typename LhsScalar, typename RhsScalar = LhsScalar> struct scalar_sum_op;

@@ -61,6 +61,11 @@ class TensorBase
   operator/(const OtherDerived& other)
   { return binaryOp(other, scalar_division_op<Scalar>()); }
 
+  template <typename OtherDerived, typename IndexPairs>
+  const TensorContractionOp<const IndexPairs, const Derived, const OtherDerived>
+  contract(const OtherDerived& other, const IndexPairs& ctr) const
+  { return TensorContractionOp<const IndexPairs, const Derived, const OtherDerived>(derived(), other.derived(), ctr); }
+
   Derived& derived() { return *static_cast<Derived*>(this); }
 
  protected:

@@ -20,13 +20,14 @@ struct promote_indices_type
 template <typename T> struct is_const { enum { value = 0 }; };
 template <typename T> struct is_const<const T> { enum { value = 1 }; };
 
-#define LvalueBit 1 << 0
+#define LvalueBit 1
 
 template <typename ExpressionType>
 struct is_lvalue
 {
   enum { value = (!bool(is_const<ExpressionType>::value)) &&
-    bool(traits<ExpressionType>::Flags & LvalueBit) };
+    bool(traits<ExpressionType>::Flags & LvalueBit)
+  };
 };
 
 }

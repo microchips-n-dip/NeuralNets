@@ -17,6 +17,8 @@
 #include "src/TensorBase.h"
 #include "src/TensorRef.h"
 #include "src/TensorExpr.h"
+#include "src/TensorContractionMapper.h"
+#include "src/TensorContraction.h"
 
 #include "src/TensorStorage.h"
 #include "src/TensorAssign.h"

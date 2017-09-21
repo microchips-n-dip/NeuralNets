@@ -5,8 +5,8 @@ namespace Japetus {
 
 namespace tensor {
 
-template <typename LhsXprType, typename RhsXprType>
-struct traits<TensorContractionOp<LhsXprType, RhsXprType>>
+template <typename IndexPairs, typename LhsXprType, typename RhsXprType>
+struct traits<TensorContractionOp<IndexPairs, LhsXprType, RhsXprType>>
 {
   typedef typename ScalarBinaryOpTraits<
     typename remove_all<typename LhsXprType::Scalar>::type,
@@ -28,13 +28,15 @@ struct traits<TensorContractionOp<LhsXprType, RhsXprType>>
 };
 
 template <typename IndexPairs, typename LhsXprType, typename RhsXprType>
-class TensorContractionOp : public TensorBase<TensorContractionOp<LhsXprType, RhsXprType>>
+class TensorContractionOp : public TensorBase<TensorContractionOp<IndexPairs, LhsXprType, RhsXprType>>
 {
  public:
   typedef traits<TensorContractionOp> Traits;
   typedef typename Traits::Scalar Scalar;
   typedef typename Traits::Index Index;
   typedef typename Traits::Indices Indices;
+
+  typedef Scalar CoeffReturnType;
 
   TensorContractionOp(const LhsXprType& leftImpl, const RhsXprType& rightImpl, const IndexPairs& contract_indices) :
     m_leftImpl(leftImpl),
@@ -46,10 +48,12 @@ class TensorContractionOp : public TensorBase<TensorContractionOp<LhsXprType, Rh
 
   const typename remove_all<RhsXprType>::type& rhsExpression() const { return m_rightImpl; }
 
+  const IndexPairs indices() const { return m_contract_indices; }
+
  protected:
   IndexPairs m_contract_indices;
-  LhsXprType m_leftImpl;
-  RhsXprType m_rightImpl;
+  const LhsXprType& m_leftImpl;
+  const RhsXprType& m_rightImpl;
 };
 
 template <typename IndexPairs_, typename LeftArgType_, typename RightArgType_>
@@ -64,9 +68,9 @@ template <typename Derived>
 struct TensorContractionEvaluatorBase
 {
   typedef traits<Derived> Traits;
-  typedef Traits::IndexPairs IndexPairs;
-  typedef Traits::LeftArgType LeftArgType;
-  typedef Traits::RightArgType RightArgType;
+  typedef typename Traits::IndexPairs IndexPairs;
+  typedef typename Traits::LeftArgType LeftArgType;
+  typedef typename Traits::RightArgType RightArgType;
 
   typedef TensorContractionOp<IndexPairs, LeftArgType, RightArgType> XprType;
   typedef typename remove_all<typename XprType::Scalar>::type Scalar;
@@ -100,8 +104,8 @@ struct TensorContractionEvaluatorBase
       eval_right_dims[i] = m_rightImpl.dimensions()[i];
     }
     for (int i = 0; i < ContractDims; ++i) {
-      eval_op_dims[i].first = op.indices()[i].first;
-      eval_op_dims[i].second = op.indices()[i].second;
+      eval_op_indices[i].first = op.indices()[i].first;
+      eval_op_indices[i].second = op.indices()[i].second;
     }
 
     for (int i = 0; i < ContractDims; ++i) {
@@ -116,9 +120,9 @@ struct TensorContractionEvaluatorBase
     }
 
     Indices lhs_strides(LDims);
-    lhs_stides[0] = 1;
+    lhs_strides[0] = 1;
     for (int i = 0; i < LDims - 1; ++i) {
-      lhs_stides[i + 1] = lhs_stides[i] * eval_left_dims[i];
+      lhs_strides[i + 1] = lhs_strides[i] * eval_left_dims[i];
     }
 
     Indices rhs_strides(RDims);
@@ -156,7 +160,7 @@ struct TensorContractionEvaluatorBase
       }
       if (!contracting) {
         m_dimensions[dim_idx] = eval_left_dims[i];
-        m_left_nocontract_stride[nocontract_idx] = lhs_strides[i];
+        m_left_nocontract_strides[nocontract_idx] = lhs_strides[i];
         if (nocontract_idx + 1 < LDims - ContractDims) {
           m_i_strides[nocontract_idx + 1] =
             m_i_strides[nocontract_idx] * eval_left_dims[i];
@@ -179,7 +183,7 @@ struct TensorContractionEvaluatorBase
       }
       if (!contracting) {
         m_dimensions[dim_idx] = eval_right_dims[i];
-        m_right_nocontract_stride[nocontract_idx] = rhs_strides[i];
+        m_right_nocontract_strides[nocontract_idx] = rhs_strides[i];
         if (nocontract_idx + 1 < RDims - ContractDims) {
           m_j_strides[nocontract_idx + 1] =
             m_j_strides[nocontract_idx] * eval_right_dims[i];
@@ -232,7 +236,47 @@ struct TensorContractionEvaluatorBase
     static_cast<const Derived*>(this)->template eval_product(buffer);
   }
 
-  
+  void eval_gemv(Scalar* buffer)
+  {
+    typedef TensorEvaluator<LeftArgType> LeftEvaluator;
+    typedef TensorEvaluator<RightArgType> RightEvaluator;
+    typedef typename LeftEvaluator::Scalar LhsScalar;
+    typedef typename RightEvaluator::Scalar RhsScalar;
+    typedef TensorContractionMapper<LhsScalar, Index, Lhs, LeftEvaluator, Indices, Indices> LeftMapper;
+    typedef TensorContractionMapper<RhsScalar, Index, Rhs, RightEvaluator, Indices, Indices> RightMapper;
+
+    LeftMapper lhs(m_leftImpl, m_left_nocontract_strides, m_i_strides,
+      m_left_contracting_strides, m_k_strides);
+    RightMapper rhs(m_rightImpl, m_right_nocontract_strides, m_j_strides,
+      m_right_contracting_strides, m_k_strides);
+
+    for (int i = 0; i < LDims - ContractDims; ++i) {
+      for (int j = 0; j < RDims - ContractDims; ++j) {
+        for (int k = 0; k < ContractDims; ++k) {
+          buffer[i + m_leftImpl.dimensions().total_size() * j] += lhs(i, k) * rhs(k, j);
+        }
+      }
+    }
+  }
+
+  void cleanup()
+  {
+    m_leftImpl.cleanup();
+    m_rightImpl.cleanup();
+
+    if (m_result) {
+      delete[] m_result;
+      m_result = nullptr;
+    }
+  }
+
+  CoeffReturnType coeff(Index index) const
+  { return m_result[index]; }
+
+  Scalar* data() const { return m_result; }
+
+ protected:
+  TensorContractionEvaluatorBase& operator=(const TensorContractionEvaluatorBase&);
 
   Indices m_k_strides;
   Indices m_left_contracting_strides;
@@ -247,10 +291,31 @@ struct TensorContractionEvaluatorBase
   Index m_j_size;
   Index m_k_size;
 
+  Dimensions m_dimensions;
+
   TensorEvaluator<LeftArgType> m_leftImpl;
   TensorEvaluator<RightArgType> m_rightImpl;
 
   Scalar* m_result;
+};
+
+template <typename IndexPairs, typename LeftArgType, typename RightArgType>
+struct TensorEvaluator<const TensorContractionOp<IndexPairs, LeftArgType, RightArgType>> :
+  public TensorContractionEvaluatorBase<
+  TensorEvaluator<const TensorContractionOp<IndexPairs, LeftArgType, RightArgType>>>
+{
+  typedef TensorContractionOp<IndexPairs, LeftArgType, RightArgType> XprType;
+  typedef TensorEvaluator<const XprType> Self;
+  typedef TensorContractionEvaluatorBase<Self> Base;
+
+  typedef typename XprType::Scalar Scalar;
+
+  TensorEvaluator(const XprType& op) :
+    Base(op)
+  { }
+
+  void eval_product(Scalar* buffer)
+  { this->template eval_gemm(buffer); }
 };
 
 }

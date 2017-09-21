@@ -24,7 +24,7 @@ struct scalar_tanh_op
   { return tanh(z); }
 };
 
-template <typename ScalarA, typename ScalarB, typename BinaryOp>
+template <typename ScalarA, typename ScalarB, typename BinaryOp=scalar_product_op<ScalarA, ScalarB>>
 struct ScalarBinaryOpTraits
 { };
 

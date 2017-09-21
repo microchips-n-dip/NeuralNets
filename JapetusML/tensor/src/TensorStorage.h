@@ -12,8 +12,10 @@ class TensorDimensions
   typedef Index_ Index;
   typedef Indices_ Indices;
 
-  const Index n_dims() const { compute_resized_values(); return ndims_; }
-  const Index total_size() const { compute_resized_values(); return total_sz_; }
+  const Index n_dims() { compute_resized_values(); return ndims_; }
+  const Index n_dims() const { return ndims_; }
+  const Index total_size() { compute_resized_values(); return total_sz_; }
+  const Index total_size() const { return total_sz_; }
   const Indices dimensions() const { return dimensions_; }
 
   const Index operator[](Index index) const
