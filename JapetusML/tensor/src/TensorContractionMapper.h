@@ -28,6 +28,19 @@ class TensorContractionMapper
 {
  public:
 
+  TensorContractionMapper(
+    const Tensor& tensor,
+    const nocontract_t& nocontract_strides,
+    const nocontract_t& ij_strides,
+    const contract_t& contract_strides,
+    const contract_t& k_strides) :
+    m_tensor(tensor),
+    m_nocontract_strides(nocontract_strides),
+    m_ij_strides(ij_strides),
+    m_contract_strides(contract_strides),
+    m_k_strides(k_strides)
+  { }
+
   Scalar operator()(Index i) const
   { return operator()(i, 0); }
 
@@ -36,7 +49,7 @@ class TensorContractionMapper
 
   Index compute_index(Index row, Index col) const
   {
-    const bool Left = side == Lhs;
+    const bool Left = (side == Lhs);
     Index nocontract_val = Left ? row : col;
     Index linidx = 0;
 
@@ -44,6 +57,7 @@ class TensorContractionMapper
     Index contract_sz = m_contract_strides.size();
 
     for (int i = static_cast<int>(nocontract_sz) - 1; i > 0; i--) {
+      printf("m_ij_strides[%d] = %d\n", i, m_ij_strides[i]);
       const Index idx = nocontract_val / m_ij_strides[i];
       linidx += idx * m_nocontract_strides[i];
       nocontract_val -= idx * m_ij_strides[i];

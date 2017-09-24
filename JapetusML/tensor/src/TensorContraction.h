@@ -68,34 +68,38 @@ template <typename Derived>
 struct TensorContractionEvaluatorBase
 {
   typedef traits<Derived> Traits;
-  typedef typename Traits::IndexPairs IndexPairs;
+  typedef typename remove_const<typename Traits::IndexPairs>::type IndexPairs;
   typedef typename Traits::LeftArgType LeftArgType;
   typedef typename Traits::RightArgType RightArgType;
 
-  typedef TensorContractionOp<IndexPairs, LeftArgType, RightArgType> XprType;
+  typedef TensorContractionOp<const IndexPairs, LeftArgType, RightArgType> XprType;
   typedef typename remove_all<typename XprType::Scalar>::type Scalar;
   typedef typename XprType::Index Index;
   typedef typename XprType::Indices Indices;
   typedef typename XprType::CoeffReturnType CoeffReturnType;
 
-  typedef typename TensorEvaluator<XprType>::Dimensions Dimensions;
+  typedef typename remove_const<typename LeftArgType::Dimensions>::type Dimensions;
 
-  const int LDims;
-  const int RDims;
-  const int ContractDims;
+  int LDims;
+  int RDims;
+  int ContractDims;
 
   TensorContractionEvaluatorBase(const XprType& op) :
     m_leftImpl(op.lhsExpression()),
-    m_rightImpl(op.rhsExpression()),
-    LDims(m_leftImpl.dimensions().n_dims()),
-    RDims(m_rightImpl.dimensions().n_dims()),
-    ContractDims(op.indices().size())
+    m_rightImpl(op.rhsExpression())
   {
+    LDims = m_leftImpl.dimensions().n_dims();
+    RDims = m_rightImpl.dimensions().n_dims();
+    ContractDims = op.indices().size();
+
+    printf("LDims: %d\n", LDims);
+    printf("RDims: %d\n", RDims);
+
     Indices eval_left_dims(LDims);
     Indices eval_right_dims(RDims);
     IndexPairs eval_op_indices(ContractDims);
 
-    m_dimensions = Dimensions(LDims + RDims - 2 * ContractDims);
+    Indices next_dims(LDims + RDims - 2 * ContractDims);
 
     for (int i = 0; i < LDims; ++i) {
       eval_left_dims[i] = m_leftImpl.dimensions()[i];
@@ -109,7 +113,7 @@ struct TensorContractionEvaluatorBase
     }
 
     for (int i = 0; i < ContractDims; ++i) {
-      for (int j = 0; j < ContractDims; ++j) {
+      for (int j = i + 1; j < ContractDims; ++j) {
         ECHECK(eval_op_indices[j].first != eval_op_indices[i].first &&
           eval_op_indices[j].second != eval_op_indices[i].second,
           "Contraction axes should be unique!");
@@ -128,11 +132,11 @@ struct TensorContractionEvaluatorBase
     Indices rhs_strides(RDims);
     rhs_strides[0] = 1;
     for (int i = 0; i < RDims - 1; ++i) {
-      rhs_strides[i + 1] = rhs_strides * eval_right_dims[i];
+      rhs_strides[i + 1] = rhs_strides[i] * eval_right_dims[i];
     }
 
-    m_i_strides = Indices(LDims);
-    m_j_strides = Indices(RDims);
+    m_i_strides = Indices(LDims - ContractDims);
+    m_j_strides = Indices(RDims - ContractDims);
     m_k_strides = Indices(ContractDims);
 
     if (m_i_strides.size() > 0) m_i_strides[0] = 1;
@@ -146,8 +150,8 @@ struct TensorContractionEvaluatorBase
     int dim_idx = 0;
     unsigned int nocontract_idx;
 
-    m_left_nocontract_strides = Indices(LDims);
-    m_right_nocontract_strides = Indices(RDims);
+    m_left_nocontract_strides = Indices(LDims - ContractDims);
+    m_right_nocontract_strides = Indices(RDims - ContractDims);
 
     nocontract_idx = 0;
     for (int i = 0; i < LDims; ++i) {
@@ -159,7 +163,7 @@ struct TensorContractionEvaluatorBase
         }
       }
       if (!contracting) {
-        m_dimensions[dim_idx] = eval_left_dims[i];
+        next_dims[dim_idx] = eval_left_dims[i];
         m_left_nocontract_strides[nocontract_idx] = lhs_strides[i];
         if (nocontract_idx + 1 < LDims - ContractDims) {
           m_i_strides[nocontract_idx + 1] =
@@ -182,7 +186,7 @@ struct TensorContractionEvaluatorBase
         }
       }
       if (!contracting) {
-        m_dimensions[dim_idx] = eval_right_dims[i];
+        next_dims[dim_idx] = eval_right_dims[i];
         m_right_nocontract_strides[nocontract_idx] = rhs_strides[i];
         if (nocontract_idx + 1 < RDims - ContractDims) {
           m_j_strides[nocontract_idx + 1] =
@@ -194,6 +198,7 @@ struct TensorContractionEvaluatorBase
         ++nocontract_idx;
       }
     }
+    m_dimensions = Dimensions(next_dims);
 
     m_left_contracting_strides = Indices(ContractDims);
     m_right_contracting_strides = Indices(ContractDims);
@@ -231,12 +236,12 @@ struct TensorContractionEvaluatorBase
     }
   }
 
-  void eval_to(Scalar* buffer)
+  void eval_to(Scalar* buffer) const
   {
     static_cast<const Derived*>(this)->template eval_product(buffer);
   }
 
-  void eval_gemv(Scalar* buffer)
+  void eval_gemm(Scalar* buffer) const
   {
     typedef TensorEvaluator<LeftArgType> LeftEvaluator;
     typedef TensorEvaluator<RightArgType> RightEvaluator;
@@ -265,7 +270,7 @@ struct TensorContractionEvaluatorBase
     m_rightImpl.cleanup();
 
     if (m_result) {
-      delete[] m_result;
+//      delete[] m_result;
       m_result = nullptr;
     }
   }
@@ -308,13 +313,15 @@ struct TensorEvaluator<const TensorContractionOp<IndexPairs, LeftArgType, RightA
   typedef TensorEvaluator<const XprType> Self;
   typedef TensorContractionEvaluatorBase<Self> Base;
 
+  typedef typename LeftArgType::Dimensions Dimensions;
+
   typedef typename XprType::Scalar Scalar;
 
   TensorEvaluator(const XprType& op) :
     Base(op)
   { }
 
-  void eval_product(Scalar* buffer)
+  void eval_product(Scalar* buffer) const
   { this->template eval_gemm(buffer); }
 };
 

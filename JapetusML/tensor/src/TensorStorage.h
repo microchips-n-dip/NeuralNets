@@ -12,9 +12,7 @@ class TensorDimensions
   typedef Index_ Index;
   typedef Indices_ Indices;
 
-  const Index n_dims() { compute_resized_values(); return ndims_; }
   const Index n_dims() const { return ndims_; }
-  const Index total_size() { compute_resized_values(); return total_sz_; }
   const Index total_size() const { return total_sz_; }
   const Indices dimensions() const { return dimensions_; }
 
@@ -32,12 +30,6 @@ class TensorDimensions
     total_sz_ = 1;
     ndims_ = 0;
     dimensions_ = Indices({1});
-  }
-
-  TensorDimensions(const Index ndims)
-  {
-    ndims_ = ndims;
-    dimensions_ = Indices(ndims_);
   }
 
   TensorDimensions(const TensorDimensions& other)
@@ -75,6 +67,8 @@ class TensorDimensions
   }
 
  private:
+  bool flag_compute_resized_values;
+
   void compute_total_size()
   {
     total_sz_ = Index(1);
@@ -91,8 +85,6 @@ class TensorDimensions
       flag_compute_resized_values = false;
     }
   }
-
-  bool flag_compute_resized_values;
 
   Indices dimensions_;
   Index total_sz_;

@@ -13,7 +13,7 @@ struct traits<Tensor<Scalar_, Index_, Indices_>>
   typedef Indices_ Indices;
 
   enum {
-    Flags = is_const<Scalar_>::value ? LvalueBit : 0
+    Flags = is_const<Scalar_>::value ? 0 : LvalueBit
   };
 
   template <typename T> struct MakePointer

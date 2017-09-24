@@ -15,7 +15,7 @@ class TensorLazyEvaluatorBase
     m_refcount(0)
   { }
 
-  virtual ~TensorLazyEvaluatorBase() { }
+  virtual ~TensorLazyEvaluatorBase() { printf("Destroying lazy evaluator %p\n", this); }
 
   virtual const Dimensions& dimensions() const = 0;
   virtual const Scalar* data() const = 0;
@@ -49,7 +49,7 @@ class TensorLazyEvaluatorReadOnly : public TensorLazyEvaluatorBase<Dimensions, t
     m_impl.evalSubExprsIfNeeded(nullptr);
   }
 
-  virtual const Dimensions& dimensions() const { return m_dims; }
+  virtual const Dimensions& dimensions() const { printf("ounnuavoiajoioe\n"); return m_dims; }
 
   virtual const Scalar* data() const { return m_impl.data(); }
 
@@ -79,7 +79,7 @@ class TensorLazyEvaluatorWritable : public TensorLazyEvaluatorReadOnly<Dimension
     Base(expr)
   { }
 
-  virtual ~TensorLazyEvaluatorWritable() { }
+  virtual ~TensorLazyEvaluatorWritable() { print("Destroying writable lazy evaluator %p\n", this); }
 
   virtual Scalar& coeffRef(Index index)
   { return this->m_impl.coeffRef(index); }
@@ -102,7 +102,7 @@ class TensorLazyEvaluator :
     Base(expr)
   { }
 
-  virtual ~TensorLazyEvaluator() { }
+  virtual ~TensorLazyEvaluator() { printf("Lazy evaluator destructor: %p\n", this); }
 };
 
 template <typename Derived>
@@ -168,7 +168,7 @@ class TensorRef : public TensorBase<TensorRef<PlainObjectType>>
     return *this;
   }
 
-  const Dimensions& dimensions() const { return m_evaluator->dimensions(); }
+  const Dimensions& dimensions() const { printf("Lazy evaluator at: %p\n"); return m_evaluator->dimensions(); }
 
   const Scalar* data() const { return m_evaluator->data(); }
 
@@ -183,6 +183,7 @@ class TensorRef : public TensorBase<TensorRef<PlainObjectType>>
     if (m_evaluator) {
       m_evaluator->decrRefCount();
       if (m_evaluator->refCount() == 0) {
+        printf("Deleting lazy evaluator at %p\n", m_evaluator);
         delete m_evaluator;
       }
     }
