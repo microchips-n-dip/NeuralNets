@@ -46,13 +46,13 @@ class TensorAssignOp : public TensorBase<TensorAssignOp<LeftXprType, RightXprTyp
     m_rightImpl(rightImpl)
   { }
 
-  typename remove_all<LeftXprType>::type& lhsExpression() const
-  { return *((typename remove_all<LeftXprType>::type*)&m_leftImpl); }
-  const typename remove_all<RightXprType>::type& rhsExpression() const { return m_rightImpl; }
+  typename remove_all<typename LeftXprType::Nested>::type& lhsExpression() const
+  { return *((typename remove_all<typename LeftXprType::Nested>::type*)&m_leftImpl); }
+  const typename remove_all<typename RightXprType::Nested>::type& rhsExpression() const { return m_rightImpl; }
 
  private:
-  typename remove_all<LeftXprType>::type& m_leftImpl;
-  const typename remove_all<RightXprType>::type& m_rightImpl;
+  typename remove_all<typename LeftXprType::Nested>::type& m_leftImpl;
+  const typename remove_all<typename RightXprType::Nested>::type& m_rightImpl;
 };
 
 template <typename LeftArgType, typename RightArgType>
