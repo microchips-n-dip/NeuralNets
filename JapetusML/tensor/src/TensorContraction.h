@@ -28,6 +28,12 @@ struct traits<TensorContractionOp<IndexPairs, LhsXprType, RhsXprType>>
 };
 
 template <typename IndexPairs, typename LhsXprType, typename RhsXprType>
+struct nested<TensorContractionOp<IndexPairs, LhsXprType, RhsXprType>>
+{
+  typedef TensorContractionOp<IndexPairs, LhsXprType, RhsXprType> type;
+};
+
+template <typename IndexPairs, typename LhsXprType, typename RhsXprType>
 class TensorContractionOp : public TensorBase<TensorContractionOp<IndexPairs, LhsXprType, RhsXprType>>
 {
  public:
@@ -35,6 +41,8 @@ class TensorContractionOp : public TensorBase<TensorContractionOp<IndexPairs, Lh
   typedef typename Traits::Scalar Scalar;
   typedef typename Traits::Index Index;
   typedef typename Traits::Indices Indices;
+
+  typedef typename nested<TensorContractionOp>::type Nested;
 
   typedef Scalar CoeffReturnType;
 
@@ -44,16 +52,16 @@ class TensorContractionOp : public TensorBase<TensorContractionOp<IndexPairs, Lh
     m_contract_indices(contract_indices)
   { }
 
-  const typename remove_all<LhsXprType>::type& lhsExpression() const { return m_leftImpl; }
+  const typename remove_all<typename LhsXprType::Nested>::type& lhsExpression() const { return m_leftImpl; }
 
-  const typename remove_all<RhsXprType>::type& rhsExpression() const { return m_rightImpl; }
+  const typename remove_all<typename RhsXprType::Nested>::type& rhsExpression() const { return m_rightImpl; }
 
   const IndexPairs indices() const { return m_contract_indices; }
 
  protected:
   IndexPairs m_contract_indices;
-  const LhsXprType& m_leftImpl;
-  const RhsXprType& m_rightImpl;
+  typename LhsXprType::Nested m_leftImpl;
+  typename RhsXprType::Nested m_rightImpl;
 };
 
 template <typename IndexPairs_, typename LeftArgType_, typename RightArgType_>
@@ -245,8 +253,8 @@ struct TensorContractionEvaluatorBase
   {
     typedef TensorEvaluator<LeftArgType> LeftEvaluator;
     typedef TensorEvaluator<RightArgType> RightEvaluator;
-    typedef typename LeftEvaluator::Scalar LhsScalar;
-    typedef typename RightEvaluator::Scalar RhsScalar;
+    typedef typename remove_const<typename LeftArgType::Scalar>::type LhsScalar;
+    typedef typename remove_const<typename RightArgType::Scalar>::type RhsScalar;
     typedef TensorContractionMapper<LhsScalar, Index, Lhs, LeftEvaluator, Indices, Indices> LeftMapper;
     typedef TensorContractionMapper<RhsScalar, Index, Rhs, RightEvaluator, Indices, Indices> RightMapper;
 

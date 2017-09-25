@@ -119,6 +119,18 @@ struct traits<TensorRef<Derived>> :
   };
 };
 
+template <typename Derived>
+struct nested<TensorRef<Derived>>
+{
+  typedef const TensorRef<Derived>& type;
+};
+
+template <typename Derived>
+struct nested<const TensorRef<Derived>>
+{
+  typedef const TensorRef<Derived>& type;
+};
+
 template <typename PlainObjectType>
 class TensorRef : public TensorBase<TensorRef<PlainObjectType>>
 {

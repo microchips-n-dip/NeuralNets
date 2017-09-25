@@ -21,6 +21,18 @@ struct traits<Tensor<Scalar_, Index_, Indices_>>
 };
 
 template <typename Scalar_, typename Index_, typename Indices_>
+struct nested<Tensor<Scalar_, Index_, Indices_>>
+{
+  typedef const Tensor<Scalar_, Index_, Indices_>& type;
+};
+
+template <typename Scalar_, typename Index_, typename Indices_>
+struct nested<const Tensor<Scalar_, Index_, Indices_>>
+{
+  typedef const Tensor<Scalar_, Index_, Indices_>& type;
+};
+
+template <typename Scalar_, typename Index_, typename Indices_>
 class Tensor : public TensorBase<Tensor<Scalar_, Index_, Indices_>>
 {
  public:
@@ -32,6 +44,8 @@ class Tensor : public TensorBase<Tensor<Scalar_, Index_, Indices_>>
   typedef Index_ Index;
   typedef Indices_ Indices;
   typedef TensorDimensions<Index, Indices> Dimensions;
+
+  typedef typename nested<Self>::type Nested;
 
   Scalar* data() { return storage_.data(); }
   const Scalar* data() const { return storage_.data(); }
@@ -83,6 +97,8 @@ class Tensor : public TensorBase<Tensor<Scalar_, Index_, Indices_>>
   Tensor(Index first_index, IndexTypes... other_indices) :
     storage_(Dimensions({first_index, other_indices...}))
   { }
+
+  ~Tensor() { printf("Tensor destructor called\n"); }
 
  private:
   Storage storage_;

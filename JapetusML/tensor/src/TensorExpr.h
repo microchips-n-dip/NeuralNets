@@ -16,13 +16,21 @@ struct traits<TensorCWiseUnaryOp<UnaryOp, XprType>> :
 };
 
 template <typename UnaryOp, typename XprType>
+struct nested<TensorCWiseUnaryOp<UnaryOp, XprType>>
+{
+  typedef TensorCWiseUnaryOp<UnaryOp, XprType> type;
+};
+
+template <typename UnaryOp, typename XprType>
 class TensorCWiseUnaryOp : public TensorBase<TensorCWiseUnaryOp<UnaryOp, XprType>>
 {
  public:
-  typedef traits<XprType> Traits;
+  typedef traits<TensorCWiseUnaryOp> Traits;
   typedef typename Traits::Scalar Scalar;
   typedef typename Traits::Index Index;
   typedef typename Traits::Indices Indices;
+
+  typedef typename nested<TensorCWiseUnaryOp>::type Nested;
 
   TensorCWiseUnaryOp(const XprType& impl, const UnaryOp& op) :
     m_impl(impl),
@@ -34,7 +42,7 @@ class TensorCWiseUnaryOp : public TensorBase<TensorCWiseUnaryOp<UnaryOp, XprType
   const typename remove_all<XprType>::type& nestedExpression() const { return m_impl; }
 
  private:
-  XprType m_impl;
+  typename XprType::Nested m_impl;
   const UnaryOp m_functor;
 };
 
@@ -94,6 +102,12 @@ struct traits<TensorCWiseBinaryOp<BinaryOp, LeftXprType, RightXprType>>
 };
 
 template <typename BinaryOp, typename LeftXprType, typename RightXprType>
+struct nested<TensorCWiseBinaryOp<BinaryOp, LeftXprType, RightXprType>>
+{
+  typedef TensorCWiseBinaryOp<BinaryOp, LeftXprType, RightXprType> type;
+};
+
+template <typename BinaryOp, typename LeftXprType, typename RightXprType>
 class TensorCWiseBinaryOp : public TensorBase<TensorCWiseBinaryOp<BinaryOp, LeftXprType, RightXprType>>
 {
  public:
@@ -102,6 +116,8 @@ class TensorCWiseBinaryOp : public TensorBase<TensorCWiseBinaryOp<BinaryOp, Left
   typedef Scalar CoeffReturnType;
   typedef typename Traits::Index Index;
   typedef typename Traits::Indices Indices;
+
+  typedef typename nested<TensorCWiseBinaryOp>::type Nested;
 
   TensorCWiseBinaryOp(const LeftXprType& leftImpl, const RightXprType& rightImpl, const BinaryOp& op) :
     m_leftImpl(leftImpl),
@@ -114,8 +130,8 @@ class TensorCWiseBinaryOp : public TensorBase<TensorCWiseBinaryOp<BinaryOp, Left
   const BinaryOp& functor() const { return m_functor; }
 
  private:
-  const typename remove_all<LeftXprType>::type& m_leftImpl;
-  const typename remove_all<RightXprType>::type& m_rightImpl;
+  typename LeftXprType::Nested m_leftImpl;
+  typename RightXprType::Nested m_rightImpl;
   const BinaryOp m_functor;
 };
 

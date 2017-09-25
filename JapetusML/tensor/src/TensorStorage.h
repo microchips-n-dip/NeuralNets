@@ -129,6 +129,7 @@ class TensorStorage
   void ts_deallocate()
   {
     if (data_) {
+      printf("Deleting %p\n", data_);
       delete[] data_;
     }
     data_ = nullptr;

@@ -21,6 +21,8 @@ template <typename PlainObjectType> class TensorRef;
 template <typename Derived> struct traits;
 template <typename Derived> struct traits<const Derived> : traits<Derived> { };
 
+template <typename T> struct nested;
+
 template <typename Expression> struct TensorEvaluator;
 template <typename Expression> struct TensorExecutor;
 

@@ -24,6 +24,12 @@ struct traits<TensorAssignOp<LeftXprType, RightXprType>>
 };
 
 template <typename LeftXprType, typename RightXprType>
+struct nested<TensorAssignOp<LeftXprType, RightXprType>>
+{
+  typedef TensorAssignOp<LeftXprType, RightXprType> type;
+};
+
+template <typename LeftXprType, typename RightXprType>
 class TensorAssignOp : public TensorBase<TensorAssignOp<LeftXprType, RightXprType>>
 {
  public:
@@ -32,6 +38,8 @@ class TensorAssignOp : public TensorBase<TensorAssignOp<LeftXprType, RightXprTyp
   typedef Scalar CoeffReturnType;
   typedef typename Traits::Index Index;
   typedef typename Traits::Indices Indices;
+
+  typedef typename nested<TensorAssignOp>::type Nested;
 
   TensorAssignOp(LeftXprType& leftImpl, const RightXprType& rightImpl) :
     m_leftImpl(leftImpl),
