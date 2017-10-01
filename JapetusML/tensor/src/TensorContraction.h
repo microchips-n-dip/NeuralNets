@@ -9,8 +9,8 @@ template <typename IndexPairs, typename LhsXprType, typename RhsXprType>
 struct traits<TensorContractionOp<IndexPairs, LhsXprType, RhsXprType>>
 {
   typedef typename ScalarBinaryOpTraits<
-    typename remove_all<typename LhsXprType::Scalar>::type,
-    typename remove_all<typename RhsXprType::Scalar>::type
+    typename remove_const<typename LhsXprType::Scalar>::type,
+    typename remove_const<typename RhsXprType::Scalar>::type
   >::ReturnType Scalar;
 
   typedef typename promote_index_type<
