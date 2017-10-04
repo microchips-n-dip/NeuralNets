@@ -84,7 +84,7 @@ struct TensorEvaluator<const TensorAssignOp<LeftArgType, RightArgType>>
   const Dimensions& dimensions() const { return m_rightImpl.dimensions(); }
 
   void evalScalar(Index index)
-  { m_leftImpl.coeffRef(index) = m_rightImpl.coeff(index); }
+  { m_leftImpl.coeffRef(index);}// = m_rightImpl.coeff(index); }
 
   CoeffReturnType coeff(Index index) const
   { return m_leftImpl.coeff(index); }

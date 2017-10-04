@@ -13,11 +13,5 @@ int main(void)
   IPs ctr(1);
   ctr[0] = std::pair<int, int>(0, 0);
 
-  typedef TensorContractionOp<const IPs, const Tensor<double>, const Tensor<double>> Contraction;
-  Contraction contraction(A, B, ctr);
-
-  typedef TensorAssignOp<Tensor<double>, const Contraction> Assign;
-  Assign assign(C, contraction);
-  B.resize(TensorEvaluator<const Assign>(assign).dimensions());
-  TensorExecutor<const Assign>::run(assign);
+  C = A.contract(B, ctr);
 }

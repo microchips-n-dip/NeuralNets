@@ -79,27 +79,19 @@ class Tensor : public TensorBase<Tensor<Scalar_, Index_, Indices_>>
   template <typename OtherDerived>
   inline Tensor& operator=(const OtherDerived& other)
   {
-    printf("Copying from OtherDerived object\n");
     typedef TensorAssignOp<Tensor, const OtherDerived> Assign;
     Assign assign(*this, other);
-    printf("Succeeded on construction of assign op\n");
     resize(TensorEvaluator<const Assign>(assign).dimensions());
-    printf("Succeeded on resizing tensor\n");
     TensorExecutor<const Assign>::run(assign);
-    printf("Succeeded on executing rhs expression\n");
     return *this;
   }
 
   inline Tensor& operator=(const Tensor& other)
   {
-    printf("Copying from Tensor object\n");
     typedef TensorAssignOp<Tensor, const Tensor> Assign;
     Assign assign(*this, other);
-    printf("Succeeded on construction of assign op\n");
     resize(TensorEvaluator<const Assign>(assign).dimensions());
-    printf("Succeeded on resizing tensor\n");
     TensorExecutor<const Assign>::run(assign);
-    printf("Succeeded on executing rhs expression\n");
     return *this;
   }
 
