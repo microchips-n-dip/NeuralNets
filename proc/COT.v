@@ -78,6 +78,11 @@ parameter nei_4 = 0;
 parameter en_nei_5 = 0;
 parameter nei_5 = 0;
 
+function new (clk);
+begin
+
+input clk;
+
 reg dests [0:5];
 
 // TODO: Finish up with router
@@ -89,12 +94,10 @@ Router router(clk, ); // Core's router
 // Compiler defined mem requests?
 parameter bank_size = 6;
 
-BankSlice #(.size(bank_size)) bank_00(clk);
-BankSlice #(.size(bank_size)) bank_01(clk);
-BankSlice #(.size(bank_size)) bank_10(clk);
-BankSlice #(.size(bank_size)) bank_11(clk);
-
-virtual task core_run(clk);
+BankSlice #(.size(bank_size)) bank_00;
+BankSlice #(.size(bank_size)) bank_01;
+BankSlice #(.size(bank_size)) bank_10;
+BankSlice #(.size(bank_size)) bank_11;
 
 reg [7:0] rf_ptr [0:15];
 
@@ -103,9 +106,9 @@ ThreadProc thread_2(clk);
 ThreadProc thread_3(clk);
 ThreadProc thread_4(clk);
 
-endtask;
+end
 
-endmodule
+endclass
 
 module TorusInterconnect(clk);
 
@@ -171,14 +174,14 @@ wire c8 [0:3];
 // 0   1
 //   3
 
-CoreType0 #(.i(0), .n(3), .en_nei_5(en_sub_0), .nei_5(sub_0), .bank_size(bank_sz_0)) core0(clk, {c1[0], c2[1], c3[2], c6[3]}, c0);
-CoreType1 #(.i(1), .n(3), .en_nei_5(en_sub_1), .nei_5(sub_1), .bank_size(bank_sz_1)) core1(clk, {c2[0], c0[1], c4[2], c7[3]}, c1);
-CoreType2 #(.i(2), .n(3), .en_nei_5(en_sub_2), .nei_5(sub_2), .bank_size(bank_sz_2)) core2(clk, {c0[0], c1[1], c5[2], c8[3]}, c2);
-CoreType3 #(.i(3), .n(3), .en_nei_5(en_sub_3), .nei_5(sub_3), .bank_size(bank_sz_3)) core3(clk, {c4[0], c5[1], c6[2], c0[3]}, c3);
-CoreType4 #(.i(4), .n(3), .en_nei_4(1), .nei_4(root_addr), .en_nei_5(en_sub_4), .nei_5(sub_4), .bank_size(bank_sz_4)) core4(clk, {c3[1], c5[0], c1[3], c7[2]}, c4);
-CoreType5 #(.i(5), .n(3), .en_nei_5(en_sub_5), .nei_5(sub_5), .bank_size(bank_sz_5)) core5(clk, {c3[0], c4[1], c8[2], c2[3]}, c5);
-CoreType6 #(.i(6), .n(3), .en_nei_5(en_sub_6), .nei_5(sub_6), .bank_size(bank_sz_6)) core6(clk, {c7[0], c8[1], c3[2], c0[3]}, c6);
-CoreType7 #(.i(7), .n(3), .en_nei_5(en_sub_7), .nei_5(sub_7), .bank_size(bank_sz_7)) core7(clk, {c8[0], c6[1], c4[2], c1[3]}, c7);
-CoreType8 #(.i(8), .n(3), .en_nei_5(en_sub_8), .nei_5(sub_8), .bank_size(bank_sz_8)) core8(clk, {c6[0], c7[1], c5[2], c2[3]}, c8); 
+CoreType0 #(.i(0), .n(3), .en_nei_5(en_sub_0), .nei_5(sub_0), .bank_size(bank_sz_0)) core0 = new(clk, {c1[0], c2[1], c3[2], c6[3]}, c0);
+CoreType1 #(.i(1), .n(3), .en_nei_5(en_sub_1), .nei_5(sub_1), .bank_size(bank_sz_1)) core1 = new(clk, {c2[0], c0[1], c4[2], c7[3]}, c1);
+CoreType2 #(.i(2), .n(3), .en_nei_5(en_sub_2), .nei_5(sub_2), .bank_size(bank_sz_2)) core2 = new(clk, {c0[0], c1[1], c5[2], c8[3]}, c2);
+CoreType3 #(.i(3), .n(3), .en_nei_5(en_sub_3), .nei_5(sub_3), .bank_size(bank_sz_3)) core3 = new(clk, {c4[0], c5[1], c6[2], c0[3]}, c3);
+CoreType4 #(.i(4), .n(3), .en_nei_4(1), .nei_4(root_addr), .en_nei_5(en_sub_4), .nei_5(sub_4), .bank_size(bank_sz_4)) core4 = new(clk, {c3[1], c5[0], c1[3], c7[2]}, c4);
+CoreType5 #(.i(5), .n(3), .en_nei_5(en_sub_5), .nei_5(sub_5), .bank_size(bank_sz_5)) core5 = new(clk, {c3[0], c4[1], c8[2], c2[3]}, c5);
+CoreType6 #(.i(6), .n(3), .en_nei_5(en_sub_6), .nei_5(sub_6), .bank_size(bank_sz_6)) core6 = new(clk, {c7[0], c8[1], c3[2], c0[3]}, c6);
+CoreType7 #(.i(7), .n(3), .en_nei_5(en_sub_7), .nei_5(sub_7), .bank_size(bank_sz_7)) core7 = new(clk, {c8[0], c6[1], c4[2], c1[3]}, c7);
+CoreType8 #(.i(8), .n(3), .en_nei_5(en_sub_8), .nei_5(sub_8), .bank_size(bank_sz_8)) core8 = new(clk, {c6[0], c7[1], c5[2], c2[3]}, c8); 
 
 endmodule
