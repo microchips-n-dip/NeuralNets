@@ -1,3 +1,6 @@
+`include "MAS.v"
+`include "router.v"
+
 module BankSlice(clk);
 
 input clk;
