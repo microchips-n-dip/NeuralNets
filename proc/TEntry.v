@@ -158,7 +158,7 @@ wire rtamatch_a;
 wire rtbmatch_a;
 wire rtamatch_b;
 wire rtbmatch_b;
-TEntry #(instr_width, tag_width, data_width) entry0(clk, rst, read_enable, write_enable, broadcast, acache_hit, bcache_hit, lookup, ready, rtamatch_a, rtamatch_b, rtbmatch_a, rtbmatch_b, instr_IN, instr_OUT, instr_tag_IN, instr_tag_bus[entry], tag0_IN, d0_IN, d0_OUT, tag1_IN, d1_IN, d1_OUT);
+TEntry #(instr_width, tag_width, data_width) entry0(clk, rst | l0q, read_enable, write_enable, broadcast, acache_hit, bcache_hit, lookup, ready, rtamatch_a, rtamatch_b, rtbmatch_a, rtbmatch_b, instr_IN, instr_OUT, instr_tag_IN, instr_tag_bus[entry], tag0_IN, d0_IN, d0_OUT, tag1_IN, d1_IN, d1_OUT);
 assign match_bus[entry] = rtamatch_a | rtbmatch_a | rtamatch_b | rtbmatch_b;
 assign d0_IN = d0_OUT;
 assign d1_IN = d1_OUT;
