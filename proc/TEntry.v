@@ -25,7 +25,7 @@ wire tags_eq;
 wire unit_enable = (tags_eq & enable) | write;
 wire v_enable = prevalid_IN | tags_eq;
 
-wire [data_width-1:0] data_mux [0:1] = {'z, 0};
+wire [data_width-1:0] data_mux [0:1] = {(data_width-1){1'bz}, (data_width-1){1'b0}};
 
 wire [tag_width-1:0] tag_output;
 Reg #(tag_width) tag(clk, write, rst, tag_IN, tag_output);
@@ -76,9 +76,9 @@ output [tag_width-1:0] wb_tag_OUT;
 output d0_OUT;
 output d1_OUT;
 
-wire [instr_width-1:0] instr_mux [0:1] = {'z, 0};
+wire [instr_width-1:0] instr_mux [0:1] = {(data_width-1){1'bz}, (data_width-1){1'b0}};
 Reg #(instr_width) instr(clk, write_alloc, rst, instr_IN, instr_mux[1]);
-wire [tag_width-1:0] wb_tag_mux [0:1] = {'z, 0};
+wire [tag_width-1:0] wb_tag_mux [0:1] = {(tag_width-1){1'bz}, (tag_width-1){1'b0}};
 Reg #(tag_width) wb_tag(clk, write_alloc, rst, wb_tag_IN, wb_tag_mux[1]);
 
 wire valid0;
@@ -190,7 +190,7 @@ output [data_width-1:0] d0_OUT;
 output [data_width-1:0] d1_OUT;
 
 wire match_bus [0:3];
-wire read_switch[0:4] = {bcast_IN, 0, 0, 0, 0};
+wire read_switch[0:4] = {bcast_IN, 1'b0, 1'b0, 1'b0, 1'b0};
 wire [tag_width-1:0] instr_tag_bus [0:3];
 
 TEntryBus #(instr_width, tag_width, data_width, 0) entry0(clk, rst, read_switch[0], read_switch[1], write_entry, acache_hit, bcache_hit, match_bus, instr_tag_bus, instr_IN, instr_tag_IN, tag0_IN, tag1_IN, d0_IN, d1_IN, instr_OUT, d0_OUT, d1_OUT);
