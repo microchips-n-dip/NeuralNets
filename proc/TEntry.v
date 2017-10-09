@@ -1,3 +1,5 @@
+`include "misc.v"
+
 // Half entry for reservation station
 module TEntryHalf(clk, rst, tag_IN, data_IN, data_OUT, prevalid_IN, valid_OUT, rta_IN, rta_enable, rtb_IN, rtb_enable, rtamatch_OUT, rtbmatch_OUT, read_enable, write, enable);
 
@@ -32,7 +34,7 @@ Reg #(tag_width) tag(clk, write, rst, tag_IN, tag_output);
 Reg #(data_width) data(clk, unit_enable, rst, data_IN, data_mux[1]);
 Reg #(1) valid(clk, v_enable, 0, unit_enable, valid_OUT);
 
-EQ(tag_IN, tag_output, tags_eq);
+assign tag_eq = tag_IN == tag_output;
 
 wire rta_eq;
 EQ(rta_IN, tag_output, rta_eq);
@@ -132,12 +134,9 @@ output [instr_width-1:0] instr_OUT;
 output [data_width-1:0] d0_OUT;
 output [data_width-1:0] d1_OUT;
 
-wire lt0;
-cmpl cl0(entry, instr_tag_bus[non_entry_0], lt0);
-wire lt1;
-cmpl cl1(entry, instr_tag_bus[non_entry_1], lt1);
-wire lt2;
-cmpl cl2(entry, instr_tag_bus[non_entry_2], lt2);
+wire lt0 = entry < instr_tag_bus[non_entry_0];
+wire lt1 = entry < instr_tag_bus[non_entry_1];
+wire lt2 = entry < instr_tag_bus[non_entry_2];
 wire ready;
 wire read_enable = ready & lt0 & lt1 & lt2;
 

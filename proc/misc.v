@@ -37,3 +37,18 @@ assign q = ~(r | qbar);
 assign qbar = ~(s | q);
 
 endmodule
+
+module SRE(clk, s0, r0, s1, r1, q, qbar);
+
+input clk;
+input s0;
+input r0;
+input s1;
+input r1;
+inout q;
+inout qbar;
+
+assign q = ~((r1 & clk) | r0 | qbar);
+assign qbar = ~((s1 & clk) | s0 | q);
+
+endmodule
