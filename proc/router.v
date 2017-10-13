@@ -1,6 +1,6 @@
 `include "MAS.v"
 
-module NodeRouter(clk, naddr_req, in_stream, out_stream);
+module NodeRouter(clk, in_stream, out_stream);
 
 parameter layer_id = 0;
 parameter net_width = 4;
