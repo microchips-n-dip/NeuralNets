@@ -2,11 +2,6 @@
 
 module NodeRouter(clk, naddr_req, in_stream, out_stream);
 
-parameter nei0x = 0;
-parameter nei1x = 0;
-parameter nei2y = 0;
-parameter nei3y = 0;
-
 parameter layer_id = 0;
 parameter net_width = 4;
 parameter stream_width = 144;
@@ -20,6 +15,11 @@ parameter naddr_mid = nw_half + net0_offset;
 parameter net1_offset = nw_full * (layer_id - 1);
 parameter nparent_end = nw_full + net1_offset;
 parameter nparent_mid = nw_half + net1_offset;
+
+parameter nei0x = 0;
+parameter nei1x = 0;
+parameter nei2y = 0;
+parameter nei3y = 0;
 
 parameter self_x = 0;
 parameter self_y = 0;
