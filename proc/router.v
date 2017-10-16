@@ -6,6 +6,7 @@ parameter layer_id = 0;
 parameter net_width = 4;
 parameter nw_full = 4;
 parameter nw_half = 2;
+
 parameter data_width = 128;
 parameter stream_width = data_width + net_width;
 
@@ -93,6 +94,7 @@ parameter layer_id = 0;
 parameter net_width = 4;
 parameter nw_full = 4;
 parameter nw_half = 2;
+
 parameter data_width = 128;
 parameter stream_width = data_width + net_width;
 
