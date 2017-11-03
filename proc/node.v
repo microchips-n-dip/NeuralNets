@@ -77,7 +77,7 @@ assign d_OUT[15:0] = acc_out[31] & instr[4];
 
 endmodule
 
-module Stripe(clk, rst, tag_IN, stride_IN, d0_IN, d1_IN, d_OUT);
+module Stripe(clk, rst, prev_enable, next_enable, tagA_IN, tagB_IN, strideA_IN, strideB_IN, d0_IN, d1_IN, d_OUT);
 
 parameter data_width = 32;
 parameter block_width = 128;
@@ -86,6 +86,7 @@ parameter tag_width = 12;
 
 input clk;
 input rst;
+input prev_enable;
 input [tag_width-1:0] tagA_IN;
 input [tag_width-1:0] tagB_IN;
 input [tag_width-1:0] strideA_IN;
@@ -94,6 +95,7 @@ input [tag_width-1:0] iter_count_IN;
 input [tag_width-1:0] iter_lim_IN;
 input [block_width-1:0] d0_IN_;
 input [block_width-1:0] d1_IN_;
+output next_enable;
 output [block_width-1:0] d_OUT;
 
 wire next_enable_0;
