@@ -1,4 +1,4 @@
-`include "misc.v"
+ `include "misc.v"
 
 // Processing Element
 module PE(clk, rst, en_v0, en_v1, compute_enable, instr, d0_IN_, d1_IN_, d_OUT);
@@ -68,9 +68,7 @@ assign acc_in[30:0] = f1_mux[sc1][30:0]; // Accumulate
 assign acc_in[31] = sc1;
 wire rc0 = acc_out[11] | acc_out[12];
 wire rc1 = (rc0 & acc_out[13]) | (acc_out[13] & ~rc0 & acc_out[14]);
-wire [14:0] rout0;
-assign rout0[14:1] = acc_out[28:15];
-assign rout0[0] = acc_out[14];
+wire [14:0] rout0 = acc_out[28:14];
 wire [14:0] rout_mux = {0, rout0 + rc1};
 assign d_OUT[14:0] = rout_mux[instr[4]];
 assign d_OUT[15:0] = acc_out[31] & instr[4];
