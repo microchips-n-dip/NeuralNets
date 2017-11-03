@@ -1,7 +1,7 @@
 `include "misc.v"
 
 // Processing Element
-module PE(clk, rst, en_v0, en_v1, compute_enable, instr, d0_IN_, d1_IN_);
+module PE(clk, rst, en_v0, en_v1, compute_enable, instr, d0_IN_, d1_IN_, d_OUT);
 
 parameter data_width = 32;
 parameter instr_width = 7;
@@ -14,6 +14,7 @@ input compute_enable;
 input [instr_width-1:0] instr;
 input [data_width-1:0] d0_IN_;
 input [data_width-1:0] d1_IN_;
+output [data_width-1:0] d_OUT;
 
 wire [data_width-1:0] d0_IN;
 assign d0_IN[28:14] = d0_IN_[14:0];
@@ -67,7 +68,12 @@ assign acc_in[30:0] = f1_mux[sc1][30:0]; // Accumulate
 assign acc_in[31] = sc1;
 wire rc0 = acc_out[11] | acc_out[12];
 wire rc1 = (rc0 & acc_out[13]) | (acc_out[13] & ~rc0 & acc_out[14]);
-
+wire [14:0] rout0;
+assign rout0[14:1] = acc_out[28:15];
+assign rout0[0] = acc_out[14];
+wire [14:0] rout_mux = {0, rout0 + rc1};
+assign d_OUT[14:0] = rout_mux[instr[4]];
+assign d_OUT[15:0] = acc_out[31] & instr[4];
 
 endmodule
 
@@ -86,8 +92,8 @@ input [tag_width-1:0] strideA_IN;
 input [tag_width-1:0] strideB_IN;
 input [tag_width-1:0] iter_count_IN;
 input [tag_width-1:0] iter_lim_IN;
-input [block_width-1:0] d0_IN;
-input [block_width-1:0] d1_IN;
+input [block_width-1:0] d0_IN_;
+input [block_width-1:0] d1_IN_;
 output [block_width-1:0] d_OUT;
 
 wire next_enable_0;
@@ -130,12 +136,17 @@ wire tm1 = tagA_IN == tag_b;
 wire mm0 = tm0 | tm1;
 wire ce0;
 SRE lce0(clk, 0, rst1, mm0, compute_enable, ce0, );
-wire tm3 = tagB_IN == tag_a;
 wire tm2 = tagB_IN == tag_b;
+wire tm3 = tagB_IN == tag_a;
 wire mm1 = tm2 | tm3;
 wire ce1;
 SRE lce1(clk, 0, rst1, mm1, compute_enable, ce1, );
 assign compute_enable = ce0 & ce1 & ~full_iter;
+
+wire [block_width-1:0] d0_IN_mux [0:1] = {d0_IN_, d1_IN_};
+wire [block_width-1:0] d0_IN = d0_IN_mux[tm1];
+wire [block_width-1:0] d1_IN_mux [0:1] = {d1_IN_, d0_IN_};
+wire [block_width-1:0] d1_IN = d1_IN_mux[tm3];
 
 PE #(data_width, instr_width) pe0(clk, rst2, mm0, mm1, compute_enable, instr, d0_IN[15:0], d1_IN[15:0], d_OUT[15:0]);
 PE #(data_width, instr_width) pe1(clk, rst2, mm0, mm1, compute_enable, instr, d0_IN[31:16], d1_IN[31:16], d_OUT[31:16]);
