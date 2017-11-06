@@ -1,4 +1,4 @@
- `include "misc.v"
+`include "misc.v"
 
 // Processing Element
 module PE(clk, rst, en_v0, en_v1, compute_enable, instr, d0_IN_, d1_IN_, d_OUT);
@@ -71,7 +71,7 @@ wire rc1 = (rc0 & acc_out[13]) | (acc_out[13] & ~rc0 & acc_out[14]);
 wire [14:0] rout0 = acc_out[28:14];
 wire [14:0] rout_mux = {0, rout0 + rc1};
 assign d_OUT[14:0] = rout_mux[instr[4]];
-assign d_OUT[15:0] = acc_out[31] & instr[4];
+assign d_OUT[15] = acc_out[31] & instr[4];
 
 endmodule
 
