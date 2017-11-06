@@ -1,7 +1,7 @@
 `include "misc.v"
 
 // Processing Element
-module PE(clk, rst, en_v0, en_v1, compute_enable, instr, d0_IN_, d1_IN_, d_OUT);
+module NodePE(clk, rst, en_v0, en_v1, compute_enable, instr, d0_IN_, d1_IN_, d_OUT);
 
 parameter data_width = 32;
 parameter instr_width = 7;
@@ -75,12 +75,14 @@ assign d_OUT[15] = acc_out[31] & instr[4];
 
 endmodule
 
-module Stripe(clk, rst, prev_enable, next_enable, tagA_IN, tagB_IN, strideA_IN, strideB_IN, d0_IN, d1_IN, d_OUT);
+module NodeStripe(clk, rst, prev_enable, next_enable, ext_req, tagA_IN, tagB_IN, strideA_IN, strideB_IN, d0_IN, d1_IN, d_OUT);
 
-parameter data_width = 32;
-parameter block_width = 128;
+parameter data_width = 16;
 parameter instr_width = 7;
 parameter tag_width = 12;
+
+parameter full_width = 2 * data_width;
+parameter block_width = 8 * data_width;
 
 input clk;
 input rst;
@@ -148,13 +150,76 @@ wire [block_width-1:0] d0_IN = d0_IN_mux[tm1];
 wire [block_width-1:0] d1_IN_mux [0:1] = {d1_IN_, d0_IN_};
 wire [block_width-1:0] d1_IN = d1_IN_mux[tm3];
 
-PE #(data_width, instr_width) pe0(clk, rst2, mm0, mm1, compute_enable, instr, d0_IN[15:0], d1_IN[15:0], d_OUT[15:0]);
-PE #(data_width, instr_width) pe1(clk, rst2, mm0, mm1, compute_enable, instr, d0_IN[31:16], d1_IN[31:16], d_OUT[31:16]);
-PE #(data_width, instr_width) pe2(clk, rst2, mm0, mm1, compute_enable, instr, d0_IN[47:32], d1_IN[47:32], d_OUT[47:32]);
-PE #(data_width, instr_width) pe3(clk, rst2, mm0, mm1, compute_enable, instr, d0_IN[63:48], d1_IN[63:48], d_OUT[63:48]);
-PE #(data_width, instr_width) pe4(clk, rst2, mm0, mm1, compute_enable, instr, d0_IN[79:64], d1_IN[79:64], d_OUT[79:64]);
-PE #(data_width, instr_width) pe5(clk, rst2, mm0, mm1, compute_enable, instr, d0_IN[95:80], d1_IN[95:80], d_OUT[95:80]);
-PE #(data_width, instr_width) pe6(clk, rst2, mm0, mm1, compute_enable, instr, d0_IN[111:96], d1_IN[111:96], d_OUT[111:96]);
-PE #(data_width, instr_width) pe7(clk, rst2, mm0, mm1, compute_enable, instr, d0_IN[127:112], d1_IN[127:112], d_OUT[127:112]);
+PE #(full_width, instr_width) pe0(clk, rst2, mm0, mm1, compute_enable, instr, d0_IN[15:0], d1_IN[15:0], d_OUT[15:0]);
+PE #(full_width, instr_width) pe1(clk, rst2, mm0, mm1, compute_enable, instr, d0_IN[31:16], d1_IN[31:16], d_OUT[31:16]);
+PE #(full_width, instr_width) pe2(clk, rst2, mm0, mm1, compute_enable, instr, d0_IN[47:32], d1_IN[47:32], d_OUT[47:32]);
+PE #(full_width, instr_width) pe3(clk, rst2, mm0, mm1, compute_enable, instr, d0_IN[63:48], d1_IN[63:48], d_OUT[63:48]);
+PE #(full_width, instr_width) pe4(clk, rst2, mm0, mm1, compute_enable, instr, d0_IN[79:64], d1_IN[79:64], d_OUT[79:64]);
+PE #(full_width, instr_width) pe5(clk, rst2, mm0, mm1, compute_enable, instr, d0_IN[95:80], d1_IN[95:80], d_OUT[95:80]);
+PE #(full_width, instr_width) pe6(clk, rst2, mm0, mm1, compute_enable, instr, d0_IN[111:96], d1_IN[111:96], d_OUT[111:96]);
+PE #(full_width, instr_width) pe7(clk, rst2, mm0, mm1, compute_enable, instr, d0_IN[127:112], d1_IN[127:112], d_OUT[127:112]);
+
+assign ext_req = en_tag_write;
+
+endmodule
+
+module Node(clk, rst, stream00, stream01, stream10, stream11, stream20, stream21, stream30, stream31);
+
+parameter data_width = 16;
+parameter instr_width = 7;
+parameter tag_width = 16;
+
+parameter block_width = 8 * data_width;
+
+input clk;
+input stream00;
+input stream10;
+input stream20;
+input stream30;
+output stream01;
+output stream11;
+output stream21;
+output stream31;
+
+wire req [0:7];
+wire d_req [0:7];
+wire d_serv [0:7];
+wire active;
+AST #(8, ) nast(clk, req, d_req, d_serv, active);
+
+wire core_in_stream;
+wire core_out_stream;
+
+wire [] in_stream;
+assign in_stream[] = stream00[];
+assign in_stream[] = stream10[];
+assign in_stream[] = stream20[];
+assign in_stream[] = stream30[];
+assign in_stream[] = core_in_stream;
+wire [] out_stream;
+assign out_stream[] = stream01[];
+assign out_stream[] = stream11[];
+assign out_stream[] = stream21[];
+assign out_stream[] = stream31[];
+assign out_stream[] = core_out_stream;
+NodeRouter router(clk, in_stream, out_stream);
+
+wire next_enable [0:8];
+assign next_enable[0] = 1;
+wire tagA;
+wire tagB;
+wire strideA;
+wire strideB;
+wire d0;
+wire d1;
+
+NodeStripe nstripe0(clk, rst, next_enable[0], next_enable[1], req[0], tagA, tagB, strideA, strideB, d0, d1);
+NodeStripe nstripe1(clk, rst, next_enable[1], next_enable[2], req[1], tagA, tagB, strideA, strideB, d0, d1);
+NodeStripe nstripe2(clk, rst, next_enable[2], next_enable[3], req[2], tagA, tagB, strideA, strideB, d0, d1);
+NodeStripe nstripe3(clk, rst, next_enable[3], next_enable[4], req[3], tagA, tagB, strideA, strideB, d0, d1);
+NodeStripe nstripe4(clk, rst, next_enable[4], next_enable[5], req[4], tagA, tagB, strideA, strideB, d0, d1);
+NodeStripe nstripe5(clk, rst, next_enable[5], next_enable[6], req[5], tagA, tagB, strideA, strideB, d0, d1);
+NodeStripe nstripe6(clk, rst, next_enable[6], next_enable[7], req[6], tagA, tagB, strideA, strideB, d0, d1);
+NodeStripe nstripe7(clk, rst, next_enable[7], next_enable[8], req[7], tagA, tagB, strideA, strideB, d0, d1);
 
 endmodule
