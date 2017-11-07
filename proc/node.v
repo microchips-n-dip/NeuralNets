@@ -29,20 +29,18 @@ wire [data_width-1:0] acc_out; // Accumulator out bus
 Reg #(data_width) acc(clk, instr[5], rst, acc_in, acc_out);
 
 // Operand v0
-wire [data_width-1:0] a_on_mux [0:1];
-assign a_on_mux[0] = 0;
 wire [data_width-1:0] a; // v0 out bus
-Reg #(data_width) v0(clk, en_v0, rst, d0_IN, a_on_mux[1]);
-assign a = a_on_mux[compute_enable];
+wire [data_width-1:0] a1;
+Reg #(data_width) v0(clk, en_v0, rst, d0_IN, a1);
+Mux2 #(data_width) mux0(compute_enable, 0, a1, a);
 
 // Operand v1
-wire [data_width-1:0] b_on_mux[0:1]
-wire [data_width-1:0] b_mux [0:1]; // Mux to switch from b to acc
-assign b_on_mux[0] = 0;
-Reg #(data_width) v1(clk, en_v1, rst, d1_IN, b_on_mux[1]);
-assign b_mux[0] = b_on_mux[compute_enable];
-assign b_mux[1] = acc_out;
-wire [data_width-1:0] b = b_mux[instr[2]]; // v1 out bus
+wire [data_width-1:0] b1;
+Reg #(data_width) v1(clk, en_v1, rst, d1_IN, b1);
+wire [data_width-1:0] b2;
+Mux2 #(data_width) mux1(compute_enable, 0, b1, b2);
+wire [data_width-1:0] b; // v1 out bus
+Mux2 #(data_width) mux2(instr[2], b2, acc_out, b);
 
 // Main alu
 wire xc0 = a[31] ^ b[31];
@@ -53,24 +51,26 @@ wire [1:0] alu_op;
 assign alu_op[0] = instr[0] ^ xc1;
 assign alu_op[1] = instr[1];
 wire [data_width-1:0] sub0 = a - b;
-wire [data_width-1:0] sub0_mux [0:1] = {sub0, -sub0};
-wire [data_width-1:0] f0_mux [0:3] = {a + b, sub0_mux[xc2], a * b, a / b}; // TBD
-wire [data_width-1:0] f0 = f0_mux[alu_op];
+wire [data_width-1:0] sub1;
+Mux2 #(data_width) mux3(xc2, sub0, -sub0, sub1);
+wire [data_width-1:0] f0;
+Mux #(4, data_width) mux4(alu_op, {a + b, sub1, a * b, a / b}, f0);
 wire sc0 = xc3 ^ acc_out[31];
 wire sc1 = (xc3 & acc_out[31]) | (sc0 & ~bout);
-wire [data_width-1:0] cumulate_mux [0:1] = {0, acc_out};
-wire [data_width-1:0] cumulate = cumulate_mux[instr[2]]; // Enable accumulation
-wire [data_width-1:0] sub1 = f0 - cumulate;
+wire [data_width-1:0] cumulate; // Enable accumulation
+Mux2 #(data_width) mux5(instr[2], 0, acc_out, cumulate);
+wire [data_width-1:0] sub2 = f0 - cumulate;
 wire bout = cumulate > f0;
-wire [data_width-1:0] sub1_mux [0:1] = {sub1, -sub1};
-wire [data_width-1:0] f1_mux [0:1] = {f0 + cumulate, sub1_mux[sc1 & bout]};
-assign acc_in[30:0] = f1_mux[sc1][30:0]; // Accumulate
+wire [data_width-1:0] sub3;
+Mux2 #(data_width) mux6(sc1 & bout, sub2, -sub2, sub3);
+wire [data_width-1:0] f1;
+Mux2 #(data_width) mux7(sc1, f0 + cumulate, sub3, f1);
+assign acc_in[30:0] = f1[30:0]; // Accumulate
 assign acc_in[31] = sc1;
 wire rc0 = acc_out[11] | acc_out[12];
 wire rc1 = (rc0 & acc_out[13]) | (acc_out[13] & ~rc0 & acc_out[14]);
 wire [14:0] rout0 = acc_out[28:14];
-wire [14:0] rout_mux = {0, rout0 + rc1};
-assign d_OUT[14:0] = rout_mux[instr[4]];
+Mux2 #(15) mux8(instr[4], 0, rout0 + rc1, d_OUT[14:0]);
 assign d_OUT[15] = acc_out[31] & instr[4];
 
 endmodule

@@ -29,16 +29,11 @@ wire en_flop = conflict && ~cpl;
 
 // Mux for switching between conflict and non-conflict mode
 // Determines future mux states
-wire conflict_switch_mux [0:1];
-assign conflict_switch_mux[0] = b_req;
-assign conflict_switch_mux[1] = flop;
-wire conflict_switch = conflict_switch_mux[conflict];
+wire conflict_switch;
+Mux2 #(1) mux0(conflict, b_req, flop, conflict_switch);
 
 // Mux for determining out address
-wire data_OUT_mux [0:1];
-assign data_OUT_mux[0] = a_req;
-assign data_OUT_mux[1] = b_req;
-assign data_OUT = data_OUT_mux[conflict_switch];
+Mux2 #(data_width) mux1(conflict_switch, d0_IN, d1_IN, d_OUT);
 
 // Servicing requests based on flop with pull up
 wire a_serv_active = !flop || !conflict;

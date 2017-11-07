@@ -52,3 +52,55 @@ assign q = ~((r1 & clk) | r0 | qbar);
 assign qbar = ~((s1 & clk) | s0 | q);
 
 endmodule
+
+module Mux2(q, a, b, o);
+
+parameter data_width = 8;
+
+input q;
+input [data_width-1:0] a;
+input [data_width-1:0] b;
+output [data_width-1:0] o;
+
+endmodule
+
+module Mux(q, in, o);
+
+parameter switch_bits = 1;
+parameter data_width = 8;
+
+parameter tree0 = pow(2, switch_bits);
+parameter tree1 = pow(2, switch_bits + 1) - 1;
+
+input [switch_bits-1:0] q;
+input [data_width-1:0] in [0:tree0 - 1];
+output [data_width-1:0] o;
+
+wire [data_width-1:0] serv_dat [0:tree1];
+
+genvar i;
+genvar j;
+genvar k;
+genvar l = tree0;
+genvar n = 0;
+
+generate
+for (i = 0; i < tree0; i = i + 1)
+begin
+  assign serv_dat[i] = in[i];
+end
+for (i = 0; i < switch_bits; i = i + 1)
+begin
+  for (j; j < l + n; j = j + 1)
+  begin
+    k = l + n + j;
+    Mux2 #(data_width) (q[i], serv_dat[2 * j], serv_dat[(2 * j) + 1], serv_dat[k]);
+  end
+  n = n + j;
+  l = l / 2;
+end
+endgenerate
+
+assign o = serv_dat[tree1 - 1];
+
+endmodule
