@@ -6,15 +6,17 @@ module NodePE(clk, rst, en_v0, en_v1, compute_enable, instr, d0_IN_, d1_IN_, d_O
 parameter data_width = 32;
 parameter instr_width = 7;
 
+parameter half_width = data_width / 2;
+
 input clk; // Clock line
 input rst; // Reset
 input en_v0;
 input en_v1;
 input compute_enable;
 input [instr_width-1:0] instr;
-input [data_width-1:0] d0_IN_;
-input [data_width-1:0] d1_IN_;
-output [data_width-1:0] d_OUT;
+input [half_width-1:0] d0_IN_;
+input [half_width-1:0] d1_IN_;
+output [half_width-1:0] d_OUT;
 
 wire [data_width-1:0] d0_IN;
 assign d0_IN[28:14] = d0_IN_[14:0];
@@ -152,16 +154,33 @@ Mux2 #(data_width) mux2(tm1, d0_IN_, d1_IN_, d0_IN);
 wire [block_width-1:0] d1_IN;
 Mux2 #(data_width) mux3(tm3, d1_IN_, d0_IN_, d1_IN);
 
-PE #(full_width, instr_width) pe0(clk, rst2, mm0, mm1, compute_enable, instr, d0_IN[15:0], d1_IN[15:0], d_OUT[15:0]);
-PE #(full_width, instr_width) pe1(clk, rst2, mm0, mm1, compute_enable, instr, d0_IN[31:16], d1_IN[31:16], d_OUT[31:16]);
-PE #(full_width, instr_width) pe2(clk, rst2, mm0, mm1, compute_enable, instr, d0_IN[47:32], d1_IN[47:32], d_OUT[47:32]);
-PE #(full_width, instr_width) pe3(clk, rst2, mm0, mm1, compute_enable, instr, d0_IN[63:48], d1_IN[63:48], d_OUT[63:48]);
-PE #(full_width, instr_width) pe4(clk, rst2, mm0, mm1, compute_enable, instr, d0_IN[79:64], d1_IN[79:64], d_OUT[79:64]);
-PE #(full_width, instr_width) pe5(clk, rst2, mm0, mm1, compute_enable, instr, d0_IN[95:80], d1_IN[95:80], d_OUT[95:80]);
-PE #(full_width, instr_width) pe6(clk, rst2, mm0, mm1, compute_enable, instr, d0_IN[111:96], d1_IN[111:96], d_OUT[111:96]);
-PE #(full_width, instr_width) pe7(clk, rst2, mm0, mm1, compute_enable, instr, d0_IN[127:112], d1_IN[127:112], d_OUT[127:112]);
+wire [data_width-1:0] na;
+Mux #(3, data_width) mux4(na_select, {d0_IN[15:0], d0_IN[31:16], d0_IN[47:32], d0_IN[63:48], d0_IN[79:64], d0_IN[95:80], d0_IN[111:96], d0_IN[127:112]}, na);
 
-assign ext_req = en_tag_write;
+wire [data_width-1:0] pe0_a;
+Mux2 #(data_width) mux5(scalar_select, d0_IN[15:0], na, pe0_a);
+PE #(full_width, instr_width) pe0(clk, rst2, mm0, mm1, compute_enable, instr, pe0_a, d1_IN[15:0], d_OUT[15:0]);
+wire [data_width-1:0] pe1_a;
+Mux2 #(data_width) mux6(scalar_select, d0_IN[31:16], na, pe1_a);
+PE #(full_width, instr_width) pe1(clk, rst2, mm0, mm1, compute_enable, instr, pe1_a, d1_IN[31:16], d_OUT[31:16]);
+wire [data_width-1:0] pe0_a;
+Mux2 #(data_width) mux7(scalar_select, d0_IN[47:32], na, pe2_a);
+PE #(full_width, instr_width) pe2(clk, rst2, mm0, mm1, compute_enable, instr, pe2_a, d1_IN[47:32], d_OUT[47:32]);
+wire [data_width-1:0] pe3_a;
+Mux2 #(data_width) mux8(scalar_select, d0_IN[63:48], na, pe3_a);
+PE #(full_width, instr_width) pe3(clk, rst2, mm0, mm1, compute_enable, instr, pe3_a, d1_IN[63:48], d_OUT[63:48]);
+wire [data_width-1:0] pe4_a;
+Mux2 #(data_width) mux9(scalar_select, d0_IN[79:64], na, pe4_a);
+PE #(full_width, instr_width) pe4(clk, rst2, mm0, mm1, compute_enable, instr, pe4_a, d1_IN[79:64], d_OUT[79:64]);
+wire [data_width-1:0] pe5_a;
+Mux2 #(data_width) mux10(scalar_select, d0_IN[95:80], na, pe5_a);
+PE #(full_width, instr_width) pe5(clk, rst2, mm0, mm1, compute_enable, instr, pe5_a, d1_IN[95:80], d_OUT[95:80]);
+wire [data_width-1:0] pe6_a;
+Mux2 #(data_width) mux11(scalar_select, d0_IN[111:96], na, pe6_a);
+PE #(full_width, instr_width) pe6(clk, rst2, mm0, mm1, compute_enable, instr, pe6_a, d1_IN[111:96], d_OUT[111:96]);
+wire [data_width-1:0] pe7_a;
+Mux2 #(data_width) mux12(scalar_select, d0_IN[127:112], na, pe7_a);
+PE #(full_width, instr_width) pe7(clk, rst2, mm0, mm1, compute_enable, instr, pe7_a, d1_IN[127:112], d_OUT[127:112]);
 
 endmodule
 
