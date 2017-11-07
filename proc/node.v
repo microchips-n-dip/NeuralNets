@@ -125,13 +125,15 @@ Reg #(instr_width) instr_buf(clk, en_tag_write, rst, instr_IN, instr);
 wire [tag_width-1:0] stride_a;
 Reg #(tag_width) strideA(clk, en_tag_write, rst, strideA_IN, stride_a);
 wire [tag_width-1:0] tag_a;
-wire [tag_width-1:0] tag_a_mux [0:1] = {tag_a + stride_a, tagA_IN};
-Reg #(tag_width) tagA(clk, en_tag_write | , rst, tag_a_mux[en_tag_write], tag_a);
+wire [tag_width-1:0] tag_a_1;
+Mux2 #(tag_width) mux0(en_tag_write, tag_a + stride_a, tagA_IN, tag_a_1);
+Reg #(tag_width) tagA(clk, en_tag_write | , rst, tag_a_1, tag_a);
 wire [tag_width-1:0] stride_b;
 Reg #(tag_width) strideB(clk, en_tag_write, rst, strideA_IN, stride_b);
 wire [tag_width-1:0] tag_b;
-wire [tag_width-1:0] tag_b_mux [0:1] = {tag_b + stride_b, tagB_IN};
-Reg #(tag_width) tagB(clk, en_tag_write | , rst, tag_b_mux[en_tag_write], tag_b);
+wire [tag_width-1:0] tag_b_1;
+Mux2 #(tag_width) mux1(en_tag_write, tag_b + stride_b, tagB_IN, tag_b_1);
+Reg #(tag_width) tagB(clk, en_tag_write | , rst, tag_b_1, tag_b);
 
 wire tm0 = tagA_IN == tag_a;
 wire tm1 = tagA_IN == tag_b;
@@ -145,10 +147,10 @@ wire ce1;
 SRE lce1(clk, 0, rst1, mm1, compute_enable, ce1, );
 assign compute_enable = ce0 & ce1 & ~full_iter;
 
-wire [block_width-1:0] d0_IN_mux [0:1] = {d0_IN_, d1_IN_};
-wire [block_width-1:0] d0_IN = d0_IN_mux[tm1];
-wire [block_width-1:0] d1_IN_mux [0:1] = {d1_IN_, d0_IN_};
-wire [block_width-1:0] d1_IN = d1_IN_mux[tm3];
+wire [block_width-1:0] d0_IN;
+Mux2 #(data_width) mux2(tm1, d0_IN_, d1_IN_, d0_IN);
+wire [block_width-1:0] d1_IN;
+Mux2 #(data_width) mux3(tm3, d1_IN_, d0_IN_, d1_IN);
 
 PE #(full_width, instr_width) pe0(clk, rst2, mm0, mm1, compute_enable, instr, d0_IN[15:0], d1_IN[15:0], d_OUT[15:0]);
 PE #(full_width, instr_width) pe1(clk, rst2, mm0, mm1, compute_enable, instr, d0_IN[31:16], d1_IN[31:16], d_OUT[31:16]);
