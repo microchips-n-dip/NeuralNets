@@ -91,10 +91,11 @@ begin
 end
 for (i = 0; i < switch_bits; i = i + 1)
 begin
-  for (j; j < l + n; j = j + 1)
+  for (j = 0; j < l; j = j + 2)
   begin
-    k = l + n + j;
-    Mux2 #(data_width) (q[i], serv_dat[2 * j], serv_dat[(2 * j) + 1], serv_dat[k]);
+    m = n + j;
+    k = l + n + (j / 2);
+    Mux2 #(data_width) (q[i], serv_dat[m], serv_dat[m + 1], serv_dat[k]);
   end
   n = n + j;
   l = l / 2;
