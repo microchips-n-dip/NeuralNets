@@ -95,16 +95,16 @@ end
 n = tree1 - 3;
 for (i = 0; i < switch_bits; i = i + 1)
 begin
+  p = 2 * l;
+  l = 2 * l;
+  n = n - p;
   for (j = 0; j < l; j = j + 1)
   begin
     o = 2 * j;
-    p = 2 * l;
     m = n + o;
     k = n + p + j;
     Mux2 #(data_width) mux(q[i], serv_dat[m], serv_dat[m + 1], serv_dat[k]);
   end
-  l = 2 * l;
-  n = n - l;
 end
 endgenerate
 
