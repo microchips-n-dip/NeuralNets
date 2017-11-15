@@ -237,48 +237,53 @@ endmodule
 
 module AST(clk, req, d_IN, d_OUT, active);
 
-parameter n_in = 8;
+parameter switch_bits = 3;
 parameter data_width = 132;
 
-parameter tree = $clog2(n_in);
-parameter remainder = n_in % 2;
-parameter r = 1 - remainder;
-parameter n_mod = 2 * tree - r;
+parameter tree0 = pow(2, switch_bits);
+parameter tree1 = pow(2, switch_bits + 1) - 1;
 
 input clk;
-input req [0:n_in-1];
-input [data_width-1:0] d_IN [0:n_in-1];
+input req [0:tree0-1];
+input [data_width-1:0] d_IN [0:tree0-1];
 output [data_width-1:0] d_OUT;
 output active;
 
-wire conflict [0:n_mod-1];
-wire a_serv [0:n_mod-1];
-wire b_serv [0:n_mod-1];
-wire serv_dat [0:n_mod-1];
-wire actives [0:n_mod-1];
+wire conflict [0:tree1];
+wire a_serv [0:tree1];
+wire b_serv [0:tree1];
+wire [data_width-1:0] serv_dat [0:tree1];
+wire actives [0:tree1];
 
 genvar i;
-genvar l = 0;
-genvar m = floor(n_in / 2);
+genvar j;
+genvar k;
+genvar l = 1;
+genvar m;
 genvar n;
+genvar o;
+genvar p;
 
 generate
-for (i = 0; i < n_in; i = i + 2)
+for (i = 0; i < tree0; i = i + 1)
 begin
-  ASM #(data_width) asm0(clk, 0, req[i], req[i+1], d_IN[i], d_IN[i+1], conflict[i], a_serv[i], b_serv[i], serv_dat[i], actives[i]);
+  assign actives[i] = req[i];
+  assign serv_dat[i] = d_IN[i];
+  assign conflict[i] = 0;
 end
-while (m > 1)
+n = tree1 - 3;
+for (i = 0; i < switch_bits; i = i + 1)
 begin
-  n = m + l;
-  for (l; l < n; l = l + 2)
+  for (j = 0; j < l; j = j + 1)
   begin
-    ASM #(data_width) asm1(clk, conflict[l] | conflict[l+1], actives[l], actives[l+1], serv_dat[l], serv_dat[l+1], conflict[l+n], a_serv[l+n], b_serv[l+n], serv_dat[l+n], actives[l+n]);
+    o = 2 * j;
+    p = 2 * l;
+    m = n + o;
+    k = n + p + j;
+    ASM #(data_width) asm(clk, conflict[m] | conflict[m + 1], actives[m], actives[m + 1], serv_dat[m], serv_dat[m + 1], conflict[k], a_serv[k], b_serv[k], serv_dat[k], actives[k]);
   end
-  m = m / 2;
-end
-if (remainder > 0)
-begin
-  ASM #(data_width) asm2(clk, conflict[n_mod-2], actives[n_mod-2], req[n_in-1], serv_dat[n_mod-2], d_IN[n_in-1], conflict[n_mod-1], a_serv[n_mod-1], b_serv[n_mod-1], serv_dat[n_mod-1], actives[n_mod-1]);
+  l = 2 * l;
+  n = n - l;
 end
 endgenerate
 
