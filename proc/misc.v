@@ -92,7 +92,7 @@ for (i = 0; i < tree0; i = i + 1)
 begin
   assign serv_dat[i] = in[i];
 end
-n = tree1 - 3;
+n = tree1 - 1;
 for (i = 0; i < switch_bits; i = i + 1)
 begin
   p = 2 * l;
