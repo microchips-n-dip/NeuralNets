@@ -275,7 +275,6 @@ n = tree1 - 1;
 for (i = 0; i < switch_bits; i = i + 1)
 begin
   p = 2 * l;
-  l = 2 * l;
   n = n - p;
   for (j = 0; j < l; j = j + 1)
   begin
@@ -284,6 +283,7 @@ begin
     k = n + p + j;
     ASM #(data_width) asm(clk, conflict[m] | conflict[m + 1], actives[m], actives[m + 1], serv_dat[m], serv_dat[m + 1], conflict[k], a_serv[k], b_serv[k], serv_dat[k], actives[k]);
   end
+  l = 2 * l;
 end
 endgenerate
 
