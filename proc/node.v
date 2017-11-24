@@ -1,4 +1,5 @@
 `include "misc.v"
+`include "router.v"
 
 // Processing Element
 module NodePE(clk, rst, compute_enable, instr, d0_IN_, d1_IN_, d_OUT);
@@ -260,8 +261,82 @@ NodeStripe #(data_width, instr_width, block_width) \
 
 endmodule
 
+// Node's CPU
+module NodeCPU(clk, rst, d_IN, d_OUT, join_a, stride_a, base_a, join_b, stride_b, base_b);
+
+parameter data_width = 16;
+parameter instr_width = ;
+parameter tag_width = 16;
+
+input clk;
+input rst;
+input [data_width-1:0] d_IN;
+output [data_width-1:0] d_OUT;
+output join_a_;
+output [tag_width-1:0] stride_a_;
+output [data_width-1:0] base_a_;
+output join_b_;
+output [tag_width-1:0] stride_b_;
+output [data_width-1:0] base_b_;
+
+wire [62:0] r0;
+Reg #(63) R0(clk, , rst, wb, r0);
+wire [62:0] r1;
+Reg #(63) R1(clk, , rst, wb, r1);
+wire [62:0] r2;
+Reg #(63) R2(clk, , rst, wb, r2);
+wire [62:0] r3;
+Reg #(63) R3(clk, , rst, wb, r3);
+wire [62:0] r4;
+Reg #(63) R4(clk, , rst, wb, r4);
+wire [62:0] r5;
+Reg #(63) R5(clk, , rst, wb, r5);
+wire [62:0] r6;
+Reg #(63) R6(clk, , rst, wb, r6);
+wire [62:0] r7;
+Reg #(63) R7(clk, , rst, wb, r7);
+wire [62:0] r8;
+Reg #(63) R8(clk, , rst, wb, r8);
+wire [62:0] r9;
+Reg #(63) R9(clk, , rst, wb, r9);
+wire [62:0] r10;
+Reg #(63) R10(clk, , rst, wb, r10);
+wire [62:0] r11;
+Reg #(63) R11(clk, , rst, wb, r11);
+wire [62:0] r12;
+Reg #(63) R12(clk, , rst, wb, r12);
+wire [62:0] r13;
+Reg #(63) R13(clk, , rst, wb, r13);
+wire [62:0] r14;
+Reg #(63) R14(clk, , rst, wb, r14);
+wire [62:0] r15;
+Reg #(63) R15(clk, , rst, wb, r15);
+
+wire [62:0] a_block;
+Mux #(4, 63) a_block_mux(a_block_switch, \
+  {r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11, r12, r13, r14, r15}, \
+  a_block);
+wire [62:0] b_block;
+Mux #(4, 63) b_block_mux(b_block_switch, \
+  {r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11, r12, r13, r14, r15}, \
+  b_block);
+wire link_a = a[62];
+wire [14:0] length_a = a[61:47];
+wire [14:0] stride_a = a[46:32];
+wire [15:0] base_a = a[31:16];
+wire [15:0] parent_a = a[15:0];
+wire link_b = b[62];
+wire [14:0] length_b = b[61:47];
+wire [14:0] stride_b = b[46:32];
+wire [15:0] base_b = b[31:16];
+wire [15:0] parent_b = b[15:0];
+
+
+
+endmodule
+
 // Full node
-module Node(clk, rst);
+module Node(clk, rst, stream00, stream10, stream20, stream30, stream01, stream11, stream21, stream31);
 
 parameter data_width = 16;
 parameter instr_width = 7;
