@@ -1,3 +1,5 @@
+`include "misc.v"
+
 // Access servicer module
 // Uses the internal flop to decide which input to service first in case of a conflict
 // State changes only occur on conflict

@@ -1,4 +1,5 @@
 `include "misc.v"
+`include "counter.v"
 `include "router.v"
 
 // Processing Element
@@ -119,7 +120,8 @@ Reg #(tag_width) iterCount(clk, compute_enable, rst0 | en_tag_write, iter_count_
 wire [tag_width-1:0] iter_lim; // Max number of iterations
 Reg #(tag_width) iterLimit(clk, en_tag_write | na_select_en, rst0, iter_lim_IN, iter_lim);
 wire full_iter = iter_count == iter_lim; // Check for complete
-SRE lw(clk, 0, rst1, prev_enable & en_tag_write, rst0, en_tag_write, next_enable_0);
+SRE lw(clk, 0, rst1, prev_enable & en_tag_write, rst0, en_tag_write);
+assign next_enable_0 = ~en_tag_write;
 assign rst0 = en_tag_write & full_iter; // Reset if tag write and complete
 assign rst1 = rst | rst0;
 
@@ -127,7 +129,7 @@ assign rst1 = rst | rst0;
 assign next_enable = next_enable_0 & prev_enable;
 
 wire lrrst;
-SRE lr(clk, 0, rst, compute_enable, lrrst, lrrst, );
+SRE lr(clk, 0, rst, compute_enable, lrrst, lrrst);
 wire rst2 = lrrst | rst; // Reset 2 line
 
 // Instruction buffer
@@ -153,12 +155,12 @@ wire tm0 = tagA_IN == tag_a; // Check for matching AA tags
 wire tm1 = tagA_IN == tag_b; // Check for matching AB tags
 wire mm0 = tm0 | tm1; // Update A register
 wire ce0;
-SRE lce0(clk, 0, rst1, mm0, compute_enable, ce0, );
+SRE lce0(clk, 0, rst1, mm0, compute_enable, ce0);
 wire tm2 = tagB_IN == tag_b; // Check for matching BB tags
 wire tm3 = tagB_IN == tag_a; // Check for matching BA tags
 wire mm1 = tm2 | tm3; // Update B register
 wire ce1;
-SRE lce1(clk, 0, rst1, mm1, compute_enable, ce1, );
+SRE lce1(clk, 0, rst1, mm1, compute_enable, ce1);
 assign compute_enable = ce0 & ce1 & ~full_iter;
 
 // Data in switch (in case of tags on opposite bus)
@@ -331,7 +333,16 @@ wire [14:0] stride_b = b[46:32];
 wire [15:0] base_b = b[31:16];
 wire [15:0] parent_b = b[15:0];
 
-
+// Watchdog timer
+parameter wdt_width = 24;
+wire wdt_rst;
+wire wdt_int;
+wire [wdt_width-1:0] wdt_rst_val;
+wire [wdt_width-1:0] wdt_val;
+wire wdt_min;
+wire wdt_max;
+Counter #(wdt_width) wdt(clk, wdt_rst | ~wdt_int, wdt_rst, rst, 0, 1, wdt_min, wdt_max, wdt_rst_val, wdt_val);
+assign wdt_int = wdt_min;
 
 endmodule
 

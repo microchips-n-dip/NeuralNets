@@ -11,48 +11,52 @@ output [width-1:0] data_OUT;
 
 reg [width-1:0] data;
 
-always @(en and posedge clk)
+genvar i;
+generate
+for (i = 0; i < width; i = i + 1)
 begin
-  data <= data_IN;
+  data[i] = (clk & en & data_IN[i]) & ~rst;
 end
-
-always @(rst)
-begin
-  data <= (width-1){1b'0};
-end
+endgenerate
 
 assign data_OUT = data;
 
 endmodule
 
-// SR latch
-module SR(s, r, q, qbar);
+// T-flipflop
+module TFF(clk, s, r, t, q);
 
+input clk;
 input s;
 input r;
-inout q;
-inout qbar;
+input t;
+output q;
 
-assign q = ~(r | qbar);
-assign qbar = ~(s | q);
+reg flop;
+assign flop = (clk & t & ~flop) | (s & ~r);
+assign q = flop;
 
 endmodule
 
-module SRE(clk, s0, r0, s1, r1, q, qbar);
+// SR latch with enable
+module SRE(clk, s0, r0, s1, r1, q);
 
 input clk;
 input s0;
 input r0;
 input s1;
 input r1;
-inout q;
-inout qbar;
+output q;
 
-assign q = ~((r1 & clk) | r0 | qbar);
-assign qbar = ~((s1 & clk) | s0 | q);
+reg flop = 0;
+wire s2 = s0 | (clk & s1);
+wire r2 = r0 | (clk & r1);
+flop = (s2 | flop) & ~r2;
+assign q = flop;
 
 endmodule
 
+// 2-way mux
 module Mux2(q, a, b, o);
 
 parameter data_width = 8;
@@ -62,8 +66,12 @@ input [data_width-1:0] a;
 input [data_width-1:0] b;
 output [data_width-1:0] o;
 
+wire [data_width-1:0] mux [0:1] = {a, b};
+assign o = mux[q];
+
 endmodule
 
+// n-way mux
 module Mux(q, in, o);
 
 parameter switch_bits = 1;
