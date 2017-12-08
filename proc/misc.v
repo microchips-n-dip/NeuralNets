@@ -51,7 +51,7 @@ output q;
 reg flop = 0;
 wire s2 = s0 | (clk & s1);
 wire r2 = r0 | (clk & r1);
-flop = (s2 | flop) & ~r2;
+assign flop = (s2 | flop) & ~r2;
 assign q = flop;
 
 endmodule

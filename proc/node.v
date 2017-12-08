@@ -281,6 +281,7 @@ output join_b_;
 output [tag_width-1:0] stride_b_;
 output [data_width-1:0] base_b_;
 
+// Basically ignore everything up to WDT, this is WIP
 wire [62:0] r0;
 Reg #(63) R0(clk, , rst, wb, r0);
 wire [62:0] r1;
@@ -349,11 +350,15 @@ endmodule
 // Full node
 module Node(clk, rst, stream00, stream10, stream20, stream30, stream01, stream11, stream21, stream31);
 
+parameter layer_id = 1;
+parameter net_width = 4;
+parameter nw_dims = 2;
+parameter local_id = 0;
+parameter upper_id = 0;
+
 parameter data_width = 16;
 parameter instr_width = 7;
 parameter tag_width = 16;
-
-parameter net_width = 4;
 
 parameter block_width = 8 * data_width;
 parameter stream_width = block_width + net_width;
@@ -375,6 +380,8 @@ output [stream_width-1:0] stream31;
 wire [stream_width-1:0] core_in_stream;
 wire [stream_width-1:0] core_out_stream;
 
+
+'';/.// TODO: Change this up to support many dims
 // Router for handling data requests
 wire [stream_width-1:0] in_stream [0:4];
 assign in_stream[0] = stream00;
@@ -388,7 +395,15 @@ assign out_stream[1] = stream11;
 assign out_stream[2] = stream21;
 assign out_stream[3] = stream31;
 assign out_stream[4] = core_out_stream;
-NodeRouter router(clk, in_stream, out_stream);
+NodeRouter #(
+  .layer_id(layer_id),
+  .net_width(net_width),
+  .nw_dims(nw_dims),
+  .data_width(block_width),
+  .local_id(local_id),
+  .upper_id(upper_id),
+  .stream_width(stream_width))
+  router(clk, in_stream, out_stream);
 
 // TODO: Add CPU and remove these "commons"
 wire [tag_width-1:0] working_tag;
