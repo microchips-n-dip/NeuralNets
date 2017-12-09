@@ -1,3 +1,28 @@
+// n-way mux
+module Mux(q, in, o);
+
+parameter switch_bits = 1;
+parameter data_width = 8;
+
+parameter n_cell = 1 << switch_bits;
+
+input [switch_bits-1:0] q;
+input [data_width-1:0] in [0:n_cell-1];
+output [data_width-1:0] o;
+
+genvar i;
+
+generate
+for (i = 0; i < n_cell; i = i + 1)
+begin
+  assign mux[i] = in[i];
+end
+endgenerate
+
+assign o = mux[q];
+
+endmodule
+
 // 2-way mux
 module Mux2(q, a, b, o);
 
@@ -8,56 +33,6 @@ input [data_width-1:0] a;
 input [data_width-1:0] b;
 output [data_width-1:0] o;
 
-wire [data_width-1:0] mux [0:1] = {a, b};
-assign o = mux[q];
-
-endmodule
-
-// n-way mux
-module Mux(q, in, o);
-
-parameter switch_bits = 1;
-parameter data_width = 8;
-
-parameter tree0 = 2 << switch_bits;
-parameter tree1 = 2 << (switch_bits + 1) - 1;
-
-input [switch_bits-1:0] q;
-input [data_width-1:0] in [0:tree0 - 1];
-output [data_width-1:0] o;
-
-wire [data_width-1:0] serv_dat [0:tree1];
-
-genvar i;
-genvar j;
-genvar k;
-genvar l = tree0;
-genvar m;
-genvar n;
-genvar o;
-genvar p;
-
-generate
-for (i = 0; i < tree0; i = i + 1)
-begin
-  assign serv_dat[i] = in[i];
-end
-n = tree1 - 1;
-for (i = 0; i < switch_bits; i = i + 1)
-begin
-  p = l << 1;
-  n = n - p;
-  for (j = 0; j < l; j = j + 1)
-  begin
-    o = j << 1;
-    m = n + o;
-    k = n + p + j;
-    Mux2 #(data_width) mux(q[i], serv_dat[m], serv_dat[m + 1], serv_dat[k]);
-  end
-  l = l >> 1;
-end
-endgenerate
-
-assign o = serv_dat[tree1 - 1];
+Mux #(1, data_width) mux(q, {a, b}, o);
 
 endmodule
