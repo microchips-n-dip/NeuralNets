@@ -242,8 +242,8 @@ module AST(clk, req, d_IN, d_OUT, active);
 parameter switch_bits = 3;
 parameter data_width = 132;
 
-parameter tree0 = pow(2, switch_bits);
-parameter tree1 = pow(2, switch_bits + 1) - 1;
+parameter tree0 = 2 << switch_bits;
+parameter tree1 = 2 << (switch_bits + 1) - 1;
 
 input clk;
 input req [0:tree0-1];
@@ -260,7 +260,7 @@ wire actives [0:tree1];
 genvar i;
 genvar j;
 genvar k;
-genvar l = 1;
+genvar l = tree0;
 genvar m;
 genvar n;
 genvar o;
@@ -276,16 +276,16 @@ end
 n = tree1 - 1;
 for (i = 0; i < switch_bits; i = i + 1)
 begin
-  p = 2 * l;
+  p = l << 1;
   n = n - p;
   for (j = 0; j < l; j = j + 1)
   begin
-    o = 2 * j;
+    o = j << 1;
     m = n + o;
     k = n + p + j;
     ASM #(data_width) asm(clk, conflict[m] | conflict[m + 1], actives[m], actives[m + 1], serv_dat[m], serv_dat[m + 1], conflict[k], a_serv[k], b_serv[k], serv_dat[k], actives[k]);
   end
-  l = 2 * l;
+  l = l >> 1;
 end
 endgenerate
 
