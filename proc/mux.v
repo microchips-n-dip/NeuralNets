@@ -10,6 +10,8 @@ input [switch_bits-1:0] q;
 input [data_width-1:0] in [0:n_cell-1];
 output [data_width-1:0] o;
 
+wire [data_width-1:0] mux [0:n_cell-1];
+
 genvar i;
 
 generate
