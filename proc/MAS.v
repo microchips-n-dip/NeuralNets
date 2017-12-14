@@ -237,7 +237,7 @@ assign data_OUT = serv_dat[6];
 endmodule
 
 
-module AST(clk, req, d_IN, d_OUT, active);
+module ASTS(clk, req, d_IN, d_OUT, active);
 
 parameter switch_bits = 3;
 parameter data_width = 132;
@@ -263,8 +263,6 @@ genvar k;
 genvar l = tree0;
 genvar m;
 genvar n;
-genvar o;
-genvar p;
 
 generate
 for (i = 0; i < tree0; i = i + 1)
@@ -273,23 +271,103 @@ begin
   assign serv_dat[i] = d_IN[i];
   assign conflict[i] = 0;
 end
-n = tree1 - 1;
 for (i = 0; i < switch_bits; i = i + 1)
 begin
-  p = l << 1;
-  n = n - p;
-  for (j = 0; j < l; j = j + 1)
+  for (j = 0; j < l >> 1; j = j + 1)
   begin
-    o = j << 1;
-    m = n + o;
-    k = n + p + j;
-    ASM #(data_width) asm(clk, conflict[m] | conflict[m + 1], actives[m], actives[m + 1], serv_dat[m], serv_dat[m + 1], conflict[k], a_serv[k], b_serv[k], serv_dat[k], actives[k]);
+    m = n + j << 1;
+    k = n + l + j;
+    ASM #(data_width) asm(clk,
+      conflict[m] | conflict[m + 1],
+      actives[m], actives[m + 1],
+      serv_dat[m], serv_dat[m + 1],
+      conflict[k],
+      a_serv[k], b_serv[k],
+      serv_dat[k], actives[k]);
   end
+  n = n + l;
   l = l >> 1;
 end
 endgenerate
 
-assign d_OUT = serv_dat[n_mod-1];
-assign active = actives[n_mod-1];
+assign d_OUT = serv_dat[tree1];
+assign active = actives[tree1];
+
+endmodule
+
+module AST(clk, req, data_IN, data_OUT, active);
+
+parameter n_inputs = 8;
+parameter data_width = 128;
+
+input clk;
+input req [0:n_inputs-1];
+input [data_width-1:0] data_IN [0:n_inputs-1];
+output [data_width-1:0] data_OUT;
+output active;
+
+genvar j;
+genvar k;
+genvar l;
+genvar m;
+genvar n;
+genvar n_remain;
+genvar prev_layer_modules;
+genvar next_layer_modules;
+genvar shift_modules;
+genvar remain_modules;
+genvar n_modules;
+
+generate
+prev_layer_modules = n_inputs;
+while (prev_layer_modules > 1)
+begin
+  shift_modules = prev_layer_modules >> 1;
+  remain_modules = prev_layer_modules % 2;
+  next_layer_modules = shift_modules + remain_modules;
+  n_modules = n_modules + prev_layer_modules;
+  prev_layer_modules = next_layer_modules;
+end
+wire conflict [0:n_modules-1];
+wire a_serv [0:n_modules-1];
+wire b_serv [0:n_modules-1];
+wire [data_width-1:0] serv_dat [0:n_modules-1];
+wire actives [0:n_modules-1];
+l = n_inputs;
+for (j = 0; j < l; j = j + 1)
+begin
+  assign actives[i] = req[i];
+  assign serv_dat[i] = data_IN[i];
+  assign conflict[i] = 0;
+end
+while (l > 1)
+begin
+  n_remain = l % 2;
+  for (j = 0; j < l >> 1; j = j + 1)
+  begin
+    m = n + j << 1;
+    k = n + l + j + n_remain;
+    ASM #(data_width) asm(clk,
+      conflict[m] | conflict[m + 1],
+      actives[m], actives[m + 1],
+      serv_dat[m], serv_dat[m + 1],
+      conflict[k],
+      a_serv[k], b_serv[k],
+      serv_dat[k], actives[k]);
+  end
+  if (n_remain > 0)
+  begin
+    m = n + l + 1;
+    k = n + (l >> 1) + 1;
+    assign actives[k] = actives[m];
+    assign serv_dat[k] = serv_dat[m];
+    assign conflict[k] = conflict[m];
+  end
+  n = n + l + n_remain;
+  l = (l >> 1) + n_remain;
+end
+assign data_OUT = serv_dat[n_modules-1];
+assign active = actives[n_modules-1];
+endgenerate
 
 endmodule

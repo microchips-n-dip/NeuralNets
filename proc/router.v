@@ -1,6 +1,20 @@
 `include "misc.v"
 `include "MAS.v"
 
+function unsigned int [0:1] compute_nei;
+
+input unsigned int i;
+input unsigned int id;
+
+begin
+  unsigned int j = 1 << (2 * i);
+  unsigned int shift_id = (id >> j) % 4;
+  compute_nei[0] = (shift_id + 1) % 3;
+  compute_nei[1] = (shift_id + 2) % 3;
+end
+
+endfunction
+
 // Node router
 module NodeRouter(clk, in_stream, out_stream);
 
@@ -44,10 +58,7 @@ begin
   // Determining neighbor addresses
   // Neighbors addresses are genvars so on comparison they are known
   //  since compile time
-  j = 1 << (2 * i);
-  k = (local_id >> j) % 4;
-  nei[i] = (k + 1) % 3;
-  nei[i + 1] = (k + 2) % 3;
+  nei[i:i+1] = compute_nei(i, local_id);
 end
 // "via" matrix
 wire via [0:n_stream-1] [0:n_stream-1];
@@ -60,7 +71,7 @@ begin
   wire cond_local = naddr_req[naddr1_end-1:net1_offset] == upper_id;
   wire via_prev[0:nw_dims];
   assign via_prev[0] = 0;
-  for (j = 0; j < nw_dims; j = j + 1)
+  for (j = 0; j < n_stream >> 1; j = j + 1)
   begin
     k = 2 * j;
     l = 1 + k;
@@ -75,17 +86,7 @@ begin
   // If no corresponding address has been found, logically we send to the local node
   assign via[n_stream][i] = ~via_prev[nw_dims];
 end
-// Construct accessor trees from "via"-s
-for (i = 0; i < n_stream; i = i + 1)
-begin
-  wire acti0;
-  wire acti1;
-  wire [stream_width-1:0] outi;
-  AST #(2, stream_width) \
-    ast(clk, via[i][0:n_stream-2], in_stream[0:n_stream-2], outi, acti0);
-  AST #(1, stream_width) \
-    asm(clk, {acti0, via[i][n_stream-1]}, {outi, in_stream[n_stream-1]}, out_stream[i], acti1);
-end
+AST #(n_stream, stream_width) ast(clk, via, in_stream, out_stream);
 endgenerate
 
 endmodule
@@ -137,13 +138,8 @@ begin
   // Determining neighbor addresses
   // Neighbors addresses are genvars so on comparison they are known
   //  since compile time
-  j = 1 << (2 * i);
-  k = (local_id >> j) % 4;
-  l = (upper0_id >> j) % 4;
-  nei_lower[i] = (k + 1) % 3;
-  nei_lower[i + 1] = (k + 2) % 3;
-  nei_upper[i] = (l + 1) % 3;
-  nei_upper[i + 1] = (l + 2) % 3;
+  nei_lower[i:i+1] = compute_nei(i, local_id);
+  nei_upper[i:i+1] = compute_nei(i, upper0_id);
 end
 // "via" matrices
 wire via_lower [n_stream-1][n_stream-1];
@@ -160,7 +156,7 @@ begin
   assign via_prev_lower[0] = 0;
   wire via_prev_upper [0:nw_dims];
   assign via_prev_upper[0] = 0;
-  for (j = 0; j < nw_dims; j = j + 1)
+  for (j = 0; j < n_stream >> 2; j = j + 1)
   begin
     k = 2 * j;
     l = 1 + k;
@@ -171,6 +167,8 @@ begin
     assign via_lower[k][i] = (addr_lower == nei_lower[k]) & ~via_prev_lower[j];
     assign via_lower[l][i] = (addr_lower == nei_lower[l]) & ~via_prev_lower[j];
     assign via_prev_lower[j + 1] = via_lower[k] | via_lower[l] | via_prev_lower[j];
+    assign via[k][i] = via_lower[k][i];
+    assign via[l][i] = via_lower[l][i];
     // Address for sending data on upper layer
     wire [nw_full-1:0] addr_upper;
     assign addr_upper = cond_local_upper ? naddr_req[l + naddr1_end:k + net1_offset] : 0;
@@ -178,28 +176,12 @@ begin
     assign via_upper[k][i] = (addr_upper == nei_upper[k]) & ~via_prev_upper[j];
     assign via_upper[l][i] = (addr_upper == nei_upper[l]) & ~via_prev_upper[j];
     assign via_prev_upper[j + 1] = via_upper[k] | via_upper[l] | via_prev_upper[j];
+    assign via[k + (n_stream >> 1)] = via_upper[k][i];
+    assign via[l + (n_stream >> 1)] = via_upper[l][i];
   end
 end
 // Construct upper and lower accessor trees from "via"-s
-for (i = 0; i < n_stream / 2; i = i + 1)
-begin
-  k = 2 * i;
-  l = 1 + k;
-  wire acti0;
-  wire acti1;
-  wire [stream_width-1:0] outi0;
-  AST #(2, stream_width) \
-    ast(clk, via_lower[i][0:n_stream-2], in_stream[0:n_stream-2], outi0, acti0);
-  AST #(1, stream_width) \
-    asm(clk, {acti0, via_lower[i][n_stream-1]}, {outi0, in_stream[n_stream-1]}, out_stream[i], acti1);
-  wire acti2;
-  wire acti3;
-  wire [stream_width-1:0] outi1;
-  AST #(2, stream_width) \
-    ast(clk, via_upper[i][0:n_stream-2], in_stream[0:n_stream-2], outi0, acti2);
-  AST #(1, stream_width) \
-    asm(clk, {acti0, via_upper[i][n_stream-1]}, {outi1, in_stream[n_stream-1]}, out_stream[i], acti3);
-end
+AST #(n_stream, stream_width) ast(clk, via, in_stream, out_stream);
 endgenerate
 
 endmodule
