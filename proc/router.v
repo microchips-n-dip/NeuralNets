@@ -1,19 +1,9 @@
+`include "vl_global_functions.sv"
+
 `include "misc.v"
 `include "MAS.v"
 
-function unsigned int [0:1] compute_nei;
-
-input unsigned int i;
-input unsigned int id;
-
-begin
-  unsigned int j = 1 << (2 * i);
-  unsigned int shift_id = (id >> j) % 4;
-  compute_nei[0] = (shift_id + 1) % 3;
-  compute_nei[1] = (shift_id + 2) % 3;
-end
-
-endfunction
+import vl_global_functions::*;
 
 // Node router
 module NodeRouter(clk, in_stream, out_stream);
