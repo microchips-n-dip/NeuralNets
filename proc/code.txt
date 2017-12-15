@@ -1,0 +1,10 @@
+tensor 2 8 8 a
+tensor 2 8 9 b
+tensor 2 8 9 c
+tensor 2 8 8 d
+matmul a b
+matadd a d
+matsub b c
+matmul a c
+matmul a d
+matsub d a
