@@ -79,7 +79,7 @@ class TensorLazyEvaluatorWritable : public TensorLazyEvaluatorReadOnly<Dimension
     Base(expr)
   { }
 
-  virtual ~TensorLazyEvaluatorWritable() { print("Destroying writable lazy evaluator %p\n", this); }
+  virtual ~TensorLazyEvaluatorWritable() { printf("Destroying writable lazy evaluator %p\n", this); }
 
   virtual Scalar& coeffRef(Index index)
   { return this->m_impl.coeffRef(index); }
