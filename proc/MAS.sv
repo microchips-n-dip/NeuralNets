@@ -100,10 +100,10 @@ end
 if (remaining > 0)
 begin
   assign in_bundle[0].conflict = 0;
-  assign in_bundle[0].a_serv = 0;
-  assign in_bundle[0].b_serv = 0;
+  assign in_bundle[0].a_serv   = 0;
+  assign in_bundle[0].b_serv   = 0;
   assign in_bundle[0].serv_dat = data_IN[n_inputs - 1];
-  assign in_bundle[0].active = req[n_inputs - 1];
+  assign in_bundle[0].active   = req[n_inputs - 1];
 end
 assign il_bundle[0] = in_bundle[0];
 for (i = 1; i < n_layer; i = i + 1)
